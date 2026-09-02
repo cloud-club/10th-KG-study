@@ -2,7 +2,7 @@
 
 ## 소개
 
-- GitHub: [@sehyun](https://github.com/sehyun)
+- GitHub: [@sese2204](https://github.com/sese2204)
 - 스터디 목표:
   - Knowledge Graph의 데이터 모델과 저장/검색 방식 이해
   - 문서에서 트리플을 추출해 그래프로 쌓는 파이프라인 직접 구현

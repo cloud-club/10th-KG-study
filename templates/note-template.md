@@ -1,6 +1,12 @@
+---
+title: 주제
+date: YYYY-MM-DD
+tags: [knowledge-graph]
+status: in-progress
+---
+
 # NN. 주제
 
-> 작성일: YYYY-MM-DD
 > 참고 자료:
 > - 링크 1
 > - 링크 2

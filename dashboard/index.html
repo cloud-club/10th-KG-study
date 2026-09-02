@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>10기 KG 스터디 현황판</title>
+  <meta name="description" content="cloud-club 10기 Knowledge Graph 스터디 진행 현황판">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕸️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a class="skip" href="#members">본문으로 건너뛰기</a>
+
+  <header class="hero" aria-labelledby="hero-title">
+    <div class="hero__text">
+      <p class="eyebrow" id="repo-slug">cloud-club / 10th-KG-study</p>
+      <h1 id="hero-title" class="hero__title">
+        <span class="mark">KG 스터디</span><br>현황판
+        <span class="sticker sticker--hero" aria-hidden="true">10기</span>
+      </h1>
+      <p class="hero__lead">각자 무엇을 공부했고 어디까지 왔는지, 한눈에.</p>
+    </div>
+
+    <aside class="digest" aria-labelledby="digest-label">
+      <span class="digest__label" id="digest-label">GPT 한마디</span>
+      <p class="digest__text" id="digest">불러오는 중…</p>
+      <ul class="digest__shoutouts" id="shoutouts"></ul>
+    </aside>
+
+    <ul class="stats" id="stats" aria-label="스터디 전체 통계"></ul>
+  </header>
+
+  <main>
+    <section class="section" aria-labelledby="graph-title">
+      <div class="section__head">
+        <h2 id="graph-title" class="section__title">스터디 지식그래프</h2>
+        <p class="section__hint">멤버 → 노트/실습 → 주제. 노드를 끌어 보거나 클릭해서 이웃만 보기.</p>
+      </div>
+      <div class="panel panel--graph">
+        <div id="graph" class="graph" role="img" aria-label="멤버, 노트, 실습, 주제를 잇는 그래프"></div>
+        <ul class="legend" aria-hidden="true">
+          <li><i class="dot dot--member"></i>멤버</li>
+          <li><i class="dot dot--note"></i>노트</li>
+          <li><i class="dot dot--lab"></i>실습</li>
+          <li><i class="dot dot--topic"></i>주제</li>
+        </ul>
+        <p class="graph__empty" id="graph-empty" hidden>노트/실습에 <code>tags</code>를 달면 그래프가 자라나요.</p>
+      </div>
+    </section>
+
+    <section class="section" id="members" aria-labelledby="members-title">
+      <div class="section__head">
+        <h2 id="members-title" class="section__title">멤버</h2>
+        <p class="section__hint">XP = 노트 40 · 실습 80 · 커밋 5. 100 XP마다 레벨 업.</p>
+      </div>
+      <div class="members" id="member-grid"></div>
+    </section>
+
+    <section class="section" aria-labelledby="activity-title">
+      <div class="section__head">
+        <h2 id="activity-title" class="section__title">최근 활동</h2>
+        <p class="section__hint">members/ 아래를 건드린 커밋만 셉니다.</p>
+      </div>
+      <ol class="activity panel" id="activity"></ol>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p id="footer-meta"></p>
+    <p>
+      <a id="repo-link" href="https://github.com/cloud-club/10th-KG-study">GitHub 레포</a>
+      <span aria-hidden="true">·</span>
+      <a id="contrib-link" href="https://github.com/cloud-club/10th-KG-study/blob/main/CONTRIBUTING.md">참여 방법</a>
+    </p>
+  </footer>
+
+  <div class="toast" id="error" role="alert" hidden></div>
+
+  <template id="member-card-template">
+    <article class="card">
+      <header class="card__head">
+        <img class="card__avatar" alt="" width="64" height="64" loading="lazy">
+        <div class="card__who">
+          <span class="card__title-tag"></span>
+          <h3 class="card__name"><a target="_blank" rel="noopener"></a></h3>
+        </div>
+        <span class="sticker sticker--level"></span>
+      </header>
+      <p class="card__summary"></p>
+      <ul class="card__highlights"></ul>
+      <div class="xp">
+        <div class="xp__meta"><span class="xp__label">XP</span><span class="xp__value"></span></div>
+        <div class="xp__bar"><div class="xp__fill"></div></div>
+      </div>
+      <dl class="counts">
+        <div><dt>노트</dt><dd data-count="notes"></dd></div>
+        <div><dt>실습</dt><dd data-count="labs"></dd></div>
+        <div><dt>커밋</dt><dd data-count="commits"></dd></div>
+        <div><dt>연속</dt><dd data-count="streak"></dd></div>
+      </dl>
+      <div class="heatmap-wrap">
+        <div class="heatmap" role="img"></div>
+        <span class="heatmap__caption">최근 12주</span>
+      </div>
+      <ul class="tags"></ul>
+      <div class="items">
+        <h4 class="items__title">노트</h4>
+        <ul class="items__list" data-list="notes"></ul>
+        <h4 class="items__title">실습</h4>
+        <ul class="items__list" data-list="labs"></ul>
+      </div>
+      <footer class="card__foot">
+        <button type="button" class="btn btn--ghost" data-action="graph">그래프에서 보기</button>
+        <a class="btn" data-link="folder" target="_blank" rel="noopener">폴더 열기 ↗</a>
+      </footer>
+    </article>
+  </template>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <script src="./graph.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

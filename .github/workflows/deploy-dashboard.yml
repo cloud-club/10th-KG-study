@@ -1,0 +1,63 @@
+name: Deploy dashboard
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 0 * * *" # 매일 09:00 KST — 히트맵/연속일수 갱신
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 활동 히트맵/커밋 통계에 전체 히스토리 필요
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Restore LLM cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/llm-cache.json
+          key: llm-cache-${{ github.run_id }}
+          restore-keys: llm-cache-
+
+      - name: Run tests
+        run: python3 -m unittest discover -s scripts -p "test_*.py"
+
+      - name: Build data.json
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # Settings → Secrets and variables → Actions
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }} # 비워두면 gpt-5-mini
+        run: python3 scripts/build_dashboard.py
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dashboard
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

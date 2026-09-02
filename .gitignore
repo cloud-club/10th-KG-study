@@ -39,3 +39,7 @@ data/raw/
 *.sqlite
 *.sqlite3
 outputs/
+
+# Dashboard (빌드 산출물 / LLM 캐시)
+dashboard/data.json
+.cache/

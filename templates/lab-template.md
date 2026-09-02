@@ -1,6 +1,12 @@
+---
+title: 실습 제목
+date: YYYY-MM-DD
+tags: [knowledge-graph]
+status: in-progress
+---
+
 # NN. 실습 제목
 
-> 작성일: YYYY-MM-DD
 > 관련 노트: `../../notes/NN-topic.md`
 
 ## 목표

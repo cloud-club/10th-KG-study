@@ -25,6 +25,22 @@ touch members/$GH_ID/notes/.gitkeep members/$GH_ID/labs/.gitkeep
 
 ## 네이밍 규칙
 
+### 프론트매터 (notes / labs 공통)
+
+파일 맨 위에 아래 블록을 둡니다. 현황판이 이걸 읽어 제목·날짜·태그를 뽑습니다.
+
+```yaml
+---
+title: RDF 데이터 모델
+date: 2026-09-10
+tags: [rdf, triple, sparql]   # 소문자 영어, 지식그래프의 주제 노드가 됨
+status: in-progress           # in-progress | done
+---
+```
+
+- `tags`를 비워두면 빌드 시 GPT가 본문을 읽고 채워줍니다.
+- `title`이 없으면 첫 `# 제목`을, 그것도 없으면 파일명을 씁니다.
+
 ### notes
 
 - 파일 하나가 주제 하나입니다.

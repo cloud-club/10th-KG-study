@@ -3,6 +3,8 @@
 10기 KG(Knowledge Graph) 스터디 레포입니다.
 각자 공부한 내용(notes)과 실습 코드(labs)를 자기 폴더 아래에 정리합니다.
 
+**현황판:** https://cloud-club.github.io/10th-KG-study/ — 누가 뭘 공부했고 어디까지 왔는지 한눈에.
+
 ## 구조
 
 ```
@@ -18,8 +20,11 @@
 ├── templates/             # notes / labs 템플릿
 │   ├── note-template.md
 │   └── lab-template.md
-└── shared/                # 공용 작업 공간
-    └── cloudclub-agent/
+├── shared/                # 공용 작업 공간
+│   └── cloudclub-agent/
+├── dashboard/             # 현황판 정적 사이트 (GitHub Pages)
+├── scripts/               # 현황판 데이터 빌드 스크립트
+└── .github/workflows/     # Pages 배포
 ```
 
 ## 참여 방법
@@ -34,6 +39,23 @@ GH_ID=<your-github-id>
 mkdir -p members/$GH_ID/notes members/$GH_ID/labs
 cp templates/note-template.md members/$GH_ID/notes/01-topic.md
 ```
+
+## 현황판 (dashboard)
+
+`main`에 푸시하면 GitHub Actions가 `members/`를 스캔해 노트·실습·커밋·활동 히트맵을 뽑고,
+GPT가 멤버별 칭호·요약·태그와 스터디 소식을 붙여 GitHub Pages로 배포합니다.
+
+- 노트/실습 맨 위 프론트매터의 `tags`가 지식그래프의 주제 노드가 됩니다. 비워두면 GPT가 채워줍니다.
+- 로컬 미리보기:
+
+```bash
+python3 scripts/build_dashboard.py                        # LLM 없이
+OPENAI_API_KEY=sk-... python3 scripts/build_dashboard.py  # GPT 요약 포함
+python3 -m http.server -d dashboard 8000                  # http://localhost:8000
+```
+
+- GPT 요약을 켜려면 레포 **Settings → Secrets and variables → Actions**에 `OPENAI_API_KEY`를 등록합니다.
+  키가 없어도 규칙 기반 요약으로 빌드됩니다. 모델은 `OPENAI_MODEL` 변수로 바꿀 수 있습니다 (기본 `gpt-5-mini`).
 
 ## 멤버
 

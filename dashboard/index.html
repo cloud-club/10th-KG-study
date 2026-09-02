@@ -14,6 +14,11 @@
 <body>
   <a class="skip" href="#members">본문으로 건너뛰기</a>
 
+  <div class="ticker" id="ticker" aria-label="최신 중계 자막">
+    <span class="ticker__badge"><i class="ticker__dot" aria-hidden="true"></i>LIVE</span>
+    <div class="ticker__viewport"><div class="ticker__track" id="ticker-track"></div></div>
+  </div>
+
   <header class="hero" aria-labelledby="hero-title">
     <div class="hero__text">
       <p class="eyebrow" id="repo-slug">cloud-club / 10th-KG-study</p>
@@ -34,6 +39,15 @@
   </header>
 
   <main>
+    <section class="section section--feed" aria-labelledby="feed-title">
+      <div class="section__head">
+        <h2 id="feed-title" class="section__title">중계석</h2>
+        <p class="section__hint" id="feed-hint">누가 무엇을 공부했는지, 캐스터가 한 줄씩 전해드립니다.</p>
+        <span class="feed__source" id="feed-source" hidden></span>
+      </div>
+      <ol class="feed panel" id="feed"></ol>
+    </section>
+
     <section class="section" aria-labelledby="graph-title">
       <div class="section__head">
         <h2 id="graph-title" class="section__title">스터디 지식그래프</h2>

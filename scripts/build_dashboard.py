@@ -18,6 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dashboard_llm import enrich_with_llm  # noqa: E402
+from mock_feed import mock_feed  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 MEMBERS_DIR = ROOT / "members"
@@ -26,6 +27,9 @@ CACHE_PATH = ROOT / ".cache" / "llm-cache.json"
 
 HEATMAP_DAYS = 84
 ACTIVITY_LIMIT = 20
+FEED_LIMIT = 12
+STREAK_MILESTONE = 3
+KIND_ORDER = {"level": 0, "streak": 1, "lab": 2, "note": 3}
 XP_PER_NOTE = 40
 XP_PER_LAB = 80
 XP_PER_COMMIT = 5
@@ -350,6 +354,44 @@ def build_activity(members: list[dict], repo: dict) -> list[dict]:
     return activity[:ACTIVITY_LIMIT]
 
 
+def build_feed_events(members: list[dict], today: dt.date) -> list[dict]:
+    """중계 피드의 원재료: 노트/실습 추가, 연속 활동, 레벨 업."""
+    events = []
+    for m in members:
+        for item in m["notes"] + m["labs"]:
+            events.append({
+                "id": f"{item['kind']}:{item['id']}",
+                "date": item["date"] or today.isoformat(),
+                "member": m["id"], "kind": item["kind"], "title": item["title"],
+                "url": item["url"], "summary": item["summary"], "tags": item["tags"],
+            })
+        if m["streak"] >= STREAK_MILESTONE:
+            events.append({
+                "id": f"streak:{m['id']}:{m['streak']}", "date": m["last_active"],
+                "member": m["id"], "kind": "streak", "title": f"{m['streak']}일 연속 활동",
+                "url": m["folder_url"], "summary": "", "tags": [],
+            })
+        level = m["progress"]["level"]
+        if level >= 2:
+            events.append({
+                "id": f"level:{m['id']}:{level}", "date": m["last_active"],
+                "member": m["id"], "kind": "level", "title": f"Lv.{level} 달성",
+                "url": m["folder_url"], "summary": "", "tags": [],
+            })
+    events.sort(key=lambda e: (e["date"], -KIND_ORDER.get(e["kind"], 9)), reverse=True)
+    return events[:FEED_LIMIT]
+
+
+def resolve_feed(feed: list[dict], source: str, today: dt.date) -> tuple[list[dict], str]:
+    """DASHBOARD_MOCK_FEED: auto(기본, 비어 있으면 목데이터) | 1(항상 목데이터) | 0(절대 안 씀)."""
+    flag = os.environ.get("DASHBOARD_MOCK_FEED", "auto").strip().lower()
+    force = flag in {"1", "true", "yes", "on"}
+    never = flag in {"0", "false", "no", "off"}
+    if force or (not never and not feed):
+        return mock_feed(today), "mock"
+    return feed, source
+
+
 def strip_private(members: list[dict]) -> list[dict]:
     cleaned = []
     for m in members:
@@ -373,13 +415,18 @@ def main() -> int:
     started = git(["log", "--reverse", "--format=%ad", "--date=short"]).splitlines()
     study = {"started_at": started[0] if started else today.isoformat()}
 
-    study.update(enrich_with_llm(members, totals, CACHE_PATH))
+    events = build_feed_events(members, today)
+    llm = enrich_with_llm(members, totals, CACHE_PATH, events)
+    feed, feed_source = resolve_feed(llm.pop("feed"), llm.pop("feed_source"), today)
+    study.update(llm)
 
     data = {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
         "repo": repo,
         "study": study,
         "totals": totals,
+        "feed": feed,
+        "feed_source": feed_source,
         "members": strip_private(members),
         "graph": build_graph(members),
         "activity": build_activity(members, repo),
@@ -389,7 +436,7 @@ def main() -> int:
     print(
         f"[dashboard] {OUT_PATH.relative_to(ROOT)} 생성: 멤버 {totals['members']}, "
         f"노트 {totals['notes']}, 실습 {totals['labs']}, 커밋 {totals['commits']}, "
-        f"LLM={study.get('digest_source')}"
+        f"LLM={study.get('digest_source')}, 피드={feed_source}({len(feed)})"
     )
     return 0
 

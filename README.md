@@ -46,6 +46,8 @@ cp templates/note-template.md members/$GH_ID/notes/01-topic.md
 GPT가 멤버별 칭호·요약·태그와 스터디 소식을 붙여 GitHub Pages로 배포합니다.
 
 - 노트/실습 맨 위 프론트매터의 `tags`가 지식그래프의 주제 노드가 됩니다. 비워두면 GPT가 채워줍니다.
+- 상단 "중계석"은 노트/실습 추가, 연속 출석, 레벨 업을 캐스터 톤으로 중계합니다.
+  실제 기록이 없으면 목데이터로 채우고 MOCK 표시가 붙습니다. `DASHBOARD_MOCK_FEED=0`이면 목데이터를 끄고, `1`이면 항상 씁니다.
 - 로컬 미리보기:
 
 ```bash

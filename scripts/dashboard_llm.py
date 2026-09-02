@@ -23,6 +23,15 @@ MAX_TAGS = 5
 TIMEOUT_SECONDS = 120
 RETRY_DELAY_SECONDS = 4
 
+KIND_LABEL = {"note": "노트", "lab": "실습", "streak": "연속 활동", "level": "레벨 업", "join": "합류"}
+FEED_TEMPLATES = {
+    "note": "🎙️ {member} 선수, '{title}' 노트 제출! 지식그래프에 새 노드가 추가됩니다.",
+    "lab": "{member} 선수, '{title}' 실습으로 득점! 손으로 직접 굴려 봤습니다.",
+    "streak": "🔥 {member} 선수 {title}! 히트맵이 물들고 있습니다.",
+    "level": "⬆️ {member} 선수 {title}! 꾸준함의 승리입니다.",
+    "join": "새 선수 입장! {member} 선수가 워밍업에 들어갑니다.",
+}
+
 SYSTEM_PROMPT = (
     "너는 Knowledge Graph(KG) 스터디 현황판의 해설자다. "
     "밝고 재치 있지만 과장하지 않는 한국어로 쓴다. 이모지는 문장당 최대 1개. "
@@ -174,7 +183,27 @@ def digest_prompt(members: list[dict], totals: dict) -> str:
     )
 
 
+def feed_prompt(events: list[dict]) -> str:
+    lines = [
+        f"- id={e['id']} | {e['date']} | {e['member']} | {KIND_LABEL.get(e['kind'], e['kind'])} | "
+        f"{e['title']} | 요약: {e['summary'] or '-'} | 태그: {', '.join(e['tags']) or '-'}"
+        for e in events
+    ]
+    return (
+        "아래는 KG 스터디에서 최근 일어난 일들이다. 스포츠 중계 캐스터처럼 각 사건을 한 줄로 중계해라.\n"
+        "규칙: 한국어, 50~70자, 멤버 id 를 '○○ 선수'라고 부르고, 무엇을 공부했는지가 드러나야 한다. "
+        "이모지는 줄당 최대 1개, 전체의 절반 이상은 이모지 없이. 과장은 살짝, 거짓 정보는 금지.\n"
+        'JSON 으로 답해라: {"lines": [{"id": "<id 그대로>", "text": "중계 문장"}]}\n\n'
+        + "\n".join(lines)
+    )
+
+
 # ---------------------------------------------------------------- fallbacks
+
+def fallback_commentary(event: dict) -> str:
+    template = FEED_TEMPLATES.get(event["kind"], "{member} 선수, {title}.")
+    return template.format(member=event["member"], title=event["title"])
+
 
 def fallback_title(member: dict) -> str:
     c = member["counts"]
@@ -214,6 +243,29 @@ def apply_fallbacks(members: list[dict]) -> None:
 
 # ---------------------------------------------------------------- applying
 
+def build_feed(events: list[dict], api_key: str, model: str, cache: dict) -> tuple[list[dict], str]:
+    """사건 목록에 중계 문장을 붙인다. LLM 이 없거나 실패하면 템플릿 문장."""
+    if not events:
+        return [], "empty"
+    texts: dict[str, str] = {}
+    if api_key:
+        result = cached_call(feed_prompt(events), api_key, model, cache)
+        for line in (result or {}).get("lines") or []:
+            if isinstance(line, dict) and line.get("id") and str(line.get("text") or "").strip():
+                texts[str(line["id"])] = str(line["text"]).strip()
+        if not texts:
+            log("중계 문장 생성 실패 → 템플릿 사용")
+    feed = []
+    for e in events:
+        feed.append({
+            "id": e["id"], "date": e["date"], "member": e["member"], "kind": e["kind"],
+            "title": e["title"], "url": e["url"],
+            "text": texts.get(e["id"]) or fallback_commentary(e),
+            "mock": False,
+        })
+    return feed, ("llm" if texts else "fallback")
+
+
 def apply_member_result(member: dict, result: dict) -> None:
     member["title"] = str(result.get("title") or "").strip()[:20]
     member["summary"] = str(result.get("summary") or "").strip()
@@ -237,14 +289,19 @@ def apply_member_result(member: dict, result: dict) -> None:
                 member["tags"].append(tag)
 
 
-def enrich_with_llm(members: list[dict], totals: dict, cache_path: Path) -> dict:
-    """members 를 제자리에서 보강하고 study 에 합칠 dict 를 돌려준다."""
+def enrich_with_llm(members: list[dict], totals: dict, cache_path: Path, events: list[dict] | None = None) -> dict:
+    """members 를 제자리에서 보강하고, study 에 합칠 값과 feed/feed_source 를 돌려준다."""
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     model = os.environ.get("OPENAI_MODEL", "").strip() or DEFAULT_MODEL
+    events = events or []
     if not api_key:
         log("OPENAI_API_KEY 없음 → 규칙 기반 폴백 사용")
         apply_fallbacks(members)
-        return {"digest": fallback_digest(members, totals), "shoutouts": [], "digest_source": "fallback", "model": ""}
+        feed, feed_source = build_feed(events, "", model, {})
+        return {
+            "digest": fallback_digest(members, totals), "shoutouts": [], "digest_source": "fallback", "model": "",
+            "feed": feed, "feed_source": feed_source,
+        }
 
     cache = load_cache(cache_path)
     for m in members:
@@ -258,13 +315,19 @@ def enrich_with_llm(members: list[dict], totals: dict, cache_path: Path) -> dict
     apply_fallbacks(members)
 
     digest_result = cached_call(digest_prompt(members, totals), api_key, model, cache)
+    feed, feed_source = build_feed(events, api_key, model, cache)
     save_cache(cache_path, cache)
     if not digest_result:
-        return {"digest": fallback_digest(members, totals), "shoutouts": [], "digest_source": "fallback", "model": model}
+        return {
+            "digest": fallback_digest(members, totals), "shoutouts": [], "digest_source": "fallback", "model": model,
+            "feed": feed, "feed_source": feed_source,
+        }
     shoutouts = [str(s).strip() for s in digest_result.get("shoutouts") or [] if str(s).strip()][:3]
     return {
         "digest": str(digest_result.get("digest") or fallback_digest(members, totals)).strip(),
         "shoutouts": shoutouts,
         "digest_source": "llm",
         "model": model,
+        "feed": feed,
+        "feed_source": feed_source,
     }

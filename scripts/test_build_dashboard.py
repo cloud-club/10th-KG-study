@@ -8,8 +8,12 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import os
+from unittest import mock
+
 import build_dashboard as bd  # noqa: E402
 import dashboard_llm as llm  # noqa: E402
+import mock_feed  # noqa: E402
 
 
 class FrontmatterTests(unittest.TestCase):
@@ -91,6 +95,59 @@ class GraphTests(unittest.TestCase):
         ids = {n["id"] for n in graph["nodes"]}
         self.assertEqual(ids, {"m:a", "m:b", "n:a/notes/01", "l:b/labs/01", "t:rdf", "t:neo4j"})
         self.assertEqual(len(graph["links"]), 5)
+
+
+class FeedTests(unittest.TestCase):
+    def test_events_include_items_streak_and_level_sorted_desc(self):
+        note = {"kind": "note", "id": "a/notes/01", "title": "n", "date": "2026-09-01", "summary": "", "tags": ["rdf"], "url": "u"}
+        lab = {"kind": "lab", "id": "a/labs/01", "title": "l", "date": "2026-09-02", "summary": "s", "tags": [], "url": "u"}
+        m = make_member(id="a", notes=[note], labs=[lab], streak=3, last_active="2026-09-02",
+                        progress={"level": 2, "xp": 120}, folder_url="f")
+        events = bd.build_feed_events([m], dt.date(2026, 9, 2))
+        kinds = [e["kind"] for e in events]
+        self.assertEqual(kinds, ["level", "streak", "lab", "note"])
+        self.assertEqual(events[0]["title"], "Lv.2 달성")
+        self.assertEqual(events[1]["title"], "3일 연속 활동")
+
+    def test_no_milestones_below_threshold(self):
+        m = make_member(streak=2, progress={"level": 1, "xp": 10}, folder_url="f")
+        self.assertEqual(bd.build_feed_events([m], dt.date(2026, 9, 2)), [])
+
+    def test_resolve_feed_uses_mock_only_when_empty_by_default(self):
+        today = dt.date(2026, 9, 2)
+        real = [{"id": "x"}]
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("DASHBOARD_MOCK_FEED", None)
+            self.assertEqual(bd.resolve_feed(real, "fallback", today), (real, "fallback"))
+            feed, source = bd.resolve_feed([], "empty", today)
+        self.assertEqual(source, "mock")
+        self.assertTrue(all(f["mock"] for f in feed))
+
+    def test_resolve_feed_env_overrides(self):
+        today = dt.date(2026, 9, 2)
+        with mock.patch.dict(os.environ, {"DASHBOARD_MOCK_FEED": "0"}):
+            self.assertEqual(bd.resolve_feed([], "empty", today), ([], "empty"))
+        with mock.patch.dict(os.environ, {"DASHBOARD_MOCK_FEED": "1"}):
+            self.assertEqual(bd.resolve_feed([{"id": "x"}], "llm", today)[1], "mock")
+
+    def test_mock_feed_dates_are_relative_to_today(self):
+        feed = mock_feed.mock_feed(dt.date(2026, 9, 10))
+        self.assertEqual(feed[0]["date"], "2026-09-10")
+        self.assertEqual(len(feed), len(mock_feed.MOCK_FEED))
+        self.assertTrue(all(f["text"] and f["member"] for f in feed))
+
+    def test_fallback_commentary_mentions_member_and_title(self):
+        text = llm.fallback_commentary({"kind": "note", "member": "sehyun", "title": "RDF"})
+        self.assertIn("sehyun", text)
+        self.assertIn("RDF", text)
+
+    def test_build_feed_without_key_uses_templates(self):
+        events = [{"id": "note:a/1", "date": "2026-09-01", "member": "a", "kind": "note", "title": "t", "url": "u", "summary": "", "tags": []}]
+        feed, source = llm.build_feed(events, "", "gpt-5-mini", {})
+        self.assertEqual(source, "fallback")
+        self.assertEqual(feed[0]["id"], "note:a/1")
+        self.assertFalse(feed[0]["mock"])
+        self.assertEqual(llm.build_feed([], "", "m", {}), ([], "empty"))
 
 
 class LlmTests(unittest.TestCase):

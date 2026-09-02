@@ -53,9 +53,17 @@
 
   function memberColorMap(members) {
     const map = new Map();
-    members.forEach((m, i) => map.set(m.id, COLORS[i % COLORS.length]));
-    return (id) => map.get(id) || COLORS[0];
+    members.forEach((m) => map.set(m.id, COLORS[map.size % COLORS.length]));
+    return (id) => {
+      if (!map.has(id)) map.set(id, COLORS[map.size % COLORS.length]); // 목데이터 등 미등록 멤버도 색을 받는다
+      return map.get(id);
+    };
   }
+
+  const KIND_LABEL = { note: '노트', lab: '실습', streak: '연속 출석', level: '레벨 업', join: '합류' };
+  const TICKER_ITEMS = 6;
+  const TICKER_SECONDS_PER_CHAR = 0.32;
+  const TICKER_MIN_SECONDS = 24;
 
   /* ------------------------------------------------------------- hero */
   function renderHero(data) {
@@ -80,6 +88,56 @@
       list.append(el('li', { class: 'stat', style: `--stat-bg:${bg}` }, [
         el('span', { class: 'stat__value', text: String(value) }),
         el('span', { class: 'stat__label', text: label }),
+      ]));
+    });
+  }
+
+  /* ------------------------------------------------------------- feed */
+  function renderTicker(feed, colorOf) {
+    const track = $('#ticker-track');
+    const items = feed.slice(0, TICKER_ITEMS);
+    if (!items.length) {
+      $('#ticker').hidden = true;
+      return;
+    }
+    const makeItem = (f) => el('span', { class: 'ticker__item' }, [
+      el('span', { class: 'ticker__who', style: `--c:${colorOf(f.member)}`, text: f.member }),
+      el('span', { class: 'ticker__text', text: f.text }),
+    ]);
+    // 끊김 없는 루프를 위해 같은 내용을 두 번 넣고 -50% 만큼 흘린다
+    items.forEach((f) => track.append(makeItem(f)));
+    items.forEach((f) => track.append(makeItem(f)));
+    const chars = items.reduce((n, f) => n + f.text.length + f.member.length, 0);
+    track.style.setProperty('--ticker-duration', `${Math.max(TICKER_MIN_SECONDS, Math.round(chars * TICKER_SECONDS_PER_CHAR))}s`);
+  }
+
+  function renderFeed(feed, source, colorOf) {
+    const list = $('#feed');
+    const badge = $('#feed-source');
+    if (source === 'mock') {
+      badge.textContent = 'MOCK DATA';
+      badge.hidden = false;
+      $('#feed-hint').textContent = '아직 실제 기록이 없어 목데이터로 채웠어요. 노트를 올리면 진짜 중계가 시작됩니다.';
+    } else if (source === 'llm') {
+      badge.textContent = 'GPT 캐스터';
+      badge.hidden = false;
+    }
+    if (!feed.length) {
+      list.append(el('li', { class: 'feed__empty', text: '아직 중계할 사건이 없어요. 첫 노트를 올려 보세요!' }));
+      return;
+    }
+    feed.forEach((f, i) => {
+      const meta = [
+        el('span', { class: 'feed__kind', text: KIND_LABEL[f.kind] || f.kind }),
+        f.url ? el('a', { class: 'feed__link', href: f.url, target: '_blank', rel: 'noopener', text: `${f.title} ↗` })
+              : el('span', { text: f.title }),
+        f.mock ? el('span', { class: 'feed__mock', text: 'MOCK' }) : null,
+      ];
+      list.append(el('li', { class: `feed__item${i === 0 ? ' is-new' : ''}` }, [
+        el('span', { class: 'feed__date', text: shortDate(f.date), title: f.date }),
+        el('span', { class: 'feed__who', style: `--c:${colorOf(f.member)}`, text: f.member }),
+        el('p', { class: 'feed__text', text: f.text }),
+        el('span', { class: 'feed__meta' }, meta),
       ]));
     });
   }
@@ -215,6 +273,8 @@
       const colorOf = memberColorMap(data.members);
       renderHero(data);
       renderStats(data);
+      renderTicker(data.feed || [], colorOf);
+      renderFeed(data.feed || [], data.feed_source, colorOf);
       renderMembers(data.members, colorOf);
       renderActivity(data.activity, colorOf);
       renderFooter(data);

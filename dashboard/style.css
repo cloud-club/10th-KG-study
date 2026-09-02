@@ -124,6 +124,35 @@ code {
 .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
 .btn--ghost { background: var(--paper-2); }
 
+/* --------------------------------------------------------------- ticker */
+.ticker {
+  display: flex; align-items: stretch;
+  background: var(--ink); color: var(--paper);
+  border-bottom: var(--border);
+  font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700;
+}
+.ticker__badge {
+  flex: none; display: inline-flex; align-items: center; gap: 0.45em;
+  padding: 0.55rem 0.9rem;
+  background: var(--pink); color: var(--ink);
+  border-right: var(--border);
+  font-family: var(--font-display); letter-spacing: 0.08em;
+}
+.ticker__dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink); animation: blink 1.1s steps(2, start) infinite; }
+.ticker__viewport { flex: 1; min-width: 0; overflow: hidden; display: flex; align-items: center; }
+.ticker__track {
+  display: inline-flex; white-space: nowrap; padding: 0.55rem 0;
+  animation: ticker var(--ticker-duration, 40s) linear infinite;
+  will-change: transform;
+}
+.ticker:hover .ticker__track, .ticker:focus-within .ticker__track { animation-play-state: paused; }
+.ticker__item { display: inline-flex; align-items: center; gap: 0.6em; margin-right: 3.5rem; }
+.ticker__item::before { content: "✦"; color: var(--yellow); }
+.ticker__who { padding: 0 0.45em; border-radius: 999px; background: var(--c, var(--blue)); color: #fff; font-size: 0.78em; }
+.ticker__text { font-family: var(--font-body); font-weight: 500; }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes blink { to { opacity: 0.2; } }
+
 /* ----------------------------------------------------------------- hero */
 .hero {
   display: grid;
@@ -223,6 +252,47 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-page) var(--spa
   font-size: var(--text-h2); line-height: 1.05;
 }
 .section__hint { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+/* ----------------------------------------------------------------- feed */
+.section--feed { margin-top: calc(var(--space-section) * 0.5); }
+.feed__source {
+  padding: 0.1em 0.6em; border: 2px dashed var(--ink); border-radius: 999px;
+  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; background: var(--paper-2);
+}
+.feed { list-style: none; margin: 0; padding: 0.3rem 0; counter-reset: feed; }
+.feed__item {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  grid-template-areas: "date who text" "date who meta";
+  column-gap: 0.8rem; row-gap: 0.2rem; align-items: baseline;
+  padding: 0.75rem 1.1rem;
+  border-bottom: 2px dashed var(--line);
+  position: relative;
+}
+.feed__item:last-child { border-bottom: 0; }
+.feed__item.is-new { background: var(--yellow); border-bottom-style: solid; border-bottom-color: var(--ink); }
+.feed__item.is-new::after {
+  content: "NEW"; position: absolute; top: -0.7rem; right: 1rem;
+  padding: 0 0.5em; background: var(--pink); border: 2px solid var(--ink); border-radius: 999px;
+  font-family: var(--font-display); font-size: 0.75rem; transform: rotate(4deg);
+}
+.feed__date { grid-area: date; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.feed__who {
+  grid-area: who; justify-self: start;
+  padding: 0 0.55em; border: 2px solid var(--ink); border-radius: 999px;
+  background: var(--c, var(--blue)); color: #fff; font-size: 0.78rem; font-weight: 700; white-space: nowrap;
+}
+.feed__text { grid-area: text; margin: 0; font-size: 1.02rem; font-weight: 500; line-height: 1.5; overflow-wrap: anywhere; }
+.feed__item.is-new .feed__text { font-size: 1.12rem; font-weight: 700; }
+.feed__meta { grid-area: meta; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+.feed__kind { padding: 0 0.45em; border: 1.5px solid var(--ink); border-radius: 4px; background: var(--paper-2); color: var(--ink); }
+.feed__link { color: var(--ink); text-decoration: none; }
+.feed__link:hover { text-decoration: underline; color: var(--blue); }
+.feed__mock { padding: 0 0.45em; border: 1.5px dashed var(--ink); border-radius: 4px; letter-spacing: 0.06em; }
+.feed__empty { padding: 1rem 1.1rem; color: var(--muted); }
+@media (max-width: 560px) {
+  .feed__item { grid-template-columns: auto 1fr; grid-template-areas: "date who" "text text" "meta meta"; }
+}
 
 /* ---------------------------------------------------------------- graph */
 .panel--graph { padding: 0.75rem; overflow: hidden; }
@@ -417,4 +487,5 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-page) var(--spa
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; animation: none !important; }
+  .ticker__viewport { overflow-x: auto; }
 }

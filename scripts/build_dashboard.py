@@ -402,6 +402,27 @@ def strip_private(members: list[dict]) -> list[dict]:
     return cleaned
 
 
+def write_step_summary(data: dict) -> None:
+    """GitHub Actions 실행 요약 탭에 빌드 결과를 남긴다."""
+    path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if not path:
+        return
+    s, t = data["study"], data["totals"]
+    model = f" ({s['model']})" if s.get("model") else ""
+    lines = [
+        "## 현황판 빌드", "",
+        f"- 멤버 {t['members']} · 노트 {t['notes']} · 실습 {t['labs']} · 커밋 {t['commits']}",
+        f"- 요약/칭호: **{s['digest_source']}**{model}",
+        f"- 중계 피드: **{data['feed_source']}** ({len(data['feed'])}건)",
+        "", f"> {s['digest']}", "",
+    ]
+    try:
+        with open(path, "a", encoding="utf-8") as fh:
+            fh.write("\n".join(lines))
+    except OSError as exc:
+        print(f"[dashboard] step summary 기록 실패: {exc}", file=sys.stderr)
+
+
 def main() -> int:
     today = dt.date.today()
     repo = detect_repo()
@@ -433,6 +454,7 @@ def main() -> int:
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_step_summary(data)
     print(
         f"[dashboard] {OUT_PATH.relative_to(ROOT)} 생성: 멤버 {totals['members']}, "
         f"노트 {totals['notes']}, 실습 {totals['labs']}, 커밋 {totals['commits']}, "

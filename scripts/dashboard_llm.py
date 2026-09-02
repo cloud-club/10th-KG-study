@@ -18,6 +18,8 @@ from pathlib import Path
 
 API_URL = "https://api.openai.com/v1/chat/completions"
 DEFAULT_MODEL = "gpt-5-mini"
+FALLBACK_MODELS = ["gpt-5-mini", "gpt-4.1-mini", "gpt-4o-mini"]  # 앞 모델이 계정에서 안 되면 차례로 시도
+MODEL_ERROR_RE = re.compile(r"model|unsupported|not supported|does not exist", re.I)
 MAX_ITEM_CHARS = 2500
 MAX_TAGS = 5
 TIMEOUT_SECONDS = 120
@@ -41,8 +43,25 @@ SYSTEM_PROMPT = (
 
 # ------------------------------------------------------------------- helpers
 
+class ModelUnavailable(Exception):
+    """모델 이름이 틀렸거나 계정에서 쓸 수 없을 때. 다음 후보 모델로 넘어간다."""
+
+
+_state = {"model": None}  # 이번 빌드에서 실제로 성공한 모델 (이후 호출은 이걸로 고정)
+
+
 def log(message: str) -> None:
     print(f"[dashboard-llm] {message}", file=sys.stderr)
+
+
+def candidate_models() -> list[str]:
+    configured = os.environ.get("OPENAI_MODEL", "").strip()
+    models = [configured] if configured else []
+    return models + [m for m in FALLBACK_MODELS if m not in models]
+
+
+def resolved_model() -> str:
+    return _state["model"] or candidate_models()[0]
 
 
 def load_cache(path: Path) -> dict:
@@ -105,6 +124,8 @@ def call_openai(prompt: str, api_key: str, model: str) -> dict | None:
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")[:300]
             log(f"HTTP {exc.code} (시도 {attempt}): {detail}")
+            if exc.code == 404 or (exc.code == 400 and MODEL_ERROR_RE.search(detail)):
+                raise ModelUnavailable(detail) from exc
             if exc.code not in (429, 500, 502, 503, 504) or attempt == 2:
                 return None
         except (urllib.error.URLError, TimeoutError, KeyError, ValueError) as exc:
@@ -115,14 +136,25 @@ def call_openai(prompt: str, api_key: str, model: str) -> dict | None:
     return None
 
 
-def cached_call(prompt: str, api_key: str, model: str, cache: dict) -> dict | None:
-    key = cache_key(model, prompt)
-    if key in cache:
-        return cache[key]
-    result = call_openai(prompt, api_key, model)
-    if result is not None:
-        cache[key] = result
-    return result
+def cached_call(prompt: str, api_key: str, cache: dict) -> dict | None:
+    """캐시 → 확정된 모델 → 후보 모델 순으로 시도. 모델이 안 되면 다음 후보로 넘어간다."""
+    models = [_state["model"]] if _state["model"] else candidate_models()
+    for model in models:
+        key = cache_key(model, prompt)
+        if key in cache:
+            _state["model"] = model
+            return cache[key]
+        try:
+            result = call_openai(prompt, api_key, model)
+        except ModelUnavailable as exc:
+            log(f"모델 '{model}' 사용 불가 → 다음 후보 시도 ({str(exc)[:100]})")
+            continue
+        _state["model"] = model
+        if result is not None:
+            cache[key] = result
+        return result
+    log("사용 가능한 모델이 없음 → 폴백")
+    return None
 
 
 # ------------------------------------------------------------------ prompts
@@ -243,13 +275,13 @@ def apply_fallbacks(members: list[dict]) -> None:
 
 # ---------------------------------------------------------------- applying
 
-def build_feed(events: list[dict], api_key: str, model: str, cache: dict) -> tuple[list[dict], str]:
+def build_feed(events: list[dict], api_key: str, cache: dict) -> tuple[list[dict], str]:
     """사건 목록에 중계 문장을 붙인다. LLM 이 없거나 실패하면 템플릿 문장."""
     if not events:
         return [], "empty"
     texts: dict[str, str] = {}
     if api_key:
-        result = cached_call(feed_prompt(events), api_key, model, cache)
+        result = cached_call(feed_prompt(events), api_key, cache)
         for line in (result or {}).get("lines") or []:
             if isinstance(line, dict) and line.get("id") and str(line.get("text") or "").strip():
                 texts[str(line["id"])] = str(line["text"]).strip()
@@ -293,12 +325,11 @@ def apply_member_result(member: dict, result: dict) -> None:
 def enrich_with_llm(members: list[dict], totals: dict, cache_path: Path, events: list[dict] | None = None) -> dict:
     """members 를 제자리에서 보강하고, study 에 합칠 값과 feed/feed_source 를 돌려준다."""
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
-    model = os.environ.get("OPENAI_MODEL", "").strip() or DEFAULT_MODEL
     events = events or []
     if not api_key:
         log("OPENAI_API_KEY 없음 → 규칙 기반 폴백 사용")
         apply_fallbacks(members)
-        feed, feed_source = build_feed(events, "", model, {})
+        feed, feed_source = build_feed(events, "", {})
         return {
             "digest": fallback_digest(members, totals), "shoutouts": [], "digest_source": "fallback", "model": "",
             "feed": feed, "feed_source": feed_source,
@@ -308,16 +339,17 @@ def enrich_with_llm(members: list[dict], totals: dict, cache_path: Path, events:
     for m in members:
         if not m["notes"] and not m["labs"]:
             continue
-        result = cached_call(member_prompt(m), api_key, model, cache)
+        result = cached_call(member_prompt(m), api_key, cache)
         if result:
             apply_member_result(m, result)
         else:
             log(f"{m['id']} 요약 실패 → 폴백")
     apply_fallbacks(members)
 
-    digest_result = cached_call(digest_prompt(members, totals), api_key, model, cache)
-    feed, feed_source = build_feed(events, api_key, model, cache)
+    digest_result = cached_call(digest_prompt(members, totals), api_key, cache)
+    feed, feed_source = build_feed(events, api_key, cache)
     save_cache(cache_path, cache)
+    model = resolved_model()
     if not digest_result:
         return {
             "digest": fallback_digest(members, totals), "shoutouts": [], "digest_source": "fallback", "model": model,

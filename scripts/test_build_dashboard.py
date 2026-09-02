@@ -144,13 +144,54 @@ class FeedTests(unittest.TestCase):
 
     def test_build_feed_without_key_uses_templates(self):
         events = [{"id": "note:a/1", "date": "2026-09-01", "member": "a", "kind": "note", "title": "t", "url": "u", "summary": "요약", "tags": ["rdf"]}]
-        feed, source = llm.build_feed(events, "", "gpt-5-mini", {})
+        feed, source = llm.build_feed(events, "", {})
         self.assertEqual(source, "fallback")
         self.assertEqual(feed[0]["id"], "note:a/1")
         self.assertEqual(feed[0]["summary"], "요약")
         self.assertEqual(feed[0]["tags"], ["rdf"])
         self.assertFalse(feed[0]["mock"])
-        self.assertEqual(llm.build_feed([], "", "m", {}), ([], "empty"))
+        self.assertEqual(llm.build_feed([], "", {}), ([], "empty"))
+
+
+class ModelFallbackTests(unittest.TestCase):
+    def setUp(self):
+        llm._state["model"] = None
+
+    def test_candidate_models_put_env_override_first(self):
+        with mock.patch.dict(os.environ, {"OPENAI_MODEL": "gpt-4o-mini"}):
+            self.assertEqual(llm.candidate_models()[0], "gpt-4o-mini")
+            self.assertEqual(len(llm.candidate_models()), len(llm.FALLBACK_MODELS))
+        with mock.patch.dict(os.environ, {"OPENAI_MODEL": ""}):
+            self.assertEqual(llm.candidate_models(), llm.FALLBACK_MODELS)
+
+    def test_cached_call_moves_to_next_model_when_unavailable(self):
+        tried = []
+
+        def fake_call(prompt, api_key, model):
+            tried.append(model)
+            if model == "gpt-5-mini":
+                raise llm.ModelUnavailable("model not found")
+            return {"ok": model}
+
+        cache = {}
+        with mock.patch.dict(os.environ, {"OPENAI_MODEL": ""}), mock.patch.object(llm, "call_openai", fake_call):
+            self.assertEqual(llm.cached_call("p", "key", cache), {"ok": "gpt-4.1-mini"})
+            self.assertEqual(llm.resolved_model(), "gpt-4.1-mini")
+            # 두 번째 호출부터는 확정된 모델만 쓴다
+            llm.cached_call("q", "key", cache)
+        self.assertEqual(tried, ["gpt-5-mini", "gpt-4.1-mini", "gpt-4.1-mini"])
+        self.assertEqual(len(cache), 2)
+
+    def test_cached_call_returns_none_when_all_models_fail(self):
+        with mock.patch.dict(os.environ, {"OPENAI_MODEL": ""}), \
+             mock.patch.object(llm, "call_openai", mock.Mock(side_effect=llm.ModelUnavailable("x"))):
+            self.assertIsNone(llm.cached_call("p", "key", {}))
+
+    def test_cache_hit_skips_network(self):
+        cache = {llm.cache_key("gpt-5-mini", "p"): {"cached": True}}
+        with mock.patch.dict(os.environ, {"OPENAI_MODEL": ""}), \
+             mock.patch.object(llm, "call_openai", mock.Mock(side_effect=AssertionError("no network"))):
+            self.assertEqual(llm.cached_call("p", "key", cache), {"cached": True})
 
 
 class LlmTests(unittest.TestCase):

@@ -111,6 +111,42 @@
     track.style.setProperty('--ticker-duration', `${Math.max(TICKER_MIN_SECONDS, Math.round(chars * TICKER_SECONDS_PER_CHAR))}s`);
   }
 
+  const KIND_ICON = { note: '📝', lab: '🧪', streak: '🔥', level: '⬆️', join: '👋' };
+
+  function avatarFor(member) {
+    const img = el('img', { class: 'post__avatar', alt: '', width: 48, height: 48, loading: 'lazy', src: `https://github.com/${member}.png?size=96` });
+    img.addEventListener('error', () => {
+      img.replaceWith(el('span', { class: 'post__avatar', 'aria-hidden': 'true', text: member.slice(0, 1) }));
+    });
+    return img;
+  }
+
+  function renderPost(f, isNew, colorOf) {
+    const meta = [
+      el('span', { class: 'post__kind', text: KIND_LABEL[f.kind] || f.kind }),
+      el('span', { text: shortDate(f.date), title: f.date }),
+      f.mock ? el('span', { class: 'post__mock', text: 'MOCK' }) : null,
+    ];
+    const foot = [
+      f.url ? el('a', { class: 'post__attach', href: f.url, target: '_blank', rel: 'noopener', text: `📎 ${f.title} ↗` })
+            : el('span', { class: 'post__attach', text: `📎 ${f.title}` }),
+      (f.tags || []).length ? el('ul', { class: 'post__tags' }, f.tags.map((t) => el('li', { text: `#${t}` }))) : null,
+    ];
+    return el('li', { class: `post${isNew ? ' is-new' : ''}`, style: `--accent:${colorOf(f.member)}` }, [
+      el('header', { class: 'post__head' }, [
+        avatarFor(f.member),
+        el('div', { class: 'post__who' }, [
+          el('a', { class: 'post__name', href: `https://github.com/${f.member}`, target: '_blank', rel: 'noopener', text: f.member }),
+          el('span', { class: 'post__meta' }, meta),
+        ]),
+        el('span', { class: 'post__icon', 'aria-hidden': 'true', text: KIND_ICON[f.kind] || '📣' }),
+      ]),
+      el('p', { class: 'post__text', text: f.text }),
+      f.summary ? el('blockquote', { class: 'post__quote', text: f.summary }) : null,
+      el('footer', { class: 'post__foot' }, foot),
+    ]);
+  }
+
   function renderFeed(feed, source, colorOf) {
     const list = $('#feed');
     const badge = $('#feed-source');
@@ -126,20 +162,7 @@
       list.append(el('li', { class: 'feed__empty', text: '아직 중계할 사건이 없어요. 첫 노트를 올려 보세요!' }));
       return;
     }
-    feed.forEach((f, i) => {
-      const meta = [
-        el('span', { class: 'feed__kind', text: KIND_LABEL[f.kind] || f.kind }),
-        f.url ? el('a', { class: 'feed__link', href: f.url, target: '_blank', rel: 'noopener', text: `${f.title} ↗` })
-              : el('span', { text: f.title }),
-        f.mock ? el('span', { class: 'feed__mock', text: 'MOCK' }) : null,
-      ];
-      list.append(el('li', { class: `feed__item${i === 0 ? ' is-new' : ''}` }, [
-        el('span', { class: 'feed__date', text: shortDate(f.date), title: f.date }),
-        el('span', { class: 'feed__who', style: `--c:${colorOf(f.member)}`, text: f.member }),
-        el('p', { class: 'feed__text', text: f.text }),
-        el('span', { class: 'feed__meta' }, meta),
-      ]));
-    });
+    feed.forEach((f, i) => list.append(renderPost(f, i === 0, colorOf)));
   }
 
   /* ---------------------------------------------------------- members */

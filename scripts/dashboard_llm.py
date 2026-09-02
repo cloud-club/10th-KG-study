@@ -261,6 +261,7 @@ def build_feed(events: list[dict], api_key: str, model: str, cache: dict) -> tup
             "id": e["id"], "date": e["date"], "member": e["member"], "kind": e["kind"],
             "title": e["title"], "url": e["url"],
             "text": texts.get(e["id"]) or fallback_commentary(e),
+            "summary": e.get("summary", ""), "tags": list(e.get("tags", [])),
             "mock": False,
         })
     return feed, ("llm" if texts else "fallback")

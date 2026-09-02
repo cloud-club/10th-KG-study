@@ -135,6 +135,7 @@ class FeedTests(unittest.TestCase):
         self.assertEqual(feed[0]["date"], "2026-09-10")
         self.assertEqual(len(feed), len(mock_feed.MOCK_FEED))
         self.assertTrue(all(f["text"] and f["member"] for f in feed))
+        self.assertTrue(all("summary" in f and isinstance(f["tags"], list) for f in feed))
 
     def test_fallback_commentary_mentions_member_and_title(self):
         text = llm.fallback_commentary({"kind": "note", "member": "sehyun", "title": "RDF"})
@@ -142,10 +143,12 @@ class FeedTests(unittest.TestCase):
         self.assertIn("RDF", text)
 
     def test_build_feed_without_key_uses_templates(self):
-        events = [{"id": "note:a/1", "date": "2026-09-01", "member": "a", "kind": "note", "title": "t", "url": "u", "summary": "", "tags": []}]
+        events = [{"id": "note:a/1", "date": "2026-09-01", "member": "a", "kind": "note", "title": "t", "url": "u", "summary": "요약", "tags": ["rdf"]}]
         feed, source = llm.build_feed(events, "", "gpt-5-mini", {})
         self.assertEqual(source, "fallback")
         self.assertEqual(feed[0]["id"], "note:a/1")
+        self.assertEqual(feed[0]["summary"], "요약")
+        self.assertEqual(feed[0]["tags"], ["rdf"])
         self.assertFalse(feed[0]["mock"])
         self.assertEqual(llm.build_feed([], "", "m", {}), ([], "empty"))
 

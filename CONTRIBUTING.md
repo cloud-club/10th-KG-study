@@ -59,7 +59,7 @@ status: in-progress           # in-progress | done
 ## 브랜치 & PR
 
 - 브랜치 이름: `<github-id>/<short-description>`
-  - 예: `sehyun/01-data-model`, `sehyun/lab-document-parser`
+  - 예: `sese2204/01-data-model`, `sese2204/lab-document-parser`
 - `main`에 직접 푸시하지 않고 PR로 올립니다.
 - 커밋 메시지: `<type>: <description>`
   - type: `docs`, `feat`, `fix`, `refactor`, `chore`

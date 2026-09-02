@@ -11,14 +11,14 @@ MOCK_FEED = [
         "tags": ["triple-extraction", "llm", "nlp"],
     },
     {
-        "days_ago": 0, "member": "sehyun", "kind": "note", "title": "저장소와 SPARQL 검색",
-        "text": "sehyun 선수, SPARQL 노트로 연타! BGP 패턴 매칭까지 정리하며 검색 구간을 돌파합니다.",
+        "days_ago": 0, "member": "sese2204", "kind": "note", "title": "저장소와 SPARQL 검색",
+        "text": "sese2204 선수, SPARQL 노트로 연타! BGP 패턴 매칭까지 정리하며 검색 구간을 돌파합니다.",
         "summary": "SPARQL 은 트리플 패턴 매칭으로 그래프를 질의한다. 기본 그래프 패턴(BGP)이 핵심이고 OPTIONAL, FILTER 로 살을 붙인다.",
         "tags": ["sparql", "rdf", "triplestore"],
     },
     {
-        "days_ago": 1, "member": "sehyun", "kind": "streak", "title": "3일 연속 활동",
-        "text": "🔥 sehyun 선수 3일 연속 출석! 히트맵이 초록으로 물들기 시작했습니다.",
+        "days_ago": 1, "member": "sese2204", "kind": "streak", "title": "3일 연속 활동",
+        "text": "🔥 sese2204 선수 3일 연속 출석! 히트맵이 초록으로 물들기 시작했습니다.",
         "summary": "", "tags": [],
     },
     {
@@ -28,8 +28,8 @@ MOCK_FEED = [
         "tags": ["neo4j", "rdf", "property-graph"],
     },
     {
-        "days_ago": 2, "member": "sehyun", "kind": "note", "title": "RDF 데이터 모델과 트리플",
-        "text": "🎙️ 경기 시작! sehyun 선수가 RDF 트리플 노트로 시즌 첫 득점을 올립니다.",
+        "days_ago": 2, "member": "sese2204", "kind": "note", "title": "RDF 데이터 모델과 트리플",
+        "text": "🎙️ 경기 시작! sese2204 선수가 RDF 트리플 노트로 시즌 첫 득점을 올립니다.",
         "summary": "지식그래프의 최소 단위는 (주어, 술어, 목적어) 트리플이고, RDF 는 이걸 IRI 로 전역 식별하는 표준이다.",
         "tags": ["rdf", "triple", "ontology"],
     },
@@ -44,8 +44,8 @@ MOCK_FEED = [
         "summary": "", "tags": [],
     },
     {
-        "days_ago": 4, "member": "sehyun", "kind": "lab", "title": "문서 파서 만들기",
-        "text": "sehyun 선수, PDF에서 문장을 뽑아내는 파서로 실습 첫 골! 트리플 추출로 가는 길을 닦았습니다.",
+        "days_ago": 4, "member": "sese2204", "kind": "lab", "title": "문서 파서 만들기",
+        "text": "sese2204 선수, PDF에서 문장을 뽑아내는 파서로 실습 첫 골! 트리플 추출로 가는 길을 닦았습니다.",
         "summary": "PDF/마크다운에서 문장 단위로 텍스트를 뽑아 트리플 추출 입력으로 넘긴다. 표와 각주 처리가 생각보다 골치.",
         "tags": ["document-parsing", "nlp"],
     },

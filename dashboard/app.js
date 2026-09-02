@@ -61,9 +61,6 @@
   }
 
   const KIND_LABEL = { note: '노트', lab: '실습', streak: '연속 출석', level: '레벨 업', join: '합류' };
-  const TICKER_ITEMS = 6;
-  const TICKER_SECONDS_PER_CHAR = 0.32;
-  const TICKER_MIN_SECONDS = 24;
 
   /* ------------------------------------------------------------- hero */
   function renderHero(data) {
@@ -93,26 +90,6 @@
   }
 
   /* ------------------------------------------------------------- feed */
-  function renderTicker(feed, colorOf) {
-    const track = $('#ticker-track');
-    const items = feed.slice(0, TICKER_ITEMS);
-    if (!items.length) {
-      $('#ticker').hidden = true;
-      return;
-    }
-    const makeItem = (f) => el('span', { class: 'ticker__item' }, [
-      el('span', { class: 'ticker__who', style: `--c:${colorOf(f.member)}`, text: f.member }),
-      el('span', { class: 'ticker__text', text: f.text }),
-    ]);
-    // 끊김 없는 루프를 위해 같은 내용을 두 번 넣고 -50% 만큼 흘린다
-    items.forEach((f) => track.append(makeItem(f)));
-    items.forEach((f) => track.append(makeItem(f)));
-    const chars = items.reduce((n, f) => n + f.text.length + f.member.length, 0);
-    track.style.setProperty('--ticker-duration', `${Math.max(TICKER_MIN_SECONDS, Math.round(chars * TICKER_SECONDS_PER_CHAR))}s`);
-  }
-
-  const KIND_ICON = { note: '📝', lab: '🧪', streak: '🔥', level: '⬆️', join: '👋' };
-
   function avatarFor(member) {
     const img = el('img', { class: 'post__avatar', alt: '', width: 48, height: 48, loading: 'lazy', src: `https://github.com/${member}.png?size=96` });
     img.addEventListener('error', () => {
@@ -123,14 +100,15 @@
 
   function renderPost(f, isNew, colorOf) {
     const meta = [
-      el('span', { class: 'post__kind', text: KIND_LABEL[f.kind] || f.kind }),
+      isNew ? el('span', { class: 'post__new', text: 'NEW' }) : null,
+      el('span', { text: KIND_LABEL[f.kind] || f.kind }),
       el('span', { text: shortDate(f.date), title: f.date }),
-      f.mock ? el('span', { class: 'post__mock', text: 'MOCK' }) : null,
+      f.mock ? el('span', { text: 'MOCK' }) : null,
     ];
     const foot = [
-      f.url ? el('a', { class: 'post__attach', href: f.url, target: '_blank', rel: 'noopener', text: `📎 ${f.title} ↗` })
-            : el('span', { class: 'post__attach', text: `📎 ${f.title}` }),
-      (f.tags || []).length ? el('ul', { class: 'post__tags' }, f.tags.map((t) => el('li', { text: `#${t}` }))) : null,
+      f.url ? el('a', { class: 'post__attach', href: f.url, target: '_blank', rel: 'noopener', text: `${f.title} ↗` })
+            : el('span', { class: 'post__attach', text: f.title }),
+      (f.tags || []).length ? el('span', { class: 'post__tags', text: f.tags.map((t) => `#${t}`).join(' ') }) : null,
     ];
     return el('li', { class: `post${isNew ? ' is-new' : ''}`, style: `--accent:${colorOf(f.member)}` }, [
       el('header', { class: 'post__head' }, [
@@ -139,7 +117,6 @@
           el('a', { class: 'post__name', href: `https://github.com/${f.member}`, target: '_blank', rel: 'noopener', text: f.member }),
           el('span', { class: 'post__meta' }, meta),
         ]),
-        el('span', { class: 'post__icon', 'aria-hidden': 'true', text: KIND_ICON[f.kind] || '📣' }),
       ]),
       el('p', { class: 'post__text', text: f.text }),
       f.summary ? el('blockquote', { class: 'post__quote', text: f.summary }) : null,
@@ -296,7 +273,6 @@
       const colorOf = memberColorMap(data.members);
       renderHero(data);
       renderStats(data);
-      renderTicker(data.feed || [], colorOf);
       renderFeed(data.feed || [], data.feed_source, colorOf);
       renderMembers(data.members, colorOf);
       renderActivity(data.activity, colorOf);

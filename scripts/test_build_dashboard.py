@@ -13,7 +13,6 @@ from unittest import mock
 
 import build_dashboard as bd  # noqa: E402
 import dashboard_llm as llm  # noqa: E402
-import mock_feed  # noqa: E402
 
 
 class FrontmatterTests(unittest.TestCase):
@@ -113,30 +112,6 @@ class FeedTests(unittest.TestCase):
         m = make_member(streak=2, progress={"level": 1, "xp": 10}, folder_url="f")
         self.assertEqual(bd.build_feed_events([m], dt.date(2026, 9, 2)), [])
 
-    def test_resolve_feed_uses_mock_only_when_empty_by_default(self):
-        today = dt.date(2026, 9, 2)
-        real = [{"id": "x"}]
-        with mock.patch.dict(os.environ, {}, clear=False):
-            os.environ.pop("DASHBOARD_MOCK_FEED", None)
-            self.assertEqual(bd.resolve_feed(real, "fallback", today), (real, "fallback"))
-            feed, source = bd.resolve_feed([], "empty", today)
-        self.assertEqual(source, "mock")
-        self.assertTrue(all(f["mock"] for f in feed))
-
-    def test_resolve_feed_env_overrides(self):
-        today = dt.date(2026, 9, 2)
-        with mock.patch.dict(os.environ, {"DASHBOARD_MOCK_FEED": "0"}):
-            self.assertEqual(bd.resolve_feed([], "empty", today), ([], "empty"))
-        with mock.patch.dict(os.environ, {"DASHBOARD_MOCK_FEED": "1"}):
-            self.assertEqual(bd.resolve_feed([{"id": "x"}], "llm", today)[1], "mock")
-
-    def test_mock_feed_dates_are_relative_to_today(self):
-        feed = mock_feed.mock_feed(dt.date(2026, 9, 10))
-        self.assertEqual(feed[0]["date"], "2026-09-10")
-        self.assertEqual(len(feed), len(mock_feed.MOCK_FEED))
-        self.assertTrue(all(f["text"] and f["member"] for f in feed))
-        self.assertTrue(all("summary" in f and isinstance(f["tags"], list) for f in feed))
-
     def test_fallback_commentary_mentions_member_and_title(self):
         text = llm.fallback_commentary({"kind": "note", "member": "sehyun", "title": "RDF"})
         self.assertIn("sehyun", text)
@@ -149,7 +124,6 @@ class FeedTests(unittest.TestCase):
         self.assertEqual(feed[0]["id"], "note:a/1")
         self.assertEqual(feed[0]["summary"], "요약")
         self.assertEqual(feed[0]["tags"], ["rdf"])
-        self.assertFalse(feed[0]["mock"])
         self.assertEqual(llm.build_feed([], "", {}), ([], "empty"))
 
 

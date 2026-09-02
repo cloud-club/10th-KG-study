@@ -18,7 +18,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dashboard_llm import enrich_with_llm  # noqa: E402
-from mock_feed import mock_feed  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 MEMBERS_DIR = ROOT / "members"
@@ -382,16 +381,6 @@ def build_feed_events(members: list[dict], today: dt.date) -> list[dict]:
     return events[:FEED_LIMIT]
 
 
-def resolve_feed(feed: list[dict], source: str, today: dt.date) -> tuple[list[dict], str]:
-    """DASHBOARD_MOCK_FEED: auto(기본, 비어 있으면 목데이터) | 1(항상 목데이터) | 0(절대 안 씀)."""
-    flag = os.environ.get("DASHBOARD_MOCK_FEED", "auto").strip().lower()
-    force = flag in {"1", "true", "yes", "on"}
-    never = flag in {"0", "false", "no", "off"}
-    if force or (not never and not feed):
-        return mock_feed(today), "mock"
-    return feed, source
-
-
 def strip_private(members: list[dict]) -> list[dict]:
     cleaned = []
     for m in members:
@@ -438,7 +427,7 @@ def main() -> int:
 
     events = build_feed_events(members, today)
     llm = enrich_with_llm(members, totals, CACHE_PATH, events)
-    feed, feed_source = resolve_feed(llm.pop("feed"), llm.pop("feed_source"), today)
+    feed, feed_source = llm.pop("feed"), llm.pop("feed_source")
     study.update(llm)
 
     data = {

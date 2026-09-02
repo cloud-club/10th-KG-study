@@ -103,7 +103,6 @@
       isNew ? el('span', { class: 'post__new', text: 'NEW' }) : null,
       el('span', { text: KIND_LABEL[f.kind] || f.kind }),
       el('span', { text: shortDate(f.date), title: f.date }),
-      f.mock ? el('span', { text: 'MOCK' }) : null,
     ];
     const foot = [
       f.url ? el('a', { class: 'post__attach', href: f.url, target: '_blank', rel: 'noopener', text: `${f.title} ↗` })
@@ -127,11 +126,7 @@
   function renderFeed(feed, source, colorOf) {
     const list = $('#feed');
     const badge = $('#feed-source');
-    if (source === 'mock') {
-      badge.textContent = 'MOCK DATA';
-      badge.hidden = false;
-      $('#feed-hint').textContent = '아직 실제 기록이 없어 목데이터로 채웠어요. 노트를 올리면 진짜 중계가 시작됩니다.';
-    } else if (source === 'llm') {
+    if (source === 'llm') {
       badge.textContent = 'GPT 캐스터';
       badge.hidden = false;
     }

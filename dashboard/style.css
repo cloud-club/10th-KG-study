@@ -228,6 +228,10 @@ main { max-width: 1320px; margin: 0 auto; padding: 0 var(--space-page) var(--spa
 }
 a.post__attach:hover { background: var(--ink); color: var(--paper-2); }
 span.post__attach { border-style: dashed; color: var(--muted); }
+.post__commit { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; color: var(--muted); text-decoration: none; overflow-wrap: anywhere; }
+.post__commit:hover { color: var(--blue); text-decoration: underline; }
+.post__stats { color: var(--green); }
+.post__stats::before { color: var(--line); }
 .post__tags { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--muted); overflow-wrap: anywhere; }
 .feed__empty { grid-column: 1 / -1; padding: 1.2rem; color: var(--muted); }
 

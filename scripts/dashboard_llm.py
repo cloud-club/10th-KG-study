@@ -25,14 +25,18 @@ MAX_TAGS = 5
 TIMEOUT_SECONDS = 120
 RETRY_DELAY_SECONDS = 4
 
-KIND_LABEL = {"note": "노트", "lab": "실습", "streak": "연속 활동", "level": "레벨 업", "join": "합류"}
+KIND_LABEL = {"note": "노트", "lab": "실습", "shared": "공유 프로젝트", "commit": "커밋",
+              "streak": "연속 활동", "level": "레벨 업"}
 FEED_TEMPLATES = {
-    "note": "🎙️ {member} 선수, '{title}' 노트 제출! 지식그래프에 새 노드가 추가됩니다.",
-    "lab": "{member} 선수, '{title}' 실습으로 득점! 손으로 직접 굴려 봤습니다.",
+    "note": "🎙️ {member} 선수, 노트 커밋 '{title}'! 지식그래프에 새 내용이 얹힙니다.",
+    "lab": "{member} 선수, 실습 커밋 '{title}'! 코드가 굴러갑니다.",
+    "shared": "{member} 선수, 공유 프로젝트에 '{title}' 커밋! 팀 플레이 가동.",
+    "commit": "{member} 선수, '{title}' 커밋으로 한 걸음 전진.",
     "streak": "🔥 {member} 선수 {title}! 히트맵이 물들고 있습니다.",
     "level": "⬆️ {member} 선수 {title}! 꾸준함의 승리입니다.",
-    "join": "새 선수 입장! {member} 선수가 워밍업에 들어갑니다.",
 }
+MAX_DIFF_CHARS = 2500
+FEED_FIELDS = ("id", "date", "member", "kind", "title", "url", "summary", "tags", "items", "stats", "files")
 
 SYSTEM_PROMPT = (
     "너는 Knowledge Graph(KG) 스터디 현황판의 해설자다. "
@@ -215,18 +219,29 @@ def digest_prompt(members: list[dict], totals: dict) -> str:
     )
 
 
-def feed_prompt(events: list[dict]) -> str:
-    lines = [
-        f"- id={e['id']} | {e['date']} | {e['member']} | {KIND_LABEL.get(e['kind'], e['kind'])} | "
-        f"{e['title']} | 요약: {e['summary'] or '-'} | 태그: {', '.join(e['tags']) or '-'}"
-        for e in events
-    ]
+def event_block(e: dict) -> str:
+    stats = e.get("stats") or {}
+    stat_line = (f"파일 {stats.get('files', 0)}개, +{stats.get('additions', 0)} -{stats.get('deletions', 0)}"
+                 if stats else "-")
+    items = "; ".join(f"{i['kind']}:{i['title']}" for i in e.get("items") or []) or "-"
+    files = ", ".join(e.get("files") or []) or "-"
+    diff = (e.get("_diff") or "")[:MAX_DIFF_CHARS]
     return (
-        "아래는 KG 스터디에서 최근 일어난 일들이다. 스포츠 중계 캐스터처럼 각 사건을 한 줄로 중계해라.\n"
-        "규칙: 한국어, 50~70자, 멤버 id 를 '○○ 선수'라고 부르고, 무엇을 공부했는지가 드러나야 한다. "
-        "이모지는 줄당 최대 1개, 전체의 절반 이상은 이모지 없이. 과장은 살짝, 거짓 정보는 금지.\n"
-        'JSON 으로 답해라: {"lines": [{"id": "<id 그대로>", "text": "중계 문장"}]}\n\n'
-        + "\n".join(lines)
+        f"### id={e['id']}\n날짜: {e['date']} | 멤버: {e['member']} | 종류: {KIND_LABEL.get(e['kind'], e['kind'])}\n"
+        f"커밋 메시지/제목: {e['title']}\n변경: {stat_line}\n파일: {files}\n연결된 노트/실습: {items}\n"
+        + (f"diff 발췌:\n```\n{diff}\n```\n" if diff else "")
+    )
+
+
+def feed_prompt(events: list[dict]) -> str:
+    return (
+        "아래는 KG 스터디 레포에서 최근 일어난 일들이다. 커밋은 diff 발췌를 실제로 읽고 무엇을 했는지 파악한 뒤, "
+        "스포츠 중계 캐스터처럼 한 줄로 중계해라.\n"
+        "규칙: 한국어. text 는 50~80자, 멤버 id 를 '○○ 선수'라고 부르고 어떤 작업(무슨 코드/노트를 어떻게)인지 드러나야 한다. "
+        "summary 는 캐스터 톤 없이 실제 변경 내용을 사실대로 1문장 (diff 에 없는 내용은 지어내지 말 것). "
+        "tags 는 그 작업의 주제 키워드 2~4개, 소문자 영어. 이모지는 text 에만 최대 1개, 전체의 절반 이상은 이모지 없이.\n"
+        'JSON 으로 답해라: {"lines": [{"id": "<id 그대로>", "text": "...", "summary": "...", "tags": ["..."]}]}\n\n'
+        + "\n".join(event_block(e) for e in events)
     )
 
 
@@ -234,7 +249,17 @@ def feed_prompt(events: list[dict]) -> str:
 
 def fallback_commentary(event: dict) -> str:
     template = FEED_TEMPLATES.get(event["kind"], "{member} 선수, {title}.")
-    return template.format(member=event["member"], title=event["title"])
+    return template.format(member=event["member"], title=event["title"][:60])
+
+
+def fallback_summary_line(event: dict) -> str:
+    stats = event.get("stats") or {}
+    if not stats:
+        return ""
+    files = ", ".join(Path(f).name for f in (event.get("files") or [])[:4])
+    more = len(event.get("files") or []) - 4
+    return (f"파일 {stats.get('files', 0)}개 변경 (+{stats.get('additions', 0)} / -{stats.get('deletions', 0)})"
+            + (f": {files}" if files else "") + (f" 외 {more}개" if more > 0 else ""))
 
 
 def fallback_title(member: dict) -> str:
@@ -275,26 +300,51 @@ def apply_fallbacks(members: list[dict]) -> None:
 
 # ---------------------------------------------------------------- applying
 
+def feed_texts(events: list[dict], api_key: str, cache: dict) -> dict[str, dict]:
+    """사건별 중계 결과. 이미 캐시된 사건은 건너뛰고, 새 사건만 한 번에 묶어 호출한다."""
+    results: dict[str, dict] = {}
+    pending = []
+    for e in events:
+        key = f"feed:{resolved_model()}:{e['id']}"
+        if key in cache:
+            results[e["id"]] = cache[key]
+        else:
+            pending.append(e)
+    if not pending:
+        return results
+    result = cached_call(feed_prompt(pending), api_key, cache)
+    for line in (result or {}).get("lines") or []:
+        if not (isinstance(line, dict) and line.get("id") and str(line.get("text") or "").strip()):
+            continue
+        entry = {
+            "text": str(line["text"]).strip(),
+            "summary": str(line.get("summary") or "").strip(),
+            "tags": [str(t).strip().lower() for t in line.get("tags") or [] if str(t).strip()][:MAX_TAGS],
+        }
+        results[str(line["id"])] = entry
+        cache[f"feed:{resolved_model()}:{line['id']}"] = entry
+    if not result:
+        log("중계 문장 생성 실패 → 템플릿 사용")
+    return results
+
+
 def build_feed(events: list[dict], api_key: str, cache: dict) -> tuple[list[dict], str]:
     """사건 목록에 중계 문장을 붙인다. LLM 이 없거나 실패하면 템플릿 문장."""
     if not events:
         return [], "empty"
-    texts: dict[str, str] = {}
-    if api_key:
-        result = cached_call(feed_prompt(events), api_key, cache)
-        for line in (result or {}).get("lines") or []:
-            if isinstance(line, dict) and line.get("id") and str(line.get("text") or "").strip():
-                texts[str(line["id"])] = str(line["text"]).strip()
-        if not texts:
-            log("중계 문장 생성 실패 → 템플릿 사용")
+    texts = feed_texts(events, api_key, cache) if api_key else {}
     feed = []
     for e in events:
-        feed.append({
-            "id": e["id"], "date": e["date"], "member": e["member"], "kind": e["kind"],
-            "title": e["title"], "url": e["url"],
-            "text": texts.get(e["id"]) or fallback_commentary(e),
-            "summary": e.get("summary", ""), "tags": list(e.get("tags", [])),
-        })
+        info = texts.get(e["id"]) or {}
+        tags = list(e.get("tags") or [])
+        for tag in info.get("tags") or []:
+            if tag not in tags and len(tags) < MAX_TAGS:
+                tags.append(tag)
+        entry = {k: e.get(k) for k in FEED_FIELDS}
+        entry["text"] = info.get("text") or fallback_commentary(e)
+        entry["summary"] = info.get("summary") or e.get("summary") or fallback_summary_line(e)
+        entry["tags"] = tags
+        feed.append(entry)
     return feed, ("llm" if texts else "fallback")
 
 
@@ -321,20 +371,19 @@ def apply_member_result(member: dict, result: dict) -> None:
                 member["tags"].append(tag)
 
 
-def enrich_with_llm(members: list[dict], totals: dict, cache_path: Path, events: list[dict] | None = None) -> dict:
-    """members 를 제자리에서 보강하고, study 에 합칠 값과 feed/feed_source 를 돌려준다."""
+def enrich_with_llm(members: list[dict], totals: dict, cache: dict, events: list[dict] | None = None) -> dict:
+    """members 를 제자리에서 보강하고, study 에 합칠 값과 feed/feed_source 를 돌려준다. cache 는 호출자가 저장."""
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     events = events or []
     if not api_key:
         log("OPENAI_API_KEY 없음 → 규칙 기반 폴백 사용")
         apply_fallbacks(members)
-        feed, feed_source = build_feed(events, "", {})
+        feed, feed_source = build_feed(events, "", cache)
         return {
             "digest": fallback_digest(members, totals), "shoutouts": [], "digest_source": "fallback", "model": "",
             "feed": feed, "feed_source": feed_source,
         }
 
-    cache = load_cache(cache_path)
     for m in members:
         if not m["notes"] and not m["labs"]:
             continue
@@ -347,7 +396,6 @@ def enrich_with_llm(members: list[dict], totals: dict, cache_path: Path, events:
 
     digest_result = cached_call(digest_prompt(members, totals), api_key, cache)
     feed, feed_source = build_feed(events, api_key, cache)
-    save_cache(cache_path, cache)
     model = resolved_model()
     if not digest_result:
         return {

@@ -60,7 +60,8 @@
     };
   }
 
-  const KIND_LABEL = { note: '노트', lab: '실습', streak: '연속 출석', level: '레벨 업', join: '합류' };
+  const KIND_LABEL = { note: '노트', lab: '실습', shared: '공유 프로젝트', commit: '커밋', streak: '연속 출석', level: '레벨 업' };
+  const COMMIT_KINDS = new Set(['note', 'lab', 'shared', 'commit']);
 
   /* ------------------------------------------------------------- hero */
   function renderHero(data) {
@@ -99,14 +100,21 @@
   }
 
   function renderPost(f, isNew, colorOf) {
+    const stats = f.stats ? `+${f.stats.additions} −${f.stats.deletions}` : '';
     const meta = [
       isNew ? el('span', { class: 'post__new', text: 'NEW' }) : null,
       el('span', { text: KIND_LABEL[f.kind] || f.kind }),
       el('span', { text: shortDate(f.date), title: f.date }),
+      stats ? el('span', { class: 'post__stats', text: stats }) : null,
     ];
+    const isCommit = COMMIT_KINDS.has(f.kind);
     const foot = [
-      f.url ? el('a', { class: 'post__attach', href: f.url, target: '_blank', rel: 'noopener', text: `${f.title} ↗` })
-            : el('span', { class: 'post__attach', text: f.title }),
+      ...(f.items || []).map((item) => el('a', {
+        class: 'post__attach', href: item.url, target: '_blank', rel: 'noopener',
+        text: `${KIND_LABEL[item.kind] || item.kind} · ${item.title}`,
+      })),
+      isCommit && f.url ? el('a', { class: 'post__commit', href: f.url, target: '_blank', rel: 'noopener', text: `${f.title} ↗` }) : null,
+      !isCommit ? el('span', { class: 'post__attach', text: f.title }) : null,
       (f.tags || []).length ? el('span', { class: 'post__tags', text: f.tags.map((t) => `#${t}`).join(' ') }) : null,
     ];
     return el('li', { class: `post${isNew ? ' is-new' : ''}`, style: `--accent:${colorOf(f.member)}` }, [
@@ -118,7 +126,7 @@
         ]),
       ]),
       el('p', { class: 'post__text', text: f.text }),
-      f.summary ? el('blockquote', { class: 'post__quote', text: f.summary }) : null,
+      f.summary ? el('p', { class: 'post__quote', text: f.summary }) : null,
       el('footer', { class: 'post__foot' }, foot),
     ]);
   }

@@ -96,35 +96,121 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(len(graph["links"]), 5)
 
 
+class CommitTests(unittest.TestCase):
+    RAW = (
+        "\x1eaaa111\x1f2026-09-02\x1fSEHYUN PARK\x1f1+sese2204@users.noreply.github.com\x1ffeat: parser\n\n"
+        "members/sese2204/labs/01-parser/src/main.py\nmembers/sese2204/labs/01-parser/README.md\n"
+        "\x1ebbb222\x1f2026-09-01\x1fWoongbi\x1fkungbi@example.com\x1ffeat: agent\n\nshared/cloudclub-agent/app.py\n"
+        "\x1eccc333\x1f2026-09-01\x1fsehyun\x1fx@y.com\x1fstyle: dashboard\n\ndashboard/style.css\nREADME.md\n"
+    )
+
+    def test_parse_git_log_reads_records_and_files(self):
+        commits = bd.parse_git_log(self.RAW)
+        self.assertEqual([c["sha"] for c in commits], ["aaa111", "bbb222", "ccc333"])
+        self.assertEqual(commits[0]["files"][0], "members/sese2204/labs/01-parser/src/main.py")
+        self.assertEqual(commits[1]["email"], "kungbi@example.com")
+
+    def test_study_files_excludes_infra(self):
+        self.assertEqual(bd.study_files(["dashboard/app.js", "README.md", "shared/x.py", ".github/w.yml",
+                                         "members/a/labs/.gitkeep"]), ["shared/x.py"])
+
+    def test_classify_commit_priority(self):
+        self.assertEqual(bd.classify_commit(["members/a/labs/01/src/x.py", "members/a/notes/01.md"]), "lab")
+        self.assertEqual(bd.classify_commit(["members/a/notes/01.md"]), "note")
+        self.assertEqual(bd.classify_commit(["shared/agent/app.py"]), "shared")
+        self.assertEqual(bd.classify_commit(["members/a/README.md"]), "commit")
+
+    def test_attribute_by_member_path_then_noreply_email(self):
+        repo = {"owner": "o", "name": "n"}
+        by_path = {"sha": "1", "files": ["members/kungbi/notes/a.md"], "email": "x@y.com", "author": "someone"}
+        self.assertEqual(bd.attribute_commit(by_path, {"kungbi", "sese2204"}, repo, {}), "kungbi")
+        by_noreply = {"sha": "2", "files": ["shared/a.py"], "email": "99+sese2204@users.noreply.github.com", "author": "SEHYUN"}
+        self.assertEqual(bd.attribute_commit(by_noreply, {"kungbi", "sese2204"}, repo, {}), "sese2204")
+
+    def test_attribute_falls_back_to_cached_login_then_email_then_name(self):
+        repo = {"owner": "o", "name": "n"}
+        cache = {"author:3": "kungbi"}
+        c = {"sha": "3", "files": ["shared/a.py"], "email": "whoever@x.com", "author": "Someone"}
+        self.assertEqual(bd.attribute_commit(c, {"kungbi"}, repo, cache), "kungbi")
+        with mock.patch.object(bd, "github_login", return_value=""):
+            by_email = {"sha": "4", "files": ["shared/a.py"], "email": "kungbi@x.com", "author": "Someone"}
+            self.assertEqual(bd.attribute_commit(by_email, {"kungbi"}, repo, {}), "kungbi")
+            unknown = {"sha": "5", "files": ["shared/a.py"], "email": "z@x.com", "author": "Guest"}
+            self.assertEqual(bd.attribute_commit(unknown, {"kungbi"}, repo, {}), "Guest")
+
+    def test_collect_study_commits_drops_infra_only(self):
+        with mock.patch.object(bd, "git_all_commits", return_value=bd.parse_git_log(self.RAW)), \
+             mock.patch.object(bd, "github_login", return_value=""):
+            commits = bd.collect_study_commits({"owner": "o", "name": "n"}, {"sese2204", "kungbi"}, {})
+        self.assertEqual([(c["sha"], c["kind"], c["member"]) for c in commits],
+                         [("aaa111", "lab", "sese2204"), ("bbb222", "shared", "kungbi")])
+
+
 class FeedTests(unittest.TestCase):
-    def test_events_include_items_streak_and_level_sorted_desc(self):
-        note = {"kind": "note", "id": "a/notes/01", "title": "n", "date": "2026-09-01", "summary": "", "tags": ["rdf"], "url": "u"}
-        lab = {"kind": "lab", "id": "a/labs/01", "title": "l", "date": "2026-09-02", "summary": "s", "tags": [], "url": "u"}
-        m = make_member(id="a", notes=[note], labs=[lab], streak=3, last_active="2026-09-02",
-                        progress={"level": 2, "xp": 120}, folder_url="f")
-        events = bd.build_feed_events([m], dt.date(2026, 9, 2))
-        kinds = [e["kind"] for e in events]
-        self.assertEqual(kinds, ["level", "streak", "lab", "note"])
-        self.assertEqual(events[0]["title"], "Lv.2 달성")
-        self.assertEqual(events[1]["title"], "3일 연속 활동")
+    def test_commit_events_link_items_and_carry_diff(self):
+        lab = {"kind": "lab", "id": "a/labs/01", "title": "파서", "date": "", "summary": "", "tags": ["nlp"],
+               "url": "lab-url", "_path": "members/a/labs/01/"}
+        m = make_member(id="a", labs=[lab], progress={"level": 1, "xp": 0}, folder_url="f")
+        commits = [{"sha": "abc123456789xyz", "date": "2026-09-02", "message": "feat: parser", "kind": "lab",
+                    "member": "a", "files": ["members/a/labs/01/src/main.py"]}]
+        with mock.patch.object(bd, "commit_numstat", return_value={"files": 1, "additions": 5, "deletions": 1}), \
+             mock.patch.object(bd, "commit_diff_excerpt", return_value="+print('hi')"):
+            events = bd.build_feed_events(commits, [m], {"url": "https://gh/x"})
+        self.assertEqual(len(events), 1)
+        e = events[0]
+        self.assertEqual(e["id"], "commit:abc123456789")
+        self.assertEqual(e["items"], [{"kind": "lab", "title": "파서", "url": "lab-url"}])
+        self.assertEqual(e["tags"], ["nlp"])
+        self.assertEqual(e["_diff"], "+print('hi')")
+        self.assertEqual(e["url"], "https://gh/x/commit/abc123456789xyz")
+
+    def test_milestones_sorted_before_commits_on_same_day(self):
+        m = make_member(id="a", streak=3, last_active="2026-09-02", progress={"level": 2, "xp": 120}, folder_url="f")
+        commits = [{"sha": "s" * 12, "date": "2026-09-02", "message": "x", "kind": "commit", "member": "a", "files": ["shared/a"]}]
+        with mock.patch.object(bd, "commit_numstat", return_value={}), mock.patch.object(bd, "commit_diff_excerpt", return_value=""):
+            kinds = [e["kind"] for e in bd.build_feed_events(commits, [m], {"url": "u"})]
+        self.assertEqual(kinds, ["level", "streak", "commit"])
 
     def test_no_milestones_below_threshold(self):
         m = make_member(streak=2, progress={"level": 1, "xp": 10}, folder_url="f")
-        self.assertEqual(bd.build_feed_events([m], dt.date(2026, 9, 2)), [])
+        self.assertEqual(bd.milestone_events([m]), [])
 
-    def test_fallback_commentary_mentions_member_and_title(self):
-        text = llm.fallback_commentary({"kind": "note", "member": "sehyun", "title": "RDF"})
-        self.assertIn("sehyun", text)
-        self.assertIn("RDF", text)
+    def test_fallback_commentary_and_summary(self):
+        e = {"kind": "shared", "member": "kungbi", "title": "feat: agent", "stats": {"files": 2, "additions": 10, "deletions": 3},
+             "files": ["shared/agent/app.py", "shared/agent/README.md"]}
+        self.assertIn("kungbi", llm.fallback_commentary(e))
+        self.assertIn("공유 프로젝트", llm.fallback_commentary(e))
+        self.assertEqual(llm.fallback_summary_line(e), "파일 2개 변경 (+10 / -3): app.py, README.md")
 
     def test_build_feed_without_key_uses_templates(self):
-        events = [{"id": "note:a/1", "date": "2026-09-01", "member": "a", "kind": "note", "title": "t", "url": "u", "summary": "요약", "tags": ["rdf"]}]
+        events = [{"id": "commit:1", "date": "2026-09-01", "member": "a", "kind": "note", "title": "t", "url": "u",
+                   "summary": "", "tags": ["rdf"], "items": [], "stats": None, "files": [], "_diff": ""}]
         feed, source = llm.build_feed(events, "", {})
         self.assertEqual(source, "fallback")
-        self.assertEqual(feed[0]["id"], "note:a/1")
-        self.assertEqual(feed[0]["summary"], "요약")
+        self.assertEqual(feed[0]["id"], "commit:1")
         self.assertEqual(feed[0]["tags"], ["rdf"])
+        self.assertNotIn("_diff", feed[0])
         self.assertEqual(llm.build_feed([], "", {}), ([], "empty"))
+
+    def test_feed_texts_uses_per_event_cache_and_batches_new_ones(self):
+        llm._state["model"] = "gpt-5-mini"
+        cache = {"feed:gpt-5-mini:commit:old": {"text": "cached", "summary": "", "tags": []}}
+        events = [
+            {"id": "commit:old", "date": "d", "member": "a", "kind": "note", "title": "t", "url": "", "summary": "", "tags": [],
+             "items": [], "stats": None, "files": [], "_diff": ""},
+            {"id": "commit:new", "date": "d", "member": "a", "kind": "lab", "title": "t2", "url": "", "summary": "", "tags": [],
+             "items": [], "stats": {"files": 1, "additions": 1, "deletions": 0}, "files": ["x.py"], "_diff": "+x"},
+        ]
+        fake = mock.Mock(return_value={"lines": [{"id": "commit:new", "text": "새 중계", "summary": "요약", "tags": ["NLP"]}]})
+        with mock.patch.object(llm, "cached_call", fake):
+            texts = llm.feed_texts(events, "key", cache)
+        self.assertEqual(texts["commit:old"]["text"], "cached")
+        self.assertEqual(texts["commit:new"], {"text": "새 중계", "summary": "요약", "tags": ["nlp"]})
+        self.assertIn("feed:gpt-5-mini:commit:new", cache)
+        prompt = fake.call_args[0][0]
+        self.assertIn("commit:new", prompt)
+        self.assertNotIn("commit:old", prompt)
+        llm._state["model"] = None
 
 
 class ModelFallbackTests(unittest.TestCase):

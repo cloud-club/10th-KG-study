@@ -42,6 +42,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # Settings → Secrets and variables → Actions
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }} # 비워두면 gpt-5-mini
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 커밋 작성자 → GitHub 로그인 식별용 (읽기 전용)
         run: python3 scripts/build_dashboard.py
 
       - uses: actions/configure-pages@v5

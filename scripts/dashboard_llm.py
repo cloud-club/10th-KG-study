@@ -25,11 +25,12 @@ MAX_TAGS = 5
 TIMEOUT_SECONDS = 120
 RETRY_DELAY_SECONDS = 4
 
-KIND_LABEL = {"note": "노트", "lab": "실습", "shared": "공유 프로젝트", "commit": "커밋",
+KIND_LABEL = {"note": "노트", "lab": "실습", "reading": "읽을거리", "shared": "공유 프로젝트", "commit": "커밋",
               "streak": "연속 활동", "level": "레벨 업"}
 FEED_TEMPLATES = {
     "note": "🎙️ 클둥이 {member}, 노트 커밋 '{title}'! 지식그래프에 새 내용이 얹힙니다.",
     "lab": "클둥이 {member}, 실습 커밋 '{title}'! 코드가 굴러갑니다.",
+    "reading": "📚 클둥이 {member}, 읽을거리 추가 '{title}'! 이번 주 참고자료가 두터워집니다.",
     "shared": "클둥이 {member}, 공유 프로젝트에 '{title}' 커밋! 팀 플레이 가동.",
     "commit": "클둥이 {member}, '{title}' 커밋으로 한 걸음 전진.",
     "streak": "🔥 클둥이 {member} {title}! 히트맵이 물들고 있습니다.",

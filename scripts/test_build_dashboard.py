@@ -52,6 +52,55 @@ class MarkdownTests(unittest.TestCase):
         self.assertEqual(bd.normalize_tags(None), [])
 
 
+class ReadingsTests(unittest.TestCase):
+    REPO = {"url": "https://github.com/x/y", "branch": "main"}
+
+    def test_parse_reading_line_markdown_link_with_note(self):
+        item = bd.parse_reading_line("[DPR](https://arxiv.org/abs/2004.04906) — dense 검색의 시작")
+        self.assertEqual(item, {"title": "DPR", "url": "https://arxiv.org/abs/2004.04906", "note": "dense 검색의 시작"})
+
+    def test_parse_reading_line_bare_url_gets_host_label(self):
+        item = bd.parse_reading_line("https://www.anthropic.com/news/contextual-retrieval : 맥락 붙이기")
+        self.assertEqual(item["title"], "anthropic.com/news/contextual-retrieval")
+        self.assertEqual(item["url"], "https://www.anthropic.com/news/contextual-retrieval")
+        self.assertEqual(item["note"], "맥락 붙이기")
+
+    def test_parse_reading_line_plain_text_book(self):
+        item = bd.parse_reading_line("『AI 에이전트 엔지니어링』 (한빛미디어)")
+        self.assertEqual(item, {"title": "『AI 에이전트 엔지니어링』 (한빛미디어)", "url": "", "note": ""})
+
+    def test_parse_readings_groups_by_week_heading(self):
+        text = (
+            "# 읽을거리\n- 주차 밖 자료\n\n## 1주차 · RAG 기초\n- [A](https://a.com) — 메모\n1. https://b.com\n"
+            "```\n- 코드블록 안은 무시\n```\n### Week 2\n* [C](https://c.com)\n## 정리\n- 다른 제목 아래\n"
+        )
+        with mock.patch.object(bd, "read_text", return_value=text):
+            items = bd.parse_readings(bd.ROOT / "members/kim/readings.md", "kim", self.REPO)
+        self.assertEqual([(i["week"], i["title"]) for i in items],
+                         [(None, "주차 밖 자료"), (1, "A"), (1, "b.com"), (2, "C"), (None, "다른 제목 아래")])
+        self.assertEqual(items[1]["label"], "RAG 기초")
+        self.assertEqual(items[1]["member"], "kim")
+        self.assertTrue(items[1]["source_url"].endswith("members/kim/readings.md"))
+
+    def test_build_readings_merges_members_latest_week_first(self):
+        def reading(member, week, title, label=""):
+            return {"week": week, "label": label, "title": title, "url": "", "note": "", "member": member, "source_url": ""}
+        members = [
+            {"readings": [reading("kim", 1, "a", "RAG"), reading("kim", 2, "b")]},
+            {"readings": [reading("lee", 1, "c"), reading("lee", None, "d")]},
+        ]
+        weeks = bd.build_readings(members)
+        self.assertEqual([w["week"] for w in weeks], [2, 1, None])
+        self.assertEqual(weeks[1]["label"], "RAG")
+        self.assertEqual(weeks[1]["members"], ["kim", "lee"])
+        self.assertEqual([i["title"] for i in weeks[1]["items"]], ["a", "c"])
+        self.assertNotIn("week", weeks[1]["items"][0])
+
+    def test_classify_commit_marks_readings_file(self):
+        self.assertEqual(bd.classify_commit(["members/kim/readings.md"]), "reading")
+        self.assertEqual(bd.classify_commit(["members/kim/readings.md", "members/kim/notes/01.md"]), "note")
+
+
 class ProgressTests(unittest.TestCase):
     def test_xp_and_level(self):
         p = bd.progress(n_notes=2, n_labs=1, n_commits=4)

@@ -15,11 +15,13 @@
 ├── members/               # 멤버별 개인 작업 공간
 │   └── <github-id>/
 │       ├── README.md      # 자기소개, 목표
+│       ├── readings.md    # 주차별 읽을거리·참고자료 (현황판에 모아서 표시)
 │       ├── notes/         # 학습 정리 (01-topic.md ...)
 │       └── labs/          # 실습 (01-topic/README.md + src/)
-├── templates/             # notes / labs 템플릿
+├── templates/             # notes / labs / readings 템플릿
 │   ├── note-template.md
-│   └── lab-template.md
+│   ├── lab-template.md
+│   └── readings-template.md
 ├── shared/                # 공용 작업 공간
 │   └── cloudclub-agent/
 ├── dashboard/             # 현황판 정적 사이트 (GitHub Pages)
@@ -32,12 +34,14 @@
 1. `members/<github-id>/` 폴더를 만듭니다. (아래 명령 참고)
 2. `README.md`에 간단한 자기소개와 스터디 목표를 적습니다.
 3. `notes/`, `labs/`에 공부한 내용을 쌓아갑니다.
-4. PR로 올립니다. 자세한 규칙은 [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.
+4. 주차별 참고자료는 `readings.md`에 `## 1주차` 제목 아래 링크로 적습니다. 현황판이 멤버 전체 것을 모아 보여줍니다.
+5. PR로 올립니다. 자세한 규칙은 [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.
 
 ```bash
 GH_ID=<your-github-id>
 mkdir -p members/$GH_ID/notes members/$GH_ID/labs
 cp templates/note-template.md members/$GH_ID/notes/01-topic.md
+cp templates/readings-template.md members/$GH_ID/readings.md
 ```
 
 ## 현황판 (dashboard)
@@ -46,6 +50,7 @@ cp templates/note-template.md members/$GH_ID/notes/01-topic.md
 GPT가 멤버별 칭호·요약·태그와 스터디 소식을 붙여 GitHub Pages로 배포합니다.
 
 - 노트/실습 맨 위 프론트매터의 `tags`가 지식그래프의 주제 노드가 됩니다. 비워두면 GPT가 채워줍니다.
+- "주차별 읽을거리"는 각자 `members/<id>/readings.md`의 `## N주차` 아래 불릿을 모아 주차별로 보여줍니다. `[제목](링크) — 메모` 형식이면 링크·도메인·메모까지 뽑히고, 링크 없는 책 제목도 됩니다.
 - "중계석"은 최근 커밋의 diff를 GPT가 읽고 무슨 작업인지 캐스터 톤으로 중계합니다. `members/`, `shared/` 어디든 스터디 작업 커밋이면 잡히고, 3일 이상 연속 출석과 레벨 업도 사건으로 올라갑니다. 현황판 코드나 템플릿만 바꾼 커밋은 제외합니다.
 - 커밋은 멤버 폴더 경로, GitHub 로그인, 이메일 순으로 멤버에 연결됩니다. `shared/` 커밋도 히트맵과 최근 활동에 포함됩니다.
 - 로컬 미리보기:

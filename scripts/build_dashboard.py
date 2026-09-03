@@ -38,7 +38,8 @@ XP_PER_NOTE = 40
 XP_PER_LAB = 80
 XP_PER_COMMIT = 5
 XP_PER_LEVEL = 100
-KIND_ORDER = {"level": 0, "streak": 1, "lab": 2, "note": 3, "shared": 4, "commit": 5}
+KIND_ORDER = {"level": 0, "streak": 1, "lab": 2, "note": 3, "reading": 4, "shared": 5, "commit": 6}
+READINGS_FILE = "readings.md"      # members/<id>/readings.md — 주차별 읽을거리
 SKIP_DIRS = {"<github-id>", "_template"}
 INFRA_PREFIXES = ("dashboard/", "scripts/", ".github/", "templates/", ".cache/")
 INFRA_FILES = {"README.md", "CONTRIBUTING.md", ".gitignore"}
@@ -54,6 +55,11 @@ FRONTMATTER_RE = re.compile(r"\A---[ \t]*\n(.*?)\n---[ \t]*\n?", re.S)
 DATE_RE = re.compile(r"작성일\s*[:：]\s*(\d{4}-\d{2}-\d{2})")
 NUMBER_PREFIX_RE = re.compile(r"^\d+[-_.\s]*")
 MEMBER_PATH_RE = re.compile(r"^members/([^/]+)/")
+WEEK_HEADING_RE = re.compile(r"^#{2,3}\s*(?:(\d+)\s*주\s*차|week\s*-?\s*(\d+)|w(\d+))\b\s*(?:[·:\-—–|]\s*(.*?))?\s*$", re.I)
+BULLET_RE = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+(.+?)\s*$")
+MD_LINK_RE = re.compile(r"\[([^\]]*)\]\((https?://[^)\s]+)\)")
+BARE_URL_RE = re.compile(r"<?(https?://[^\s<>()]+)>?")
+SEPARATOR_RE = re.compile(r"^\s*[—–\-:·|]+\s*")
 NOREPLY_RE = re.compile(r"^(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$", re.I)
 
 
@@ -146,9 +152,11 @@ def classify_commit(files: list[str]) -> str:
             kinds.add("lab")
         elif re.match(r"^members/[^/]+/notes/", f):
             kinds.add("note")
+        elif re.match(rf"^members/[^/]+/{re.escape(READINGS_FILE)}$", f):
+            kinds.add("reading")
         elif f.startswith("shared/"):
             kinds.add("shared")
-    for kind in ("lab", "note", "shared"):
+    for kind in ("lab", "note", "reading", "shared"):
         if kind in kinds:
             return kind
     return "commit"
@@ -300,6 +308,78 @@ def read_text(path: Path) -> str:
         return ""
 
 
+# ----------------------------------------------------------------- readings
+
+def url_label(url: str, limit: int = 60) -> str:
+    """제목 없는 URL 의 표시용 라벨: 호스트 + 경로 (앞부분만)."""
+    stripped = re.sub(r"^https?://(?:www\.)?", "", url).rstrip("/")
+    return stripped if len(stripped) <= limit else stripped[:limit - 1] + "…"
+
+
+def parse_reading_line(text: str) -> dict | None:
+    """`[제목](url) — 메모`, `https://… — 메모`, `제목만` 형태의 불릿 한 줄을 항목으로."""
+    title, url, rest = "", "", text.strip()
+    link = MD_LINK_RE.search(rest)
+    if link:
+        title, url = link.group(1).strip(), link.group(2)
+        rest = (rest[:link.start()] + " " + rest[link.end():]).strip()
+    else:
+        bare = BARE_URL_RE.search(rest)
+        if bare:
+            url = bare.group(1).rstrip(".,;")
+            rest = (rest[:bare.start()] + " " + rest[bare.end():]).strip()
+    rest = SEPARATOR_RE.sub("", rest).strip()
+    if not title and not url:
+        title, rest = rest, ""
+    if not title:
+        title = url_label(url)
+    if not title:
+        return None
+    return {"title": title, "url": url, "note": rest}
+
+
+def parse_readings(path: Path, member_id: str, repo: dict) -> list[dict]:
+    """`## N주차 [· 제목]` 아래 불릿을 주차별 읽을거리 항목으로. 주차 제목 밖의 불릿은 week=None."""
+    _, body = parse_frontmatter(read_text(path))
+    body = re.sub(r"```.*?```", "", body, flags=re.S)
+    week, label, items = None, "", []
+    for line in body.splitlines():
+        heading = WEEK_HEADING_RE.match(line)
+        if heading:
+            week = int(next(g for g in heading.groups()[:3] if g))
+            label = (heading.group(4) or "").strip()
+            continue
+        if line.startswith("#"):
+            week, label = None, ""
+            continue
+        bullet = BULLET_RE.match(line)
+        if not bullet:
+            continue
+        item = parse_reading_line(bullet.group(1))
+        if item:
+            items.append({**item, "week": week, "label": label, "member": member_id, "source_url": file_url(repo, path)})
+    return items
+
+
+def build_readings(members: list[dict]) -> list[dict]:
+    """전 멤버 읽을거리를 주차별로 묶어 최신 주차부터. 주차 없는 항목은 맨 뒤 '기타'."""
+    groups: dict = defaultdict(list)
+    for m in members:
+        for item in m["readings"]:
+            groups[item["week"]].append(item)
+    weeks = []
+    for week in sorted((w for w in groups if w is not None), reverse=True) + ([None] if None in groups else []):
+        items = groups[week]
+        labels = [i["label"] for i in items if i["label"]]
+        weeks.append({
+            "week": week,
+            "label": Counter(labels).most_common(1)[0][0] if labels else "",
+            "members": sorted({i["member"] for i in items}),
+            "items": [{k: v for k, v in i.items() if k not in ("week", "label")} for i in items],
+        })
+    return weeks
+
+
 # ----------------------------------------------------------------- scanning
 
 def parse_note(path: Path, member_id: str, repo: dict) -> dict:
@@ -388,6 +468,8 @@ def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict
                    key=lambda n: n["file"])
     labs = sorted((parse_lab(d, member_id, repo) for d in labs_dir.iterdir() if d.is_dir() and not d.name.startswith("."))
                   if labs_dir.exists() else [], key=lambda l: l["file"])
+    readings_path = member_dir / READINGS_FILE
+    readings = parse_readings(readings_path, member_id, repo) if readings_path.exists() else []
     dates = [c["date"] for c in commits]
     tags = normalize_tags([t for item in notes + labs for t in item["tags"]])
 
@@ -399,7 +481,7 @@ def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict
         "folder_url": f"{repo['url']}/tree/{repo['branch']}/members/{member_id}",
         "intro": section_text(body, "소개", 300),
         "title": "", "summary": "", "highlights": [], "llm": False,
-        "counts": {"notes": len(notes), "labs": len(labs), "commits": len(commits)},
+        "counts": {"notes": len(notes), "labs": len(labs), "commits": len(commits), "readings": len(readings)},
         "progress": progress(len(notes), len(labs), len(commits)),
         "streak": current_streak(dates, today),
         "last_active": dates[0] if dates else "",
@@ -407,6 +489,7 @@ def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict
         "tags": tags,
         "notes": notes,
         "labs": labs,
+        "readings": readings,
         "_commits": commits,
     }
 
@@ -502,7 +585,7 @@ def write_step_summary(data: dict) -> None:
     model = f" ({s['model']})" if s.get("model") else ""
     lines = [
         "## 현황판 빌드", "",
-        f"- 멤버 {t['members']} · 노트 {t['notes']} · 실습 {t['labs']} · 커밋 {t['commits']}",
+        f"- 멤버 {t['members']} · 노트 {t['notes']} · 실습 {t['labs']} · 읽을거리 {t['readings']} · 커밋 {t['commits']}",
         f"- 요약/칭호: **{s['digest_source']}**{model}",
         f"- 중계 피드: **{data['feed_source']}** ({len(data['feed'])}건)",
         "", f"> {s['digest']}", "",
@@ -532,6 +615,7 @@ def main() -> int:
         "notes": sum(m["counts"]["notes"] for m in members),
         "labs": sum(m["counts"]["labs"] for m in members),
         "commits": len(commits),
+        "readings": sum(m["counts"]["readings"] for m in members),
     }
     started = git(["log", "--reverse", "--format=%ad", "--date=short"]).splitlines()
     study = {"started_at": started[0] if started else today.isoformat()}
@@ -552,13 +636,14 @@ def main() -> int:
         "members": strip_private(members),
         "graph": build_graph(members),
         "activity": build_activity(commits, repo),
+        "readings": build_readings(members),
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     write_step_summary(data)
     print(
         f"[dashboard] {OUT_PATH.relative_to(ROOT)} 생성: 멤버 {totals['members']}, "
-        f"노트 {totals['notes']}, 실습 {totals['labs']}, 커밋 {totals['commits']}, "
+        f"노트 {totals['notes']}, 실습 {totals['labs']}, 읽을거리 {totals['readings']}, 커밋 {totals['commits']}, "
         f"LLM={study.get('digest_source')}, 피드={feed_source}({len(feed)})"
     )
     return 0

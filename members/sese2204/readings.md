@@ -10,3 +10,4 @@
 - [Anthropic, Contextual Retrieval](https://www.anthropic.com/news/contextual-retrieval) — 청크마다 문서 맥락을 앞에 붙여 검색 실패율을 줄이는 방법
 - [Jina, Late Chunking](https://jina.ai/news/late-chunking-in-long-context-embedding-models/) — 임베딩 먼저, 청킹 나중에
 - 『AI 에이전트 엔지니어링』 (마이클 알바다 저 / 강민혁 역, 한빛미디어, 2026.01) — RAG 변천사 장을 참고
+- [zg(zvec-grep) — 키워드를 넘어서는 로컬 검색 인프라 (GeekNews)](https://news.hada.io/topic?id=33183) — Qwen 팀의 ripgrep 확장. 벡터 + BM25 하이브리드를 RRF로 합치고 16M 온디바이스 임베딩으로 코드·문서를 의미 검색. 하이브리드 검색 노트의 실전 사례

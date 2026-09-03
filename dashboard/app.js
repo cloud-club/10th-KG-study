@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const COLORS = ['#3d6bff', '#ff5c8a', '#37d67a', '#8b5cf6', '#ff8a3d', '#00b8d9'];
+  const COLORS = ['#3b8beb', '#ff7a90', '#35c39a', '#8f7bff', '#ffa14d', '#1fb6c8'];
   const MAX_ITEMS_PER_LIST = 5;
   const DAY_MS = 86400000;
 
@@ -75,15 +75,15 @@
   function renderStats(data) {
     const t = data.totals;
     const tiles = [
-      ['멤버', t.members, 'var(--yellow)'],
-      ['노트', t.notes, 'var(--paper-2)'],
-      ['실습', t.labs, 'var(--green)'],
-      ['커밋', t.commits, 'var(--paper-2)'],
-      ['일째', `D+${daysSince(data.study.started_at)}`, 'var(--pink)'],
+      ['멤버', t.members, 'var(--sky-500)'],
+      ['노트', t.notes, 'var(--lavender)'],
+      ['실습', t.labs, 'var(--mint)'],
+      ['커밋', t.commits, 'var(--teal)'],
+      ['일째', `D+${daysSince(data.study.started_at)}`, 'var(--coral)'],
     ];
     const list = $('#stats');
-    tiles.forEach(([label, value, bg]) => {
-      list.append(el('li', { class: 'stat', style: `--stat-bg:${bg}` }, [
+    tiles.forEach(([label, value, accent]) => {
+      list.append(el('li', { class: 'stat', style: `--stat-accent:${accent}` }, [
         el('span', { class: 'stat__value', text: String(value) }),
         el('span', { class: 'stat__label', text: label }),
       ]));

@@ -28,12 +28,12 @@ RETRY_DELAY_SECONDS = 4
 KIND_LABEL = {"note": "노트", "lab": "실습", "shared": "공유 프로젝트", "commit": "커밋",
               "streak": "연속 활동", "level": "레벨 업"}
 FEED_TEMPLATES = {
-    "note": "🎙️ {member} 선수, 노트 커밋 '{title}'! 지식그래프에 새 내용이 얹힙니다.",
-    "lab": "{member} 선수, 실습 커밋 '{title}'! 코드가 굴러갑니다.",
-    "shared": "{member} 선수, 공유 프로젝트에 '{title}' 커밋! 팀 플레이 가동.",
-    "commit": "{member} 선수, '{title}' 커밋으로 한 걸음 전진.",
-    "streak": "🔥 {member} 선수 {title}! 히트맵이 물들고 있습니다.",
-    "level": "⬆️ {member} 선수 {title}! 꾸준함의 승리입니다.",
+    "note": "🎙️ 클둥이 {member}, 노트 커밋 '{title}'! 지식그래프에 새 내용이 얹힙니다.",
+    "lab": "클둥이 {member}, 실습 커밋 '{title}'! 코드가 굴러갑니다.",
+    "shared": "클둥이 {member}, 공유 프로젝트에 '{title}' 커밋! 팀 플레이 가동.",
+    "commit": "클둥이 {member}, '{title}' 커밋으로 한 걸음 전진.",
+    "streak": "🔥 클둥이 {member} {title}! 히트맵이 물들고 있습니다.",
+    "level": "⬆️ 클둥이 {member} {title}! 꾸준함의 승리입니다.",
 }
 MAX_DIFF_CHARS = 2500
 FEED_FIELDS = ("id", "date", "member", "kind", "title", "url", "summary", "tags", "items", "stats", "files")
@@ -237,7 +237,7 @@ def feed_prompt(events: list[dict]) -> str:
     return (
         "아래는 KG 스터디 레포에서 최근 일어난 일들이다. 커밋은 diff 발췌를 실제로 읽고 무엇을 했는지 파악한 뒤, "
         "스포츠 중계 캐스터처럼 한 줄로 중계해라.\n"
-        "규칙: 한국어. text 는 50~80자, 멤버 id 를 '○○ 선수'라고 부르고 어떤 작업(무슨 코드/노트를 어떻게)인지 드러나야 한다. "
+        "규칙: 한국어. text 는 50~80자, 멤버 id 를 '클둥이 ○○'라고 부르고 (클라우드 클럽 애칭, 예: '클둥이 sese2204') 어떤 작업(무슨 코드/노트를 어떻게)인지 드러나야 한다. "
         "summary 는 캐스터 톤 없이 실제 변경 내용을 사실대로 1문장 (diff 에 없는 내용은 지어내지 말 것). "
         "tags 는 그 작업의 주제 키워드 2~4개, 소문자 영어. 이모지는 text 에만 최대 1개, 전체의 절반 이상은 이모지 없이.\n"
         'JSON 으로 답해라: {"lines": [{"id": "<id 그대로>", "text": "...", "summary": "...", "tags": ["..."]}]}\n\n'
@@ -248,7 +248,7 @@ def feed_prompt(events: list[dict]) -> str:
 # ---------------------------------------------------------------- fallbacks
 
 def fallback_commentary(event: dict) -> str:
-    template = FEED_TEMPLATES.get(event["kind"], "{member} 선수, {title}.")
+    template = FEED_TEMPLATES.get(event["kind"], "클둥이 {member}, {title}.")
     return template.format(member=event["member"], title=event["title"][:60])
 
 

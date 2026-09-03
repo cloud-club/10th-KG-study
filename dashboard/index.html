@@ -54,16 +54,24 @@
     <section class="section" aria-labelledby="graph-title">
       <div class="section__head">
         <h2 id="graph-title" class="section__title">스터디 지식그래프</h2>
-        <p class="section__hint">멤버 → 노트/실습 → 주제. 노드를 끌어 보거나 클릭해서 이웃만 보기.</p>
+        <p class="section__hint">멤버 → 노트/실습 → 주제. 두 명 이상이 겹친 주제만 그리고, 노트·실습을 누르면 태그 전체가 펼쳐져요.</p>
       </div>
       <div class="panel panel--graph">
         <div id="graph" class="graph" role="img" aria-label="멤버, 노트, 실습, 주제를 잇는 그래프"></div>
-        <ul class="legend" aria-hidden="true">
-          <li><i class="dot dot--member"></i>멤버</li>
-          <li><i class="dot dot--note"></i>노트</li>
-          <li><i class="dot dot--lab"></i>실습</li>
-          <li><i class="dot dot--topic"></i>주제</li>
-        </ul>
+        <div class="graph__foot">
+          <ul class="legend" aria-hidden="true">
+            <li><i class="dot dot--member"></i>멤버</li>
+            <li><i class="dot dot--note"></i>노트</li>
+            <li><i class="dot dot--lab"></i>실습</li>
+            <li><i class="dot dot--topic"></i>주제</li>
+          </ul>
+          <span class="graph__hidden" id="graph-hidden" hidden></span>
+          <label class="switch">
+            <input type="checkbox" id="graph-all-topics">
+            <span class="switch__track" aria-hidden="true"></span>
+            주제 전부 보기
+          </label>
+        </div>
         <p class="graph__empty" id="graph-empty" hidden>노트/실습에 <code>tags</code>를 달면 그래프가 자라나요.</p>
       </div>
     </section>

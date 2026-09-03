@@ -11,6 +11,7 @@
 ```
 members/<github-id>/
 ├── README.md     # 자기소개, 목표, 진행 현황
+├── readings.md   # 주차별 읽을거리 (선택)
 ├── notes/        # 학습 정리
 └── labs/         # 실습
 ```
@@ -55,6 +56,13 @@ status: in-progress           # in-progress | done
   - 예: `01-document-parser/README.md`, `01-document-parser/src/`
 - `README.md`는 `templates/lab-template.md`를 복사해서 작성합니다.
 - 실행 방법, 의존성, 결과를 README에 적어 다른 사람이 재현할 수 있게 합니다.
+
+### readings (주차별 읽을거리)
+
+- `members/<github-id>/readings.md` 파일 하나에 주차별로 모읍니다. `templates/readings-template.md`를 복사해서 시작합니다.
+- `## N주차` 제목 아래 불릿 하나가 자료 하나입니다. `## 1주차 · RAG 기초`처럼 제목 뒤에 주제를 붙여도 됩니다.
+- 불릿은 `[제목](링크) — 한 줄 메모` 형식을 기본으로 하되, 링크만 적거나 책처럼 링크 없이 제목만 적어도 됩니다.
+- 현황판 "주차별 읽을거리"가 멤버 전체 파일을 합쳐 주차별로 보여줍니다. 주차 제목 밖의 불릿은 "기타"로 묶입니다.
 
 ## 브랜치 & PR
 

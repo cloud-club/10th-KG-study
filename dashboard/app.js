@@ -60,8 +60,8 @@
     };
   }
 
-  const KIND_LABEL = { note: '노트', lab: '실습', shared: '공유 프로젝트', commit: '커밋', streak: '연속 출석', level: '레벨 업' };
-  const COMMIT_KINDS = new Set(['note', 'lab', 'shared', 'commit']);
+  const KIND_LABEL = { note: '노트', lab: '실습', reading: '읽을거리', shared: '공유 프로젝트', commit: '커밋', streak: '연속 출석', level: '레벨 업' };
+  const COMMIT_KINDS = new Set(['note', 'lab', 'reading', 'shared', 'commit']);
 
   /* ------------------------------------------------------------- hero */
   function renderHero(data) {
@@ -78,6 +78,7 @@
       ['멤버', t.members, 'var(--sky-500)'],
       ['노트', t.notes, 'var(--lavender)'],
       ['실습', t.labs, 'var(--mint)'],
+      ['읽을거리', t.readings || 0, 'var(--lavender)'],
       ['커밋', t.commits, 'var(--teal)'],
       ['일째', `D+${daysSince(data.study.started_at)}`, 'var(--coral)'],
     ];
@@ -143,6 +144,47 @@
       return;
     }
     feed.forEach((f, i) => list.append(renderPost(f, i === 0, colorOf)));
+  }
+
+  /* --------------------------------------------------------- readings */
+  function hostOf(url) {
+    try { return new URL(url).hostname.replace(/^www\./, ''); } catch (_) { return ''; }
+  }
+
+  function renderReadingItem(item, colorOf) {
+    const title = item.url
+      ? el('a', { class: 'reading__title', href: item.url, target: '_blank', rel: 'noopener', text: item.title })
+      : el('span', { class: 'reading__title', text: item.title });
+    const meta = [hostOf(item.url), item.note].filter(Boolean);
+    return el('li', { class: 'reading', style: `--c:${colorOf(item.member)}` }, [
+      el('a', { class: 'chip reading__who', href: `https://github.com/${item.member}`, target: '_blank', rel: 'noopener', text: item.member }),
+      el('div', { class: 'reading__body' }, [
+        title,
+        meta.length ? el('span', { class: 'reading__meta', text: meta.join(' · ') }) : null,
+      ]),
+    ]);
+  }
+
+  function renderReadingWeek(group, isLatest, colorOf) {
+    const name = group.week === null ? '기타' : `${group.week}주차`;
+    const summary = el('summary', { class: 'readings__week' }, [
+      el('span', { class: 'readings__name', text: name }),
+      group.label ? el('span', { class: 'readings__label', text: group.label }) : null,
+      el('span', { class: 'readings__count', text: `${group.items.length}개 · ${group.members.join(', ')}` }),
+    ]);
+    return el('details', { class: 'readings__group', open: isLatest ? '' : undefined }, [
+      summary,
+      el('ul', { class: 'readings__items' }, group.items.map((item) => renderReadingItem(item, colorOf))),
+    ]);
+  }
+
+  function renderReadings(weeks, colorOf) {
+    const box = $('#readings-list');
+    if (!weeks.length) {
+      box.append(el('p', { class: 'readings__empty', text: '아직 올라온 읽을거리가 없어요. members/<id>/readings.md 에 "## 1주차" 아래로 링크를 적어 보세요.' }));
+      return;
+    }
+    weeks.forEach((group, i) => box.append(renderReadingWeek(group, i === 0, colorOf)));
   }
 
   /* ---------------------------------------------------------- members */
@@ -277,6 +319,7 @@
       renderHero(data);
       renderStats(data);
       renderFeed(data.feed || [], data.feed_source, colorOf);
+      renderReadings(data.readings || [], colorOf);
       renderMembers(data.members, colorOf);
       renderActivity(data.activity, colorOf);
       renderFooter(data);

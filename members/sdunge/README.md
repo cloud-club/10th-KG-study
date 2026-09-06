@@ -6,6 +6,6 @@
 - Email: [sdunge222@gmail.com]
 - GitHub: [github.com/sdunge](https://github.com/sdunge)
 
-## 📁 이 폴더 구성
-- `data/` : 데이터 관련 정리
+## 📁 폴더
+- `data/` : 데이터 저장
 - `study/` : 스터디 내용 정리

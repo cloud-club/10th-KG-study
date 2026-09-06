@@ -1,5 +1,3 @@
-# 👋 안녕하세요, 조승아입니다!
-
 <img src="치이카와.jpeg" width="200" />
 
 ## 📫 Contact

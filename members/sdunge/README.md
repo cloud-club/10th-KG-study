@@ -1,8 +1,6 @@
 <img src="치이카와.jpeg" width="200" />
 
-## 📫 Contact
-- Email: [sdunge222@gmail.com]
-- GitHub: [github.com/sdunge](https://github.com/sdunge)
+## 화이팅~.~
 
 ## 📁 폴더
 - `data/` : 데이터 저장

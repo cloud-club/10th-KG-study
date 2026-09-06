@@ -1,0 +1,2655 @@
+TrendMicro RESTful API (v1)
+Download OpenAPI specification:
+
+License: 
+Apex Central Open API
+
+Servers
+List managed servers
+Retrieves a list of managed product servers reporting to Apex Central
+
+query Parameters
+entity_id	
+string
+The GUID of the managed product server
+
+ip_address	
+string
+The IP address of the endpoint
+
+mac_address	
+string
+The MAC address of the endpoint
+
+host_name	
+string
+The name of the endpoint
+
+product	
+string
+The Trend Micro product name
+
+Responses
+Request samples
+Python
+import base64
+import jwt
+import hashlib
+import requests
+import time
+import json
+import urllib.parse
+
+def create_checksum(http_method, raw_url, headers, request_body):
+    string_to_hash = http_method.upper() + '|' + raw_url.lower() + '|' + headers + '|' + request_body
+    base64_string = base64.b64encode(hashlib.sha256(str.encode(string_to_hash)).digest()).decode('utf-8')
+    return base64_string
+
+def create_jwt_token(appication_id, api_key, http_method, raw_url, headers, request_body,
+                     iat=time.time(), algorithm='HS256', version='V1'):
+    payload = {'appid': appication_id,
+               'iat': iat,
+               'version': version,
+               'checksum': create_checksum(http_method, raw_url, headers, request_body)}
+    token = jwt.encode(payload, api_key, algorithm=algorithm)
+    return token 
+	
+# Use this region to setup the call info of the Apex Central server (server url, application id, api key)
+
+# server info
+use_url_base = 'SERVER_HOST' 
+use_application_id = 'YOUR_APPLICATION_ID'
+use_api_key = 'YOUR_API_KEY'
+
+productAgentAPIPath = '/WebApp/API/ServerResource/ProductServers'
+
+canonicalRequestHeaders = ''
+
+useRequestBody = ''
+useQueryString=''
+
+jwt_token = create_jwt_token(use_application_id, use_api_key, 'GET',
+                              productAgentAPIPath + useQueryString,
+                              canonicalRequestHeaders, useRequestBody, iat=time.time())
+
+headers = {'Authorization': 'Bearer ' + jwt_token , 'Content-Type': 'application/json;charset=utf-8'}
+#Choose by call type.
+r = requests.get(use_url_base + productAgentAPIPath + useQueryString, headers=headers, verify=False)
+
+print(r.status_code)
+print(json.dumps(r.json(), indent=4))
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"result_code": 1,
+"result_content": [
+{}
+],
+"result_description": "string"
+}
+Endpoint Sensor
+Terminate process on Security Agents with Endpoint Sensor enabled
+Terminates the processes specified on Security Agent endpoints
+
+Request Body schema: application/json
+required
+object (Root Type for CreateProcessTerminationRequestPayload)
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"Payload": {
+"agentGuid": {},
+"filter": [],
+"serverGuid": [],
+"suspiciousObjectName": "SuspiciousObjectName",
+"terminationInfoList": []
+},
+"TaskType": 4,
+"Url": "V1/Task/CreateProcessTermination"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+List Security Agents with Endpoint Sensor enabled
+Retrieves a list of all Security Agents with the Endpoint Sensor feature enabled
+
+Request Body schema: application/json
+required
+object (ShowAgentListRequestPayload)
+Payload of the request
+
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"Payload": {
+"filter": [],
+"pagination": {}
+},
+"TaskType": 4,
+"Url": "V1/Task/ShowAgentList"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+Security Agents
+List Security Agents v1.0
+Retrieves a list of Security Agents
+
+query Parameters
+entity_id	
+string
+The GUID of the Security Agent
+
+ip_address	
+string
+The IP address of the endpoint
+
+mac_address	
+string
+The MAC address of the endpoint
+
+host_name	
+string
+The name of the endpoint
+
+product	
+string
+The Trend Micro product name
+
+managing_server_id	
+string
+The GUID of the product server that manages the Security Agent
+
+Responses
+Request samples
+Python
+import base64
+import jwt
+import hashlib
+import requests
+import time
+import json
+import urllib.parse
+
+def create_checksum(http_method, raw_url, headers, request_body):
+    string_to_hash = http_method.upper() + '|' + raw_url.lower() + '|' + headers + '|' + request_body
+    base64_string = base64.b64encode(hashlib.sha256(str.encode(string_to_hash)).digest()).decode('utf-8')
+    return base64_string
+
+def create_jwt_token(appication_id, api_key, http_method, raw_url, headers, request_body,
+                     iat=time.time(), algorithm='HS256', version='V1'):
+    payload = {'appid': appication_id,
+               'iat': iat,
+               'version': version,
+               'checksum': create_checksum(http_method, raw_url, headers, request_body)}
+    token = jwt.encode(payload, api_key, algorithm=algorithm)
+    return token 
+	
+# Use this region to setup the call info of the Apex Central server (server url, application id, api key)
+
+# server info
+use_url_base = 'SERVER_HOST' 
+use_application_id = 'YOUR_APPLICATION_ID'
+use_api_key = 'YOUR_API_KEY'  
+
+productAgentAPIPath = '/WebApp/API/AgentResource/ProductAgents'
+canonicalRequestHeaders = ''
+
+useRequestBody = ''
+useQueryString="?ip_address=192.168.121.132&mac_address=00-0C-29-9B-AB-65&host_name=OSCECLIENT"
+
+jwt_token = create_jwt_token(use_application_id, use_api_key, 'GET',
+                              productAgentAPIPath + useQueryString,
+                              canonicalRequestHeaders, useRequestBody, iat=time.time())
+
+headers = {'Authorization': 'Bearer ' + jwt_token , 'Content-Type': 'application/json;charset=utf-8'}
+#Choose by call type.
+r = requests.get(use_url_base + productAgentAPIPath + useQueryString, headers=headers, verify=False)
+
+print(r.status_code)
+print(json.dumps(r.json(), indent=4))
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"result_code": 1,
+"result_content": [
+{}
+],
+"result_description": "string"
+}
+Isolate, Restore, Relocate, or Uninstall Security Agent
+Performs the action specified in the "act" parameter
+● Isolate endpoint: Prevents the endpoin from connecting to the network
+● Restore connection: Restores network connectivity to an isolated endpoint
+● Uninstall Security Agent: Removes the Security Agent program from an endpoint
+● Relocate Security Agent: Moves the Security Agent to a different Apex One server or domain (the source and target must be registered to the same Apex Central server)
+
+Request Body schema: application/json
+Use act to specify operate.
+
+act	
+string
+Isolate: Specify the value as cmd_isolate_agent. Restore: Specify the value as cmd_restore_isolated_agent. Relocate: Specify the value as cmd_relocate_agent. Uninstall: Specify the value as cmd_uninstall_agent.
+
+allow_multiple_match	
+string
+True: Allows multiple matches False: Does not allow multiple matches
+
+entity_id	
+string
+The GUID of the managed product agent. Use to identify the agent(s) on which the action is performed.
+
+host_name	
+string
+The endpoint name of the managed product agent. Use to identify the agent(s) on which the action is performed.
+
+ip_address	
+string
+The IP address of the managed product agent. Use to identify the agent(s) on which the action is performed.
+
+mac_address	
+string
+The MAC address of the managed product agent. Use to identify the agent(s) on which the action is performed.
+
+product	
+string
+The Trend Micro product on the server instance. Use to identify the agent(s) on which the action is performed.
+
+relocate_to_folder_path	
+string
+The target directory for the agent.
+
+relocate_to_server_id	
+string
+The GUID of the target server for the agent.
+
+object (allowListParam)
+The allow list for isolated agent.
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"act": "string",
+"allow_multiple_match": "string",
+"entity_id": "string",
+"host_name": "string",
+"ip_address": "string",
+"mac_address": "string",
+"product": "string",
+"relocate_to_folder_path": "string",
+"relocate_to_server_id": "string",
+"allowList": {
+"inbound": [],
+"outbound": []
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"result_code": 1,
+"result_content": { },
+"result_description": "string"
+}
+List Security Agents v2.0
+Retrieves a list of Security Agents with more detail
+
+query Parameters
+entityID	
+string
+The GUID of the Security Agent
+
+ipAddress	
+string
+The IP address of the endpoint
+
+macAddress	
+string
+The MAC address of the endpoint
+
+hostName	
+string
+The name of the endpoint
+
+product	
+string
+The Trend Micro product ID. For example: 15 = Apex One, 31001 = Apex One(Mac)
+
+managingServerID	
+string
+The GUID of the product server that manages the Security Agent
+
+Responses
+Request samples
+Python
+import base64
+import jwt
+import hashlib
+import requests
+import time
+import json
+import urllib.parse
+
+def create_checksum(http_method, raw_url, headers, request_body):
+    string_to_hash = http_method.upper() + '|' + raw_url.lower() + '|' + headers + '|' + request_body
+    base64_string = base64.b64encode(hashlib.sha256(str.encode(string_to_hash)).digest()).decode('utf-8')
+    return base64_string
+
+def create_jwt_token(appication_id, api_key, http_method, raw_url, headers, request_body,
+                     iat=time.time(), algorithm='HS256', version='V1'):
+    payload = {'appid': appication_id,
+               'iat': iat,
+               'version': version,
+               'checksum': create_checksum(http_method, raw_url, headers, request_body)}
+    token = jwt.encode(payload, api_key, algorithm=algorithm)
+    return token 
+	
+# Use this region to setup the call info of the Apex Central server (server url, application id, api key)
+
+# server info
+use_url_base = 'SERVER_HOST' 
+use_application_id = 'YOUR_APPLICATION_ID'
+use_api_key = 'YOUR_API_KEY'  
+
+productAgentAPIPath = '/WebApp/API/v2/AgentResource/ProductAgents'
+canonicalRequestHeaders = ''
+
+useRequestBody = ''
+useQueryString="?ipAddress=192.168.121.132&macAddress=00-0C-29-9B-AB-65&hostName=OSCECLIENT"
+
+jwt_token = create_jwt_token(use_application_id, use_api_key, 'GET',
+                              productAgentAPIPath + useQueryString,
+                              canonicalRequestHeaders, useRequestBody, iat=time.time())
+
+headers = {'Authorization': 'Bearer ' + jwt_token , 'Content-Type': 'application/json;charset=utf-8'}
+#Choose by call type.
+r = requests.get(use_url_base + productAgentAPIPath + useQueryString, headers=headers, verify=False)
+
+print(r.status_code)
+print(json.dumps(r.json(), indent=4))
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"result_code": 1,
+"result_content": [
+{}
+],
+"result_description": "string"
+}
+Update Agents
+Deploy update settings to Update Agents
+Deploys update source settings to Update Agents reporting to an Apex One server
+
+Request Body schema: application/json
+The settings Update Agents apply
+
+act	
+string
+Specify the value as cmd_deploy_update_sources
+
+entity_id	
+string
+The GUID of the managed product server. Use to indicate the server on which to perform the action
+
+setting_data_JSON_string	
+string
+The JSON string containing the update source settings to deploy AllowUpdateFromOtherAU:0 (Use standard update source) | 1 (Use customized update source) UpdateComponentFromServerIfOUSFailed:0 (Do not deploy components if custom sources unavailable) | 1 (Deploy components even if custom sources unavailable) UpdateSettingFromServerIfOUSFailed:0 (Do not deploy domain settings if custom sources unavailable) | 1 (Deploy domain settings even if custom sources unavailable) UpdateProgramFromServerIfOUSFailed: 0 (Do not deploy Security Agent program or hotfixes if custom sources unavailable) | 1 (Deploy Security Agent program or hotfixes even if custom sources unavailable) OUSList
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"act": "string",
+"entity_id": "string",
+"setting_data_JSON_string": "string"
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"result_code": 1,
+"result_content": [
+{}
+],
+"result_description": "string"
+}
+Data Loss Prevention
+List Apex One Data Loss Prevention policy information
+Retrieves a list of all configured Apex One Data Loss Prevention policy names and related Security Agent targets.
+
+Note: This API does not require a request body.
+
+Responses
+Request samples
+Python
+import base64
+import jwt
+import hashlib
+import requests
+import time
+import json
+
+# Define the Apex Central server variables (server url, application id, api key)
+use_url_base = 'SERVER_HOST' 
+use_application_id = 'YOUR_APPLICATION_ID'
+use_api_key = 'YOUR_API_KEY'
+
+canonicalRequestHeaders = ''
+
+def create_checksum(http_method, raw_url, headers, request_body):
+    string_to_hash = http_method.upper() + '|' + raw_url.lower() + '|' + headers + '|' + request_body
+    base64_string = base64.b64encode(hashlib.sha256(str.encode(string_to_hash)).digest()).decode('utf-8')
+    return base64_string
+
+
+def create_jwt_token(application_id, api_key, http_method, raw_url, headers, request_body,
+                     iat=time.time(), algorithm='HS256', version='V1'):
+    payload = {'appid': application_id,
+               'iat': iat,
+               'version': version,
+               'checksum': create_checksum(http_method, raw_url, headers, request_body)}
+    token = jwt.encode(payload, api_key, algorithm=algorithm)
+    return token
+
+
+def get_ApexOneDLP_policy():
+
+    productAgentAPIPath = '/WebApp/api/policy/ApexOneDLP'
+
+    useRequestBody = ''
+
+    start_time = time.time()
+    jwt_token = create_jwt_token(use_application_id, use_api_key, 'GET',
+                                 productAgentAPIPath,
+                                 canonicalRequestHeaders, useRequestBody, iat=start_time)
+
+    headers = {'Authorization': 'Bearer ' + jwt_token, 'Content-Type': 'application/json;charset=utf-8'}
+
+    r = requests.get(use_url_base + productAgentAPIPath, headers=headers, verify=False)
+
+    if r.status_code != 200:
+        print("Error return code: " + str(r.status_code))
+
+    print(json.dumps(r.json(), indent=4))
+
+get_ApexOneDLP_policy()
+Response samples
+200500
+Content type
+
+application/json
+application/json
+{
+"Data": {
+"PolicyList": []
+},
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+OpenIOC
+List extraction status of OpenIOC files
+Queries the extraction status of uploaded OpenIOC files
+
+Request Body schema: application/json
+The OpenIOC file properties
+
+required
+object (FileHashIDListParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashIDList": []
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": [
+{}
+],
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Delete uploaded OpenIOC file
+Deletes existing OpenIOC files from the Apex Central server
+
+Request Body schema: application/json
+The OpenIOC file properties
+
+required
+object (FileHashIDListParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashIDList": []
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": [
+{}
+],
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Download uploaded OpenIOC file
+Downloads existing OpenIOC files from the Apex Central server
+
+Request Body schema: application/json
+The OpenIOC file properties
+
+required
+object (FileDownloadedParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashID": "stringstringstringstringstringstringstri"
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": {
+"FileContentBase64": "string",
+"FileName": "string"
+},
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Upload OpenIOC file
+Uploads OpenIOC files to the Apex Central server
+
+Request Body schema: application/json
+Upload file info
+
+required
+object (FileUploadedListParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileUploadedList": []
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": {
+"UploadedResultInfoList": [],
+"UploadedResultMessageList": []
+},
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+List uploaded OpenIOC files
+Retrieves a list of OpenIOC files from the Apex Central server
+
+Request Body schema: application/json
+Specify a JSON object containing the following HTTP header and request body
+
+required
+object (FilingCabinetParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashIDList": [],
+"FuzzyMatchString": "string",
+"PageNumber": 2147483647,
+"PageSize": 2147483647,
+"SortingColumn": 1,
+"SortingDirection": 1
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": {
+"FilingCabinet": [],
+"TotalIOCCount": 0
+},
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Extract OpenIOC objects to list
+Extracts suspicious object definitions from uploaded OpenIOC files to the User-Defined Suspicious Object list
+
+Request Body schema: application/json
+The OpenIOC file properties
+
+object (IOCInfo)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashIDList": [],
+"ScanType": {}
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": [
+{}
+],
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+STIX
+List extraction status of STIX files
+Queries the extraction status of uploaded STIX files
+
+Request Body schema: application/json
+The STIX file properties
+
+required
+object (FileHashIDListParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashIDList": []
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": [
+{}
+],
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Delete uploaded STIX file
+Deletes existing STIX files from the Apex Central server
+
+Request Body schema: application/json
+The STIX file properties
+
+required
+object (FileHashIDListParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashIDList": []
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": [
+{}
+],
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Download uploaded STIX file
+Downloads existing STIX files from the Apex Central server
+
+Request Body schema: application/json
+The STIX file properties
+
+required
+object (FileDownloadedParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashID": "stringstringstringstringstringstringstri"
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": {
+"FileContentBase64": "string",
+"FileName": "string"
+},
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Upload STIX file
+Uploads STIX files to the Apex Central server
+
+Request Body schema: application/json
+The STIX file properties
+
+required
+Array of objects (FileParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": [
+{}
+]
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": {
+"UploadedResultInfoList": [],
+"UploadedResultMessageList": []
+},
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+List uploaded STIX files
+Retrieves a list of STIX files from the Apex Central server
+
+Request Body schema: application/json
+Specify a JSON object containing the following HTTP header and request body
+
+required
+object (FilingCabinetParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashIDList": [],
+"FuzzyMatchString": "string",
+"PageNumber": 2147483647,
+"PageSize": 2147483647,
+"SortingColumn": 1,
+"SortingDirection": 1
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": {
+"FilingCabinet": [],
+"TotalIOCCount": 0
+},
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Extract STIX objects to list
+Extracts suspicious object definitions from uploaded STIX files to the User-Defined Suspicious Object list
+
+Request Body schema: application/json
+The STIX file properties
+
+object (IOCInfo)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashIDList": [],
+"ScanType": {}
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": [
+{}
+],
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+YARA
+Delete uploaded YARA file
+Deletes existing YARA files from the Apex Central server
+
+Request Body schema: application/json
+The YARA file properties
+
+required
+object (FileHashIDListParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashIDList": []
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": [
+{}
+],
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Download uploaded YARA file
+Downloads existing YARA files from the Apex Central server
+
+Request Body schema: application/json
+The YARA file properties
+
+required
+object (FileDownloadedParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashID": "stringstringstringstringstringstringstri"
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": {
+"FileContentBase64": "string",
+"FileName": "string"
+},
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Upload YARA file
+Uploads YARA files to the Apex Central server
+
+Request Body schema: application/json
+The YARA file properties
+
+required
+Array of objects (FileParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": [
+{}
+]
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": {
+"UploadedResultInfoList": [],
+"UploadedResultMessageList": []
+},
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+List uploaded YARA files
+Retrieves a list of YARA files from the Apex Central server
+
+Request Body schema: application/json
+Specify a JSON object containing the following HTTP header and request body
+
+required
+object (FilingCabinetParam)
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"param": {
+"FileHashIDList": [],
+"FuzzyMatchString": "string",
+"PageNumber": 2147483647,
+"PageSize": 2147483647,
+"SortingColumn": 1,
+"SortingDirection": 1
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": {
+"FilingCabinet": [],
+"TotalIOCCount": 0
+},
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+UDSO
+Add file object to UDSO list
+Adds the uploaded file information to the User-Defined Suspicious Objects list
+
+Request Body schema: application/json
+The suspicious file object properties
+
+file_content_base64_string	
+string
+The binary content of the file, converted to a base64 string
+
+file_name	
+string
+The name of the file
+
+file_scan_action	
+string
+The scan action to perform
+
+● Log
+● Block
+● Quarantine
+
+note	
+string
+Additional information
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"file_content_base64_string": "string",
+"file_name": "string",
+"file_scan_action": "string",
+"note": "string"
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": { },
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Delete UDSO from list
+Deletes existing User-Defined Suspicious Objects from the Apex Central server
+
+query Parameters
+type	
+string
+The suspicious object type ip url file_sha1 domain
+
+content	
+string
+The suspicious object content for the specified type
+ip:provide the IPv4 address
+url:provide the URL starting with http:// or https:// (maximum length: 2047 characters)
+file_sha1:provide the file SHA-1 hash (maximum length: 40 characters)
+domain:provide the domain
+
+notes	
+string
+Description of the object (maximum length: 256 characters)
+
+scan_action	
+string
+The scan action to perform on the suspicious object (maximum length: 64 characters) log block
+
+expiration_utc_date	
+string <date-time>
+The expiration date(UTC) of the suspicious object
+
+Responses
+Request samples
+Python
+import base64
+import jwt
+import hashlib
+import requests
+import time
+import json
+import urllib.parse
+
+def create_checksum(http_method, raw_url, headers, request_body):
+    string_to_hash = http_method.upper() + '|' + raw_url.lower() + '|' + headers + '|' + request_body
+    base64_string = base64.b64encode(hashlib.sha256(str.encode(string_to_hash)).digest()).decode('utf-8')
+    return base64_string
+
+def create_jwt_token(appication_id, api_key, http_method, raw_url, headers, request_body,
+                     iat=time.time(), algorithm='HS256', version='V1'):
+    payload = {'appid': appication_id,
+               'iat': iat,
+               'version': version,
+               'checksum': create_checksum(http_method, raw_url, headers, request_body)}
+    token = jwt.encode(payload, api_key, algorithm=algorithm)
+    return token 
+	
+# Use this region to setup the call info of the Apex Central server (server url, application id, api key)
+
+# server info
+use_url_base = 'SERVER_HOST' 
+use_application_id = 'YOUR_APPLICATION_ID'
+use_api_key = 'YOUR_API_KEY' 
+ 
+productAgentAPIPath = '/WebApp/api/SuspiciousObjects/UserDefinedSO/'
+canonicalRequestHeaders = ''
+useRequestBody = ''
+  
+useQueryString="?type=ip&content=123.123.123.123"
+
+jwt_token = create_jwt_token(use_application_id, use_api_key, 'DELETE',
+                              productAgentAPIPath + useQueryString,
+                              canonicalRequestHeaders, useRequestBody, iat=time.time())
+
+headers = {'Authorization': 'Bearer ' + jwt_token , 'Content-Type': 'application/json;charset=utf-8'}
+#Choose by call type.
+r = requests.delete(use_url_base + productAgentAPIPath + useQueryString, headers=headers, verify=False)
+
+print(r.status_code)
+print(json.dumps(r.json(), indent=4))
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": { },
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+List UDSO entries
+Retrieves a list of User-Defined Suspicious Objects from the Apex Central server
+
+query Parameters
+type	
+string
+The suspicious object type to queryip url file_sha1 domain file
+
+contentFilter	
+string
+Filters the list to suspicious objects that match the specified string
+
+Responses
+Request samples
+Python
+import base64
+import jwt
+import hashlib
+import requests
+import time
+import json
+import urllib.parse
+
+def create_checksum(http_method, raw_url, headers, request_body):
+    string_to_hash = http_method.upper() + '|' + raw_url.lower() + '|' + headers + '|' + request_body
+    base64_string = base64.b64encode(hashlib.sha256(str.encode(string_to_hash)).digest()).decode('utf-8')
+    return base64_string
+
+def create_jwt_token(appication_id, api_key, http_method, raw_url, headers, request_body,
+                     iat=time.time(), algorithm='HS256', version='V1'):
+    payload = {'appid': appication_id,
+               'iat': iat,
+               'version': version,
+               'checksum': create_checksum(http_method, raw_url, headers, request_body)}
+    token = jwt.encode(payload, api_key, algorithm=algorithm)
+    return token 
+	
+# Use this region to setup the call info of the Apex Central server (server url, application id, api key)
+
+# server info
+use_url_base = 'SERVER_HOST' 
+use_application_id = 'YOUR_APPLICATION_ID'
+use_api_key = 'YOUR_API_KEY'  
+
+productAgentAPIPath = '/WebApp/api/SuspiciousObjects/UserDefinedSO/'
+canonicalRequestHeaders = ''
+
+useRequestBody = ''
+
+useQueryString="?type=ip&contentFilter=168.95"
+jwt_token = create_jwt_token(use_application_id, use_api_key, 'GET',
+                              productAgentAPIPath + useQueryString,
+                              canonicalRequestHeaders, useRequestBody, iat=time.time())
+
+headers = {'Authorization': 'Bearer ' + jwt_token , 'Content-Type': 'application/json;charset=utf-8'}
+#Choose by call type.
+r = requests.get(use_url_base + productAgentAPIPath + useQueryString, headers=headers, verify=False)
+
+print(r.status_code)
+print(json.dumps(r.json(), indent=4))
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": { },
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Add UDSO to list
+Adds the specified object information to the User-Defined Suspicious Objects list
+
+Request Body schema: 
+application/json
+application/json
+required
+object (UDSOEntity)
+Responses
+Request samples
+PayloadPython
+Content type
+
+application/json
+application/json
+{
+"param": {
+"content": "string",
+"expiration_utc_date": "2019-08-24T14:15:22Z",
+"notes": "string",
+"scan_action": "string",
+"type": "string"
+}
+}
+Response samples
+200400500
+Content type
+
+application/json
+application/json
+{
+"Data": { },
+"FeatureCtrl": {
+"mode": "string"
+},
+"Meta": {
+"ErrorCode": 0,
+"ErrorMsg": "string",
+"Result": 0
+},
+"PermissionCtrl": {
+"elements": "string",
+"permission": "string"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "string"
+}
+}
+Assessment
+Create assessment using custom criteria and return taskID
+Creates a new historical investigation on all Security Agents with Endpoint Sensor enabled using the specified criteria, search operator, and match condition
+
+Request Body schema: application/json
+required
+object (CreateQuickScanRequestPayload)
+Payload of the request
+
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"Payload": {
+"criteria": {},
+"criteriaKvp": "File name: notepad.exe",
+"criteriaSource": 1,
+"searchPeriod": 3
+},
+"TaskType": 4,
+"Url": "V1/Task/CreateQuickScan"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+Investigation
+Create Live Investigation using registry, OpenIOC, or YARA information
+Creates a new Live Investigation using registry, OpenIOC, or YARA information
+
+Request Body schema: application/json
+required
+object (CreateScanRequestPayload)
+Payload of the request
+
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"Payload": {
+"agentGuid": {},
+"name": "test",
+"retroCriteria": {},
+"scanType": 0,
+"serverGuid": [],
+"timeRange": {}
+},
+"TaskType": 4,
+"Url": "V1/Task/CreateScan"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+Create scheduled Live Investigation
+Creates a scheduled Live Investigation
+
+Request Body schema: application/json
+object (Root Type for CreateScanScheduleRequestPayload)
+TaskType	
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+Url	
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"IsSync": true,
+"Payload": {
+"agentGuid": {},
+"fileContentCriteria": {},
+"name": "test",
+"scanType": 6,
+"scheduleCriteria": {},
+"selectAll": [ ],
+"serverGuid": [],
+"timeRange": {},
+"userTimezone": "8"
+},
+"TaskType": 4,
+"Url": "V1/Task/CreateScanSchedule"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+Investigation Results
+List filtered investigation results by status
+Retrieves a list of filtered investigation results
+
+Request Body schema: application/json
+required
+object (ShowScanListByScanSummaryGuidRequestPayload)
+Payload of the request
+
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"Payload": {
+"filter": [],
+"pagination": {},
+"scanStatus": 3,
+"scanSummaryGuid": [],
+"scanType": []
+},
+"TaskType": 4,
+"Url": "V1/Task/ShowScanListByScanSummaryGuid"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+List all investigation results
+Retrieves a list of all investigation results
+
+Request Body schema: application/json
+required
+object (ShowScanSummaryListRequestPayload)
+Payload of the request
+
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"Payload": {
+"filter": [],
+"pagination": {},
+"scanType": []
+},
+"TaskType": 4,
+"Url": "V1/Task/ShowScanSummaryList"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+Root Cause Analysis
+Get RCA response object returned by taskID (CreateQuickScan, ShowFootPrintChain, ShowFootPrintTable)
+Retrieves results of investigations in different formats based on the specified taskId (see Response object of "Get RCA - CreateQuickScan", Response object of "Get RCA – ShowFootPrintChain", Response object of "Get RCA – ShowFootPrintTable" )"
+
+Request Body schema: application/json
+ContentId
+required
+string
+Indicates the location of the dataset
+
+Specify an empty string for the initial request.
+
+Specify the lastContentId of the response after the first initial request to continually get results from the servers until the hasMore value response is false.
+
+object (ShowContentRequestPayload)
+TaskId
+required
+string
+TaskId from another API call that is used to retrieve a specific task result Specify the taskId values returned by the following APIs:
+
+ShowFootprintChain ShowFootprintTable CreateQuickScan
+
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+TopN
+required
+string
+Retrieves the top n results from the servers
+
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"ContentId": "",
+"Payload": {
+"serverGuid": "94fa27d5-aec6-46b6-828c-10c28a7a8bfd"
+},
+"TaskId": "88173A23-F45E-4ADB-B2D8-5609BB18A625",
+"TaskType": 4,
+"TopN": 1,
+"Url": "V1/Content/ShowContent"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+Download the RCA CSV file
+Downloads existing RCA files from the Apex Central server
+
+Request Body schema: application/json
+required
+object (ShowFootPrintCSVRequestPayload)
+Payload of the request
+
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"Payload": {
+"agentGuid": "654B1B52-C3C9-4405-B133-48E2353DA13B",
+"hostIP": "10.1.172.94",
+"hostName": "SAMPLE_AGENT",
+"scanSummaryGuid": "58127b3e-1bde-4c6e-8d86-0d0f89ded601",
+"serverGuid": []
+},
+"TaskType": 4,
+"Url": "V1/Task/ShowFootPrintCsv"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+Get taskID of RCA in Analysis Chain result
+Retrieves the taskID of the Analysis Chain view of a Root Cause Analysis
+
+Request Body schema: application/json
+required
+object (ShowFootPrintChainRequestPayload)
+Payload of the request
+
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"Payload": {
+"agentGuid": "654B1B52-C3C9-4405-B133-48E2353DA13B",
+"scanSummaryGuid": "58127b3e-1bde-4c6e-8d86-0d0f89ded601",
+"serverGuid": []
+},
+"TaskType": 4,
+"Url": "V1/Task/ShowFootPrintChain"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+Get taskID of RCA in table format
+Retrieves the taskID of the table view of a Root Cause Analysis
+
+Request Body schema: application/json
+required
+object (ShowFootPrintTableRequestPayload)
+Payload of the request
+
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"Payload": {
+"agentGuid": "654B1B52-C3C9-4405-B133-48E2353DA13B",
+"scanSummaryGuid": "58127b3e-1bde-4c6e-8d86-0d0f89ded601",
+"serverGuid": []
+},
+"TaskType": 4,
+"Url": "V1/Task/ShowFootPrintTable"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+Response Object
+Response object of "Get RCA - CreateQuickScan"
+A possible response object returned when the "Get RCA response object returned by taskID (CreateQuickScan, ShowFootPrintChain, ShowFootPrintTable)" API is invoked
+
+Request Body schema: application/json
+ContentId
+required
+string
+Indicates the location of the dataset
+
+Specify an empty string for the initial request.
+
+Specify the lastContentId of the response after the first initial request to continually get results from the servers until the hasMore value response is false.
+
+object (ShowContentRequestPayload)
+TaskId
+required
+string
+TaskId from another API call that is used to retrieve a specific task result Specify the taskId values returned by the following APIs:
+
+ShowFootprintChain ShowFootprintTable CreateQuickScan
+
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+TopN
+required
+string
+Retrieves the top n results from the servers
+
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"ContentId": "",
+"Payload": {
+"serverGuid": "94fa27d5-aec6-46b6-828c-10c28a7a8bfd"
+},
+"TaskId": "88173A23-F45E-4ADB-B2D8-5609BB18A625",
+"TaskType": 4,
+"TopN": 1,
+"Url": "V1/Content/ShowContent"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+Response object of "Get RCA – ShowFootPrintChain"
+A possible response object returned when the "Get RCA response object returned by taskID (CreateQuickScan, ShowFootPrintChain, ShowFootPrintTable)" API is invoked
+
+Request Body schema: application/json
+ContentId
+required
+string
+Indicates the location of the dataset
+
+Specify an empty string for the initial request.
+
+Specify the lastContentId of the response after the first initial request to continually get results from the servers until the hasMore value response is false.
+
+object (ShowContentRequestPayload)
+TaskId
+required
+string
+TaskId from another API call that is used to retrieve a specific task result Specify the taskId values returned by the following APIs:
+
+ShowFootprintChain ShowFootprintTable CreateQuickScan
+
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+TopN
+required
+string
+Retrieves the top n results from the servers
+
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"ContentId": "",
+"Payload": {
+"serverGuid": "94fa27d5-aec6-46b6-828c-10c28a7a8bfd"
+},
+"TaskId": "88173A23-F45E-4ADB-B2D8-5609BB18A625",
+"TaskType": 4,
+"TopN": 1,
+"Url": "V1/Content/ShowContent"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+Response object of "Get RCA – ShowFootPrintTable"
+A possible response object returned when the "Get RCA response object returned by taskID (CreateQuickScan, ShowFootPrintChain, ShowFootPrintTable)" API is invoked
+
+Request Body schema: application/json
+ContentId
+required
+string
+Indicates the location of the dataset
+
+Specify an empty string for the initial request.
+
+Specify the lastContentId of the response after the first initial request to continually get results from the servers until the hasMore value response is false.
+
+object (ShowContentRequestPayload)
+TaskId
+required
+string
+TaskId from another API call that is used to retrieve a specific task result Specify the taskId values returned by the following APIs:
+
+ShowFootprintChain ShowFootprintTable CreateQuickScan
+
+TaskType
+required
+integer
+Type of API request. For Endpoint Sensor, the value is always 4.
+
+1 - UNKNOWN
+2 - INTERNAL
+3 - CM
+4 - CMEF
+5 - OSF_COMMAND
+6 - OSF_QUERY
+7 - OSF_NOTIFY
+8 - OSF_LOG
+9 - MDR_ATTACK_DISCOVERY
+10 - OSF_SYS_CALL
+TopN
+required
+string
+Retrieves the top n results from the servers
+
+Url
+required
+string
+Specifies the Endpoint Sensor API request to query
+
+Responses
+Request samples
+PayloadPython
+Content type
+application/json
+{
+"ContentId": "",
+"Payload": {
+"serverGuid": "94fa27d5-aec6-46b6-828c-10c28a7a8bfd"
+},
+"TaskId": "88173A23-F45E-4ADB-B2D8-5609BB18A625",
+"TaskType": 4,
+"TopN": 1,
+"Url": "V1/Content/ShowContent"
+}
+Response samples
+200400500
+Content type
+application/json
+{
+"Data": {
+"Code": 0,
+"CodeType": 1,
+"Data": {},
+"Message": "OK",
+"TimeZone": 8
+},
+"FeatureCtrl": {
+"mode": "0"
+},
+"Meta": {
+"errorCode": 0,
+"errorMessgae": "Success",
+"result": 1
+},
+"PermissionCtrl": {
+"permission": "255"
+},
+"SystemCtrl": {
+"TmcmSoDist_Role": "none"
+}
+}
+Logs
+Get syslog data
+Retrieves a maximum of 1000 logs of detection types from the server. The Pattern Update Status and Engine Update Status logs returns all logs (no maximum) from the specified "since_time"
+
+path Parameters
+logType
+required
+string
+The type of log data to retrieve
+data_loss_prevention:Data Loss Prevention
+device_access_control:Device Control
+behaviormonitor_rule:Behavior Monitoring
+officescan_virus:Virus/Malware
+spyware:Spyware/Grayware
+web_security:Web Violation
+security:Content Violation
+ncie:Network Content Inspection
+cncdetection:C&C Callback
+filehashdetection:Suspicious File Information
+Predictive_Machine_Learning:Predictive Machine Learning
+Sandbox_Detection_Log:Virtual Analyzer Detections
+EACV_Information:Application Control
+Managed_Product_Logged_Information:Managed Product User Access
+Attack_Discovery_Detections:Attack Discovery
+pattern_updated_status:Pattern Update Status
+engine_updated_status:Engine Update Status
+product_auditing_events:Product Auditing Events
+intrusion_prevention:Intrusion Prevention
+
+query Parameters
+inputQueryParams.page_token	
+string
+The log ID of the first record to query
+Note: For Pattern Update Status and Engine Update Status logs, the value of page_token must be "0".
+
+inputQueryParams.since_time	
+string
+The date/time of the first record to query (UNIX timestamp)
+
+inputQueryParams.output_format	
+string
+The log format of the response (1 or CEF)
+
+Responses
+Response Schema: 
+application/json
+application/json
+object (SyslogResponse)
+object (SaaSCtrlObject)
+Indicates the Apex Central deployment model
+
+object (MetaEntity)
+Indicates the response status, including the result, error code, and error message
+
+object (PermissionCtrlObject)
+Indicates the permissions assigned to the logged-on user account for accessing Apex Central menu items and features
+
+object (SystemCtrlObject)
+Indicates the suspicious object distribution role of the Apex Central server
+
+Response Schema: 
+application/json
+application/json
+object (SyslogResponse)
+object (SaaSCtrlObject)
+Indicates the Apex Central deployment model
+
+object (MetaEntity)
+Indicates the response status, including the result, error code, and error message
+
+object (PermissionCtrlObject)
+Indicates the permissions assigned to the logged-on user account for accessing Apex Central menu items and features
+
+object (SystemCtrlObject)
+Indicates the suspicious object distribution role of the Apex Central server
+
+Response Schema: 
+application/json
+application/json
+object (SyslogResponse)
+object (SaaSCtrlObject)
+Indicates the Apex Central deployment model
+
+object (MetaEntity)
+Indicates the response status, including the result, error code, and error message
+
+object (PermissionCtrlObject)
+Indicates the permissions assigned to the logged-on user account for accessing Apex Central menu items and features
+
+object (SystemCtrlObject)
+Indicates the suspicious object distribution role of the Apex Central server
+
+

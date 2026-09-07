@@ -3,7 +3,7 @@
   'use strict';
 
   const COLORS = ['#3b8beb', '#ff7a90', '#35c39a', '#8f7bff', '#ffa14d', '#1fb6c8'];
-  const MAX_ITEMS_PER_LIST = 5;
+  const MAX_ITEMS_PER_LIST = 2;
   const DAY_MS = 86400000;
 
   const $ = (sel, root) => (root || document).querySelector(sel);

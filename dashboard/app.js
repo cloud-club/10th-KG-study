@@ -100,11 +100,20 @@
     return img;
   }
 
+  function renderCommitLinks(f) {
+    const commits = (f.commits || []).length > 1 ? f.commits : (f.url ? [{ message: f.title, url: f.url }] : []);
+    const links = commits.map((c) => el('a', { class: 'post__commit', href: c.url, target: '_blank', rel: 'noopener', text: `${c.message} ↗` }));
+    const rest = (f.count || 1) - commits.length;
+    if (rest > 0) links.push(el('span', { class: 'post__commit', text: `외 ${rest}건` }));
+    return links;
+  }
+
   function renderPost(f, isNew, colorOf) {
     const stats = f.stats ? `+${f.stats.additions} −${f.stats.deletions}` : '';
     const meta = [
       isNew ? el('span', { class: 'post__new', text: 'NEW' }) : null,
       el('span', { text: KIND_LABEL[f.kind] || f.kind }),
+      f.count > 1 ? el('span', { class: 'post__count', text: `커밋 ${f.count}건` }) : null,
       el('span', { text: shortDate(f.date), title: f.date }),
       stats ? el('span', { class: 'post__stats', text: stats }) : null,
     ];
@@ -114,7 +123,7 @@
         class: 'post__attach', href: item.url, target: '_blank', rel: 'noopener',
         text: `${KIND_LABEL[item.kind] || item.kind} · ${item.title}`,
       })),
-      isCommit && f.url ? el('a', { class: 'post__commit', href: f.url, target: '_blank', rel: 'noopener', text: `${f.title} ↗` }) : null,
+      ...(isCommit ? renderCommitLinks(f) : []),
       !isCommit ? el('span', { class: 'post__attach', text: f.title }) : null,
       (f.tags || []).length ? el('span', { class: 'post__tags', text: f.tags.map((t) => `#${t}`).join(' ') }) : null,
     ];

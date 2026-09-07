@@ -213,6 +213,45 @@ class FeedTests(unittest.TestCase):
         self.assertEqual(e["_diff"], "+print('hi')")
         self.assertEqual(e["url"], "https://gh/x/commit/abc123456789xyz")
 
+    def test_same_member_same_day_commits_are_grouped(self):
+        m = make_member(id="a", progress={"level": 1, "xp": 0}, folder_url="f")
+        commits = [
+            {"sha": "aaa111222333x", "date": "2026-09-05", "message": "docs: note 2", "kind": "note", "member": "a", "files": ["members/a/notes/02.md"]},
+            {"sha": "bbb111222333x", "date": "2026-09-05", "message": "docs: note 1", "kind": "note", "member": "a", "files": ["members/a/notes/01.md"]},
+            {"sha": "ccc111222333x", "date": "2026-09-05", "message": "feat: lab", "kind": "lab", "member": "a", "files": ["members/a/labs/01/x.py"]},
+            {"sha": "ddd111222333x", "date": "2026-09-04", "message": "chore: init", "kind": "commit", "member": "a", "files": ["members/a/README.md"]},
+        ]
+        with mock.patch.object(bd, "commit_numstat", return_value={"files": 1, "additions": 2, "deletions": 1}), \
+             mock.patch.object(bd, "commit_diff_excerpt", side_effect=lambda sha, files: f"+{sha[:3]}"):
+            events = bd.build_feed_events(commits, [m], {"url": "u"})
+        self.assertEqual([e["count"] for e in events], [3, 1])
+        grouped = events[0]
+        self.assertEqual(grouped["id"], "commits:a:2026-09-05:aaa1112")
+        self.assertEqual(grouped["kind"], "lab")  # 묶음 안에 실습이 있으면 실습으로
+        self.assertEqual(grouped["title"], "docs: note 2")
+        self.assertEqual([c["message"] for c in grouped["commits"]], ["docs: note 2", "docs: note 1", "feat: lab"])
+        self.assertEqual(grouped["stats"], {"files": 3, "additions": 6, "deletions": 3})
+        self.assertEqual(len(grouped["files"]), 3)
+        self.assertIn("## feat: lab\n+ccc", grouped["_diff"])
+        self.assertEqual(events[1]["id"], "commit:ddd111222333")
+        self.assertEqual(events[1]["commits"], [{"message": "chore: init", "url": "u/commit/ddd111222333x"}])
+
+    def test_feed_caps_events_per_member_and_backfills_others(self):
+        def commit(i, member, date):
+            return {"sha": f"{i:012d}x", "date": date, "message": f"c{i}", "kind": "commit", "member": member, "files": ["shared/x"]}
+        # a 가 5일 연속 푸시, b 는 그보다 오래된 커밋 2개
+        commits = [commit(i, "a", f"2026-09-{10 - i:02d}") for i in range(5)] + \
+                  [commit(9, "b", "2026-09-01"), commit(8, "b", "2026-08-30")]
+        groups = bd.pick_feed_groups(bd.group_commits(commits))
+        self.assertEqual([(g[0]["member"], g[0]["date"]) for g in groups],
+                         [("a", "2026-09-10"), ("a", "2026-09-09"), ("a", "2026-09-08"), ("b", "2026-09-01"), ("b", "2026-08-30")])
+
+    def test_fallback_commentary_for_grouped_event(self):
+        e = {"kind": "note", "member": "a", "title": "docs: note 2", "count": 3}
+        text = llm.fallback_commentary(e)
+        self.assertIn("3건", text)
+        self.assertIn("docs: note 2", text)
+
     def test_milestones_sorted_before_commits_on_same_day(self):
         m = make_member(id="a", streak=3, last_active="2026-09-02", progress={"level": 2, "xp": 120}, folder_url="f")
         commits = [{"sha": "s" * 12, "date": "2026-09-02", "message": "x", "kind": "commit", "member": "a", "files": ["shared/a"]}]

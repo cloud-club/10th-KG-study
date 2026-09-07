@@ -29,7 +29,10 @@ CACHE_PATH = ROOT / ".cache" / "llm-cache.json"
 
 HEATMAP_DAYS = 84
 ACTIVITY_LIMIT = 20
-COMMIT_FEED_LIMIT = 10          # 중계할 최근 커밋 수
+COMMIT_FEED_LIMIT = 10          # 중계할 커밋 사건 수 (같은 멤버·같은 날 커밋은 한 사건)
+COMMIT_SCAN_LIMIT = 80          # 사건을 고를 때 훑는 최근 커밋 수
+FEED_PER_MEMBER = 3             # 한 멤버가 피드에서 차지할 수 있는 커밋 사건 수
+MAX_COMMITS_IN_EVENT = 6        # 묶인 사건에 실어 보내는 커밋 메시지 수
 FEED_LIMIT = 12                 # 커밋 + 마일스톤 합쳐 최대
 DIFF_EXCERPT_CHARS = 2500       # GPT 에 넘길 diff 길이 (커밋당)
 MAX_FILES_IN_EVENT = 12
@@ -526,28 +529,81 @@ def linked_items(files: list[str], member: dict | None) -> list[dict]:
             if any(f == item["_path"].rstrip("/") or f.startswith(item["_path"]) for f in files)]
 
 
+def group_commits(commits: list[dict]) -> list[list[dict]]:
+    """같은 멤버가 같은 날 올린 커밋을 한 묶음으로. 입력·출력 모두 최신순."""
+    groups: dict[tuple[str, str], list[dict]] = {}
+    for c in commits[:COMMIT_SCAN_LIMIT]:
+        groups.setdefault((c["member"], c["date"]), []).append(c)
+    return list(groups.values())
+
+
+def pick_feed_groups(groups: list[list[dict]]) -> list[list[dict]]:
+    """멤버당 FEED_PER_MEMBER 묶음까지만, 전체 COMMIT_FEED_LIMIT 개까지. 한 사람이 도배하지 못하게."""
+    taken: Counter = Counter()
+    picked = []
+    for g in groups:
+        member = g[0]["member"]
+        if taken[member] >= FEED_PER_MEMBER:
+            continue
+        taken[member] += 1
+        picked.append(g)
+        if len(picked) >= COMMIT_FEED_LIMIT:
+            break
+    return picked
+
+
+def sum_numstat(shas: list[str]) -> dict:
+    total = {"files": 0, "additions": 0, "deletions": 0}
+    for sha in shas:
+        for key, value in commit_numstat(sha).items():
+            total[key] += value
+    return total
+
+
+def group_diff_excerpt(group: list[dict]) -> str:
+    if len(group) == 1:
+        return commit_diff_excerpt(group[0]["sha"], group[0]["files"])
+    parts, budget = [], DIFF_EXCERPT_CHARS
+    for c in group:
+        if budget <= 0:
+            break
+        excerpt = commit_diff_excerpt(c["sha"], c["files"])[:budget]
+        parts.append(f"## {c['message']}\n{excerpt}")
+        budget -= len(excerpt)
+    return "\n".join(parts)
+
+
+def commit_event(group: list[dict], members_by_id: dict, repo: dict) -> dict:
+    """커밋 묶음(같은 멤버·같은 날) 하나를 피드 사건으로. 한 건이면 예전과 같은 모양."""
+    latest = group[0]
+    files: list[str] = []
+    for c in group:
+        files.extend(f for f in c["files"] if f not in files)
+    items = linked_items(files, members_by_id.get(latest["member"]))
+    single = len(group) == 1
+    return {
+        "id": f"commit:{latest['sha'][:12]}" if single else f"commits:{latest['member']}:{latest['date']}:{latest['sha'][:7]}",
+        "date": latest["date"], "member": latest["member"], "kind": latest["kind"] if single else classify_commit(files),
+        "title": latest["message"], "url": f"{repo['url']}/commit/{latest['sha']}",
+        "count": len(group),
+        "commits": [{"message": c["message"], "url": f"{repo['url']}/commit/{c['sha']}"} for c in group[:MAX_COMMITS_IN_EVENT]],
+        "summary": "",
+        "tags": normalize_tags([t for i in items for t in i["tags"]]),
+        "items": [{"kind": i["kind"], "title": i["title"], "url": i["url"]} for i in items],
+        "stats": sum_numstat([c["sha"] for c in group]),
+        "files": files[:MAX_FILES_IN_EVENT],
+        "_diff": group_diff_excerpt(group),
+    }
+
+
 def commit_events(commits: list[dict], members_by_id: dict, repo: dict) -> list[dict]:
-    events = []
-    for c in commits[:COMMIT_FEED_LIMIT]:
-        items = linked_items(c["files"], members_by_id.get(c["member"]))
-        events.append({
-            "id": f"commit:{c['sha'][:12]}",
-            "date": c["date"], "member": c["member"], "kind": c["kind"],
-            "title": c["message"], "url": f"{repo['url']}/commit/{c['sha']}",
-            "summary": "",
-            "tags": normalize_tags([t for i in items for t in i["tags"]]),
-            "items": [{"kind": i["kind"], "title": i["title"], "url": i["url"]} for i in items],
-            "stats": commit_numstat(c["sha"]),
-            "files": c["files"][:MAX_FILES_IN_EVENT],
-            "_diff": commit_diff_excerpt(c["sha"], c["files"]),
-        })
-    return events
+    return [commit_event(g, members_by_id, repo) for g in pick_feed_groups(group_commits(commits))]
 
 
 def milestone_events(members: list[dict]) -> list[dict]:
     events = []
     for m in members:
-        base = {"member": m["id"], "date": m["last_active"], "url": m["folder_url"],
+        base = {"member": m["id"], "date": m["last_active"], "url": m["folder_url"], "count": 1, "commits": [],
                 "summary": "", "tags": [], "items": [], "stats": None, "files": [], "_diff": ""}
         if m["streak"] >= STREAK_MILESTONE:
             events.append({**base, "id": f"streak:{m['id']}:{m['streak']}", "kind": "streak",

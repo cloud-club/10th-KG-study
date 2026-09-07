@@ -37,7 +37,8 @@ FEED_TEMPLATES = {
     "level": "⬆️ 클둥이 {member} {title}! 꾸준함의 승리입니다.",
 }
 MAX_DIFF_CHARS = 2500
-FEED_FIELDS = ("id", "date", "member", "kind", "title", "url", "summary", "tags", "items", "stats", "files")
+FEED_FIELDS = ("id", "date", "member", "kind", "title", "url", "count", "commits", "summary", "tags", "items", "stats", "files")
+GROUP_TEMPLATE = "📦 클둥이 {member}, 하루에 커밋 {count}건 몰아치기! 최신은 '{title}'."
 
 SYSTEM_PROMPT = (
     "너는 Knowledge Graph(KG) 스터디 현황판의 해설자다. "
@@ -227,9 +228,13 @@ def event_block(e: dict) -> str:
     items = "; ".join(f"{i['kind']}:{i['title']}" for i in e.get("items") or []) or "-"
     files = ", ".join(e.get("files") or []) or "-"
     diff = (e.get("_diff") or "")[:MAX_DIFF_CHARS]
+    count = e.get("count") or 1
+    messages = ("\n".join(f"  - {c['message']}" for c in e.get("commits") or [])
+                if count > 1 else e["title"])
     return (
-        f"### id={e['id']}\n날짜: {e['date']} | 멤버: {e['member']} | 종류: {KIND_LABEL.get(e['kind'], e['kind'])}\n"
-        f"커밋 메시지/제목: {e['title']}\n변경: {stat_line}\n파일: {files}\n연결된 노트/실습: {items}\n"
+        f"### id={e['id']}\n날짜: {e['date']} | 멤버: {e['member']} | 종류: {KIND_LABEL.get(e['kind'], e['kind'])}"
+        + (f" | 같은 날 커밋 {count}건을 한 사건으로 묶음" if count > 1 else "") + "\n"
+        f"커밋 메시지/제목: {messages}\n변경: {stat_line}\n파일: {files}\n연결된 노트/실습: {items}\n"
         + (f"diff 발췌:\n```\n{diff}\n```\n" if diff else "")
     )
 
@@ -249,8 +254,9 @@ def feed_prompt(events: list[dict]) -> str:
 # ---------------------------------------------------------------- fallbacks
 
 def fallback_commentary(event: dict) -> str:
-    template = FEED_TEMPLATES.get(event["kind"], "클둥이 {member}, {title}.")
-    return template.format(member=event["member"], title=event["title"][:60])
+    count = event.get("count") or 1
+    template = GROUP_TEMPLATE if count > 1 else FEED_TEMPLATES.get(event["kind"], "클둥이 {member}, {title}.")
+    return template.format(member=event["member"], title=event["title"][:60], count=count)
 
 
 def fallback_summary_line(event: dict) -> str:

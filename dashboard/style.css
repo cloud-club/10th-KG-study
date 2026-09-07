@@ -312,9 +312,12 @@ span.post__attach { border-style: dashed; color: var(--muted); }
 .post.is-new a.post__attach:hover { background: #fff; color: var(--sky-700); }
 .post__commit { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; color: var(--muted); text-decoration: none; overflow-wrap: anywhere; }
 .post__commit:hover { color: var(--sky-700); text-decoration: underline; }
+span.post__commit { font-weight: 500; }
 .post.is-new .post__commit { color: rgba(255, 255, 255, 0.85); }
 .post.is-new .post__commit:hover { color: #fff; }
 .post__stats { color: var(--mint); }
+.post__count { color: var(--peach); font-weight: 700; }
+.post.is-new .post__count { color: var(--sun-2); }
 .post.is-new .post__stats { color: var(--sun-2); }
 .post__stats::before { color: var(--line); }
 .post__tags { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--muted); overflow-wrap: anywhere; }

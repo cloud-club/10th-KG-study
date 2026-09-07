@@ -1,0 +1,40 @@
+services:
+  # 1세대: 역색인 + BM25
+  es:
+    build:
+      context: .
+      dockerfile: Dockerfile.es
+    container_name: gen1-es
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false        # 실습용. 인증 없이 바로 붙는다
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  # 2세대: 벡터 + HNSW
+  pg:
+    image: pgvector/pgvector:pg16
+    container_name: gen2-pgvector
+    environment:
+      - POSTGRES_USER=study
+      - POSTGRES_PASSWORD=study
+      - POSTGRES_DB=study
+    ports:
+      # 호스트 5432는 로컬 Postgres가 이미 쓰고 있어서 5433으로 비켰다
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U study"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:

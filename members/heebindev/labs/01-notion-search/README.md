@@ -2,7 +2,7 @@
 title: Notion 문서 저장 및 검색
 date: 2026-09-08
 tags: [notion, grep, elasticsearch, pgvector]
-status: in-progress
+status: done
 ---
 
 # 1. Notion 문서 저장 및 검색
@@ -23,8 +23,8 @@ Notion에서 내보낸 운영체제 수업 자료를 이용해 grep, Elasticsear
 
 ## 환경
 
-- 언어 / 런타임: Python 3
-- 주요 라이브러리: 없음 (Python 표준 라이브러리 사용)
+- 언어 / 런타임: Python 3.12
+- 주요 라이브러리: sentence-transformers, psycopg
 - 저장소: Elasticsearch, PostgreSQL + pgvector
 - 실행 환경: Docker Compose
 
@@ -67,14 +67,29 @@ docker compose down
 ```text
 01-notion-search/
 ├── README.md
-├── compose.yaml             # Elasticsearch 실행 설정
+├── compose.yaml             # Elasticsearch, PostgreSQL 실행 설정
+├── requirements.txt         # Python 패키지 목록
 ├── data/
 │   ├── raw/                 # Git에 올리지 않는 Notion 원본
 │   └── processed/           # Git에 올리지 않는 변환 결과
 └── src/
     ├── notion_parser.py          # Markdown 파싱 및 청킹
-    └── elasticsearch_index.py    # Elasticsearch 인덱스 생성 및 적재
+    ├── elasticsearch_index.py    # Elasticsearch 인덱스 생성 및 적재
+    ├── pgvector_index.py         # 임베딩 생성 및 PostgreSQL 적재
+    └── pgvector_search.py        # pgvector 유사도 검색
 ```
+
+## 코덱스의 도움을 받은 부분
+
+이번 실습에서는 코덱스의 도움을 받아 아래 코드와 실행 환경을 구성했다.
+
+- Notion Markdown 문서를 읽고 청크로 나누는 `notion_parser.py` 작성
+- Elasticsearch 인덱스를 만들고 청크 454개를 적재하는 `elasticsearch_index.py` 작성
+- Docker Compose로 Elasticsearch와 PostgreSQL + pgvector 실행 환경 구성
+- 로컬 임베딩 모델로 청크를 벡터로 변환하고 PostgreSQL에 적재하는 `pgvector_index.py` 작성 및 실행
+- 자연어 검색어를 벡터로 변환하고 유사한 청크를 찾는 `pgvector_search.py` 작성
+
+나는 작성된 코드를 직접 실행해 데이터를 확인하고, grep, BM25, 벡터 검색의 결과를 비교하여 기록했다.
 
 ## 결과
 
@@ -217,9 +232,72 @@ BM25 점수를 계산하여 관련도가 높은 결과부터 정렬했다.
 따라서 grep보다 다양한 표현을 찾을 수 있었지만,
 문장의 의미 자체를 이해한 것은 아니다.
 
+### 3. PostgreSQL 및 pgvector
+
+코덱스의 도움을 받아 Docker에 PostgreSQL 실행, pgvector 활성화, 임베딩 모델 설치, 청크 454개를 벡터로 변환, PostgreSQL에 저장까지 실행했다.
+
+![도커](image-7.png)
+
+이제 검색해보겠다.
+
+```bash
+cd members/heebindev/labs/01-notion-search
+docker compose exec postgres psql -U study -d knowledge_graph
+```
+
+![PostgreSQL 접속](image-8.png)
+
+- `document_chunks`에 454개 행 저장
+- `embedding`은 `vector(384)` 타입
+- 모든 컬럼은 `NOT NULL`
+- `id`에는 기본키 B-tree 인덱스
+- `embedding`에는 코사인 거리용 HNSW 인덱스
+
+![청크 세 개의 제목과 글자 수 확인](image-9.png)
+
+#### "CPU 작업 순서" 검색
+
+```bash
+.venv/bin/python src/pgvector_search.py "CPU 작업 순서"
+```
+
+![검색 결과](image-10.png)
+
+문맥 교환 과정 — 유사도 0.8967
+프로세스 동작 — 유사도 0.8960
+프로세스 상태 — 유사도 0.8952
+검색어와 정확히 같은 문자열은 없지만, CPU와 관련된 내용을 찾았다.
+다만, BM25로 찾은 결과인 SJF, Round Robin보다 덜 정확해 보인다.
+즉, 벡터 검색이 항상 BM25보다 좋은 것은 아니다.
+
+#### 다른 용어로 검색
+
+```bash
+.venv/bin/python src/pgvector_search.py "운영체제가 다음에 실행할 프로세스를 결정하는 방법"
+```
+
+![검색 결과](image-11.png)
+
+부분적으로 성공했지만 품질이 좋지는 않은 편이다.
+1위가 프로세스 종료, 2위가 프로세스 관리 시스템 호출, 3위가 Guaranteed Scheduling이다.
+
+#### 다르게 검색
+
+```bash
+.venv/bin/python src/pgvector_search.py "스케줄링"
+```
+
+![검색 결과](image-12.png)
+
+1. 스케줄러의 비목표
+2. 멀티프로그래밍과 스케줄링
+3. 실시간 시스템의 스케줄링
+
+이번에는 잘 나왔다.
+
 ## 다음 단계
 
 - [x] Notion Markdown 문서를 읽고 청크로 나누기
 - [x] grep으로 문자열 검색하기
 - [x] Elasticsearch에 저장하고 BM25 검색하기
-- [ ] PostgreSQL에 임베딩을 저장하고 pgvector로 검색하기
+- [x] PostgreSQL에 임베딩을 저장하고 pgvector로 검색하기

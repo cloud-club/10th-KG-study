@@ -1,11 +1,6 @@
 # e0ng
 
-## 소개
-
-- GitHub: [@e0ng](https://github.com/e0ng)
-- 스터디 목표:
-  - 문자열·키워드·벡터 검색의 차이 이해
-  - 같은 데이터를 grep, Elasticsearch BM25, pgvector에 저장하고 검색해 보기
+잘 부탁드립니다 ! 화이팅 :)
 
 ## 진행 현황
 

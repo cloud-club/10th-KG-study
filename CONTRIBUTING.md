@@ -73,8 +73,13 @@ status: in-progress           # in-progress | done
   - type: `docs`, `feat`, `fix`, `refactor`, `chore`
   - 예: `docs: 01-data-model 정리`, `feat: document parser 초안`
 
+## 데이터셋
+
+- 받아온 데이터는 루트 `data/<github-id>/` 아래에 둡니다. `data/` 는 git 이 무시하고, 도커 컨테이너(postgres `/data`, neo4j import 폴더)에 마운트되어 바로 읽을 수 있습니다. → [data/README.md](data/README.md)
+- 실습에 DB 가 필요하면 `docker compose up -d` 로 공용 인프라를 씁니다. → [infra/README.md](infra/README.md)
+
 ## 커밋하면 안 되는 것
 
-- 데이터셋 원본, 대용량 파일 (필요하면 다운로드 스크립트나 링크로 대체)
+- 데이터셋 원본, 대용량 파일 (`data/` 에 두고, 다운로드 스크립트나 링크로 대체)
 - `.env`, API 키, 토큰 등 비밀 정보
 - 가상환경, `node_modules`, 빌드 산출물, 캐시

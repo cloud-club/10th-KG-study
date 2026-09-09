@@ -12,6 +12,10 @@
 ├── README.md
 ├── CONTRIBUTING.md        # 참여 방법, 네이밍 규칙
 ├── .gitignore
+├── docker-compose.yml     # 로컬 인프라: Postgres(pgvector) + Elasticsearch(nori) + Neo4j(APOC)
+├── .env.example           # 인프라 비밀번호·포트 (cp .env.example .env)
+├── infra/                 # 인프라 설정, 사용법 (infra/README.md)
+├── data/                  # 각자 받아온 데이터셋 (git 무시, 컨테이너에 마운트됨)
 ├── members/               # 멤버별 개인 작업 공간
 │   └── <github-id>/
 │       ├── README.md      # 자기소개, 목표
@@ -43,6 +47,24 @@ mkdir -p members/$GH_ID/notes members/$GH_ID/labs
 cp templates/note-template.md members/$GH_ID/notes/01-topic.md
 cp templates/readings-template.md members/$GH_ID/readings.md
 ```
+
+## 로컬 인프라 (Docker)
+
+실습용 DB 세 개를 한 번에 띄웁니다. 자세한 건 [infra/README.md](infra/README.md).
+
+```bash
+cp .env.example .env
+docker compose up -d      # PostgreSQL 17 + pgvector, Elasticsearch 9 + nori, Neo4j 5.26 + APOC
+bash infra/check.sh       # 정상 기동 확인
+```
+
+| 서비스 | 접속 |
+|--------|------|
+| PostgreSQL + pgvector | `postgresql://kg:kg@localhost:5432/kg` |
+| Elasticsearch + nori | `http://localhost:9200` |
+| Neo4j + APOC | `bolt://localhost:7687`, Browser `http://localhost:7474` (neo4j / kgstudy2026) |
+
+받아온 데이터셋은 `data/<github-id>/` 아래에 두면 컨테이너에서 바로 읽을 수 있고 git 에는 올라가지 않습니다.
 
 ## 현황판 (dashboard)
 

@@ -110,9 +110,15 @@ def schema() -> None:
         print(f"    {d}")
 
 
+# HNSW 기본 ef_search=40에서는 recall@10이 0.94까지 떨어졌다(쿼리에 따라 0.60).
+# 100으로 올리면 완전 탐색과 100% 일치한다. 검증 결과는 src/recall_check.py 참고.
+EF_SEARCH = 100
+
+
 def search(query: str, limit: int = 5):
     vec = embedder().encode([query], normalize_embeddings=True)[0]
     with connect() as conn, conn.cursor() as cur:
+        cur.execute(f"SET hnsw.ef_search = {EF_SEARCH}")
         cur.execute(
             f"SELECT text, 1 - (embedding <=> %s) AS score FROM {PG_TABLE}"
             " ORDER BY embedding <=> %s LIMIT %s",

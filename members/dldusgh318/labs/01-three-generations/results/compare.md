@@ -40,8 +40,8 @@
 | 순위 | 0세대 grep | 1세대 BM25 | 2세대 벡터 |
 |------|-----------|-----------|-----------|
 | 1 | - 작업: 분석 요청 정보를 먼저 저장하고, `@TransactionalEventListener(AFTER_COMMIT)`와 | 객체지향으로 해결하는 코드와 구조 (1) > 객체지향으로 해결하는 코드와 구조 (1) > Service에서 Service를 호 | 지피티_클클 > 지피티_클클 > 14. 왜 @TransactionalEventListener(AFTER_COMMIT)을 사 용 |
-| 2 | - 작업: 도메인 이벤트와 `@TransactionalEventListener(AFTER_COMMIT)`를 적용하고, FCM | 객체지향으로 해결하는 코드와 구조 (1) > 객체지향으로 해결하는 코드와 구조 (1) > 실제로 리팩토링 해보기  **STEP | 스마일샤크 지원자 이연호 포트폴리오 > 스마일샤크 지원자 이연호 포트폴리오 > 📽️ Projects > 04. 소프트스킬 기반 |
-| 3 | - **꼬리**: "AOP의 한계는?" → Spring AOP는 프록시 기반이라 **같은 클래스 내부 호출(self-invoc | 객체지향으로 해결하는 코드와 구조 (1) > 객체지향으로 해결하는 코드와 구조 (1) > 실제로 리팩토링 해보기  </asid | 에코마케팅 지원자 이연호 포트폴리오 > 에코마케팅 지원자 이연호 포트폴리오 > 📽️ Projects > 04. 소프트스킬 기반 |
+| 2 | - 작업: 도메인 이벤트와 `@TransactionalEventListener(AFTER_COMMIT)`를 적용하고, FCM | 객체지향으로 해결하는 코드와 구조 (1) > 객체지향으로 해결하는 코드와 구조 (1) > 실제로 리팩토링 해보기  **STEP | 할 일 정리 > 할 일 정리 > 리팩토링  t org.springframework.aop.framework.Reflective |
+| 3 | - **꼬리**: "AOP의 한계는?" → Spring AOP는 프록시 기반이라 **같은 클래스 내부 호출(self-invoc | 객체지향으로 해결하는 코드와 구조 (1) > 객체지향으로 해결하는 코드와 구조 (1) > 실제로 리팩토링 해보기  </asid | 스마일샤크 지원자 이연호 포트폴리오 > 스마일샤크 지원자 이연호 포트폴리오 > 📽️ Projects > 04. 소프트스킬 기반 |
 
 ### Q03 — `Write-Behind`  (A 기술 용어)
 
@@ -110,8 +110,8 @@
 | 순위 | 0세대 grep | 1세대 BM25 | 2세대 벡터 |
 |------|-----------|-----------|-----------|
 | 1 | — | 공부 > 5. 한영 혼용: 이 셋은 서로 매칭 안 됨  grep "ES" sample.txt grep "엘라스틱서치" samp | 모니터링이 모니~ (1) > prometheus-config.yml > 2️⃣ AWS CloudWatch > 3️⃣ ELK 스 |
-| 2 | — | 공부 > 0. 실습용 파일 만들기  cat > sample.txt <<'EOF' 학교에서 지식 그래프를 배웠다. 지식그래프는 | 핸드북 2 포트폴리오와 관측 > PART 4. Observability 집중 대비 ★★★★★ > 4-2. Loki 기본 — 왜 |
-| 3 | — | 공부 > 공부 > 2. 실패 원인 ① 표현 불일치 (Vocabulary Mismatch Problem) > 2.3 🇰🇷 한국어 | Redis & Memcached 정리 > Redis & Memcached 정리 > 1. Redis > 4. AWS Elasti |
+| 2 | — | 공부 > 0. 실습용 파일 만들기  cat > sample.txt <<'EOF' 학교에서 지식 그래프를 배웠다. 지식그래프는 | 공부 > 5. 한영 혼용: 이 셋은 서로 매칭 안 됨  grep "ES" sample.txt grep "엘라스틱서치" samp |
+| 3 | — | 공부 > 공부 > 2. 실패 원인 ① 표현 불일치 (Vocabulary Mismatch Problem) > 2.3 🇰🇷 한국어 | 공부 > 0. 실습용 파일 만들기  cat > sample.txt <<'EOF' 학교에서 지식 그래프를 배웠다. 지식그래프는 |
 
 ### Q10 — `쿠버네티즈`  (C 오타)
 

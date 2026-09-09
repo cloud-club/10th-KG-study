@@ -1,0 +1,8 @@
+# 원본 카톡 파일, 파싱 결과, 실명 매핑표는 절대 커밋하지 않는다
+data/raw/
+data/interim/
+data/private/
+.env
+__pycache__/
+*.pyc
+.venv/

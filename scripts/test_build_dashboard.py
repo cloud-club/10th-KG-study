@@ -376,3 +376,51 @@ class LlmTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CohortTests(unittest.TestCase):
+    def test_assign_cohorts_puts_unlisted_members_in_next_open_cohort(self):
+        config = [{"id": "A", "members": ["lee", "kim", "ghost", "kim"]}]
+        with mock.patch("sys.stderr"):
+            cohorts, cohort_of = bd.assign_cohorts(["choi", "kim", "lee", "park"], config)
+        self.assertEqual([(c["id"], c["label"], c["members"], c["open"]) for c in cohorts],
+                         [("A", "A반", ["lee", "kim"], False), ("B", "B반", ["choi", "park"], True)])
+        self.assertEqual(cohort_of, {"kim": "A", "lee": "A", "choi": "B", "park": "B"})
+
+    def test_assign_cohorts_without_config_opens_a(self):
+        cohorts, cohort_of = bd.assign_cohorts(["kim"], [])
+        self.assertEqual(cohorts, [{"id": "A", "label": "A반", "members": ["kim"], "open": True}])
+        self.assertEqual(cohort_of, {"kim": "A"})
+
+    def test_open_cohort_stays_listed_when_empty(self):
+        cohorts, _ = bd.assign_cohorts(["kim"], [{"id": "A", "members": ["kim"]}])
+        self.assertEqual(cohorts[-1], {"id": "B", "label": "B반", "members": [], "open": True})
+
+    def test_next_cohort_id_walks_the_alphabet(self):
+        self.assertEqual(bd.next_cohort_id([]), "A")
+        self.assertEqual(bd.next_cohort_id(["A", "B"]), "C")
+        self.assertEqual(bd.next_cohort_id(["Z"]), "Z2")
+
+    def test_load_cohorts_keeps_order_and_skips_bad_entries(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "cohorts.json"
+            path.write_text('{"B": ["lee"], "A": ["kim"], "C": "not-a-list"}', encoding="utf-8")
+            with mock.patch("sys.stderr"):
+                self.assertEqual(bd.load_cohorts(path), [{"id": "B", "members": ["lee"]}, {"id": "A", "members": ["kim"]}])
+            path.write_text("[1, 2]", encoding="utf-8")
+            with mock.patch("sys.stderr"):
+                self.assertEqual(bd.load_cohorts(path), [])
+            self.assertEqual(bd.load_cohorts(Path(tmp) / "missing.json"), [])
+
+    def test_build_cohort_graphs_never_links_across_cohorts(self):
+        def member(mid, tag):
+            note = {"kind": "note", "id": f"{mid}/n1", "title": "n", "tags": [tag], "url": ""}
+            return {"id": mid, "name": mid, "avatar": "", "notes": [note], "labs": []}
+        members = [member("kim", "rag"), member("park", "rag")]
+        cohorts = [{"id": "A", "label": "A반", "members": ["kim"], "open": False},
+                   {"id": "B", "label": "B반", "members": ["park"], "open": True}]
+        out = bd.build_cohort_graphs(cohorts, members)
+        self.assertEqual([n["id"] for n in out[0]["graph"]["nodes"]], ["m:kim", "n:kim/n1", "t:rag"])
+        self.assertEqual([n["id"] for n in out[1]["graph"]["nodes"]], ["m:park", "n:park/n1", "t:rag"])
+        self.assertEqual(out[0]["members"], ["kim"])

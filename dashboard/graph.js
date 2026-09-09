@@ -1,4 +1,5 @@
 /* 멤버 · 노트 · 실습 · 주제를 잇는 force-directed 그래프 (d3 v7)
+   반(cohort)마다 패널 하나에 그래프 하나를 그린다. 반끼리는 선을 긋지 않는다.
    주제는 두 명 이상이 겹친 것만 노드로 그리고, 나머지는 노트/실습을 클릭했을 때 태그 칩으로 펼친다. */
 window.KGGraph = (function () {
   'use strict';
@@ -16,19 +17,24 @@ window.KGGraph = (function () {
   const SPREAD_MAX = 1.7;
   const MIN_HEIGHT = 340;
   const MAX_HEIGHT = 560;
+  const HEIGHT_BASE = 200; // 노드가 적은 반은 낮게: 200 + 노드 수 × 14 (MIN~MAX 사이)
+  const HEIGHT_PER_NODE = 14;
   const STATIC_TICKS = 300;
   const SHARED_MIN_MEMBERS = 2; // 이 인원 이상이 건드린 주제만 노드로
   const MIN_TOPICS = 3; // 공통 주제가 이보다 적으면 연결 많은 순으로 채운다
   const POP_GAP = 8;
+  const RESIZE_DEBOUNCE_MS = 150;
 
-  let state = null;
+  const instances = []; // 반마다 하나
 
   const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function size(container) {
+  /* ------------------------------------------------------ pure helpers */
+  function size(container, nodeCount) {
     const width = Math.max(320, Math.floor(container.getBoundingClientRect().width));
     const ratio = width < NARROW_WIDTH ? 1.25 : 0.55;
-    const height = Math.round(Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, width * ratio)));
+    const byNodes = HEIGHT_BASE + nodeCount * HEIGHT_PER_NODE;
+    const height = Math.round(Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, width * ratio, byNodes)));
     container.classList.toggle('is-compact', width < NARROW_WIDTH);
     return { width, height };
   }
@@ -54,7 +60,6 @@ window.KGGraph = (function () {
     };
   }
 
-  /* ------------------------------------------------------- topic filter */
   // 원본 링크(source/target 이 id 문자열)에서 주제별 멤버 집합과 연결 수를 센다.
   function topicStats(graph) {
     const byId = new Map(graph.nodes.map((n) => [n.id, n]));
@@ -97,7 +102,6 @@ window.KGGraph = (function () {
     return { nodes, links, tagsOf: stats.tagsOf, drawnTopics: keep, hiddenCount: stats.degree.size - keep.size };
   }
 
-  /* -------------------------------------------------------------- focus */
   function neighborsOf(id, links) {
     const set = new Set([id]);
     links.forEach((l) => {
@@ -107,30 +111,6 @@ window.KGGraph = (function () {
     return set;
   }
 
-  function applyFocus(id) {
-    if (!state) return;
-    const { container, nodeSel, linkSel, links } = state;
-    if (!id) {
-      container.classList.remove('has-focus');
-      nodeSel.classed('is-dim', false).classed('is-focused', false);
-      linkSel.classed('is-dim', false).classed('is-lit', false);
-      state.focused = null;
-      hidePop();
-      return;
-    }
-    const near = neighborsOf(id, links);
-    container.classList.add('has-focus');
-    nodeSel.classed('is-dim', (d) => !near.has(d.id)).classed('is-focused', (d) => d.id === id);
-    linkSel
-      .classed('is-lit', (l) => l.source.id === id || l.target.id === id)
-      .classed('is-dim', (l) => l.source.id !== id && l.target.id !== id);
-    state.focused = id;
-    const node = state.nodes.find((n) => n.id === id);
-    if (node && DOC_TYPES.has(node.type)) showPop(node);
-    else hidePop();
-  }
-
-  /* ---------------------------------------------------------- popover */
   function el(tag, attrs, children) {
     const node = document.createElement(tag);
     Object.entries(attrs || {}).forEach(([k, v]) => {
@@ -143,74 +123,14 @@ window.KGGraph = (function () {
     return node;
   }
 
-  function ensurePop(container) {
-    let pop = container.querySelector('.graph__pop');
-    if (!pop) {
-      pop = el('div', { class: 'graph__pop', role: 'dialog', 'aria-live': 'polite', hidden: 'hidden' });
-      pop.addEventListener('click', (e) => e.stopPropagation());
-      container.append(pop);
-    }
-    return pop;
+  function labelType(type) {
+    return { member: '멤버', topic: '주제', note: '노트', lab: '실습' }[type] || type;
   }
 
-  function showPop(node) {
-    const { container, tagsOf, drawnTopics } = state;
-    const pop = ensurePop(container);
-    pop.replaceChildren();
-    const tags = tagsOf.get(node.id) || [];
-    pop.append(
-      el('div', { class: 'graph__pop-head' }, [
-        el('span', { class: 'graph__pop-kind', text: labelType(node.type) }),
-        el('strong', { class: 'graph__pop-title', text: node.label }),
-      ]),
-      tags.length
-        ? el('ul', { class: 'graph__pop-tags' }, tags.map((t) => {
-          const drawn = drawnTopics.has(t.id);
-          const chip = el('li', { class: drawn ? 'is-drawn' : '' });
-          if (drawn) {
-            const btn = el('button', { type: 'button', text: `#${t.label}`, title: '이 주제로 이동' });
-            btn.addEventListener('click', () => applyFocus(t.id));
-            chip.append(btn);
-          } else {
-            chip.textContent = `#${t.label}`;
-          }
-          return chip;
-        }))
-        : el('p', { class: 'graph__pop-empty', text: '태그가 없어요.' }),
-      node.url ? el('a', { class: 'graph__pop-link', href: node.url, target: '_blank', rel: 'noopener', text: '열기 ↗' }) : null,
-    );
-    pop.hidden = false;
-    state.popNode = node;
-    placePop();
+  function cssId(id) {
+    return id.replace(/[^a-zA-Z0-9_-]/g, '_');
   }
 
-  function hidePop() {
-    const pop = state && state.container.querySelector('.graph__pop');
-    if (pop) pop.hidden = true;
-    if (state) state.popNode = null;
-  }
-
-  function placePop() {
-    if (!state || !state.popNode) return;
-    const { container, popNode, width, height } = state;
-    const pop = container.querySelector('.graph__pop');
-    if (!pop || pop.hidden) return;
-    const rect = container.getBoundingClientRect();
-    const scale = rect.width / width;
-    const r = RADIUS[popNode.type] * nodeScale(width);
-    const popW = pop.offsetWidth;
-    const popH = pop.offsetHeight;
-    let left = popNode.x * scale - popW / 2;
-    left = Math.max(4, Math.min(rect.width - popW - 4, left));
-    let top = (popNode.y + r) * scale + POP_GAP;
-    const above = top + popH > height * scale - 4; // 아래 공간이 없으면 위로
-    if (above) top = (popNode.y - r) * scale - POP_GAP - popH;
-    pop.classList.toggle('is-above', above);
-    pop.style.left = `${Math.round(left)}px`;
-    pop.style.top = `${Math.round(Math.max(4, top))}px`;
-  }
-
-  /* ---------------------------------------------------------- drawing */
   function clamp(node, width, height) {
     const r = RADIUS[node.type] * nodeScale(width);
     const padX = Math.max(r + 6, labelHalfWidth(node, width));
@@ -219,7 +139,8 @@ window.KGGraph = (function () {
     node.y = Math.max(r + 6, Math.min(height - padBottom, node.y));
   }
 
-  function drawNodes(group, nodes, colorOf, scale, tagsOf) {
+  // clipPath id 는 문서 전체에서 유일해야 하므로 인스턴스 번호(key)를 앞에 붙인다.
+  function drawNodes(group, nodes, colorOf, scale, tagsOf, key) {
     const r = (type) => RADIUS[type] * scale;
     const nodeSel = group.selectAll('g.node').data(nodes, (d) => d.id).join('g')
       .attr('class', (d) => `node node--${d.type}`)
@@ -233,13 +154,13 @@ window.KGGraph = (function () {
 
     const inner = r('member') - 2;
     const members = nodeSel.filter((d) => d.type === 'member' && d.avatar);
-    members.append('clipPath').attr('id', (d) => `clip-${cssId(d.id)}`)
+    members.append('clipPath').attr('id', (d) => `clip-${key}-${cssId(d.id)}`)
       .append('circle').attr('r', inner);
     members.append('image')
       .attr('href', (d) => d.avatar)
       .attr('x', -inner).attr('y', -inner)
       .attr('width', inner * 2).attr('height', inner * 2)
-      .attr('clip-path', (d) => `url(#clip-${cssId(d.id)})`)
+      .attr('clip-path', (d) => `url(#clip-${key}-${cssId(d.id)})`)
       .attr('preserveAspectRatio', 'xMidYMid slice');
 
     nodeSel.filter((d) => LABELED.has(d.type)).append('text')
@@ -257,104 +178,186 @@ window.KGGraph = (function () {
     return nodeSel;
   }
 
-  function labelType(type) {
-    return { member: '멤버', topic: '주제', note: '노트', lab: '실습' }[type] || type;
-  }
+  /* ---------------------------------------------------- one cohort panel */
+  // panel 안의 .graph 에 그리고, .graph__hidden / .graph__toggle / .graph__empty 를 같은 패널에서 찾는다.
+  function create(panel, graph, colorOf, key) {
+    const container = panel.querySelector('.graph');
+    const hint = panel.querySelector('.graph__hidden');
+    const toggleAll = panel.querySelector('.graph__toggle');
+    const emptyMsg = panel.querySelector('.graph__empty');
+    const state = { container, graph, colorOf, showAll: Boolean(toggleAll && toggleAll.checked), focused: null, popNode: null };
 
-  function cssId(id) {
-    return id.replace(/[^a-zA-Z0-9_-]/g, '_');
-  }
-
-  function render() {
-    const { container, graph, colorOf, showAll } = state;
-    hidePop();
-    container.querySelectorAll('svg').forEach((s) => s.remove());
-    container.classList.remove('has-focus');
-
-    const { nodes, links, tagsOf, drawnTopics, hiddenCount } = visibleGraph(graph, showAll);
-    const hint = document.getElementById('graph-hidden');
-    if (hint) {
-      hint.hidden = showAll || hiddenCount === 0;
-      hint.textContent = `주제 ${hiddenCount}개는 접혀 있어요`;
+    /* focus */
+    function applyFocus(id) {
+      const { nodeSel, linkSel, links } = state;
+      if (!nodeSel) return;
+      if (!id) {
+        container.classList.remove('has-focus');
+        nodeSel.classed('is-dim', false).classed('is-focused', false);
+        linkSel.classed('is-dim', false).classed('is-lit', false);
+        state.focused = null;
+        hidePop();
+        return;
+      }
+      const near = neighborsOf(id, links);
+      container.classList.add('has-focus');
+      nodeSel.classed('is-dim', (d) => !near.has(d.id)).classed('is-focused', (d) => d.id === id);
+      linkSel
+        .classed('is-lit', (l) => l.source.id === id || l.target.id === id)
+        .classed('is-dim', (l) => l.source.id !== id && l.target.id !== id);
+      state.focused = id;
+      const node = state.nodes.find((n) => n.id === id);
+      if (node && DOC_TYPES.has(node.type)) showPop(node);
+      else hidePop();
     }
 
-    let { width, height } = size(container);
-    const svg = d3.select(container).insert('svg', '.graph__pop').attr('viewBox', [0, 0, width, height]);
-    const linkGroup = svg.append('g');
-    const nodeGroup = svg.append('g');
+    /* popover */
+    function ensurePop() {
+      let pop = container.querySelector('.graph__pop');
+      if (!pop) {
+        pop = el('div', { class: 'graph__pop', role: 'dialog', 'aria-live': 'polite', hidden: 'hidden' });
+        pop.addEventListener('click', (e) => e.stopPropagation());
+        container.append(pop);
+      }
+      return pop;
+    }
 
-    const linkSel = linkGroup.selectAll('line').data(links).join('line').attr('class', 'link');
-    const nodeSel = drawNodes(nodeGroup, nodes, colorOf, nodeScale(width), tagsOf);
-
-    const sim = d3.forceSimulation(nodes);
-    const applyForces = () => {
-      const spread = spreadFor(width);
-      sim
-        .force('link', d3.forceLink(links).id((d) => d.id).distance(linkDistance(spread)).strength(0.9))
-        .force('charge', d3.forceManyBody().strength((d) => CHARGE[d.type] * spread))
-        .force('collide', d3.forceCollide().radius((d) => RADIUS[d.type] * nodeScale(width) + 10))
-        .force('x', d3.forceX(width / 2).strength(0.06))
-        .force('y', d3.forceY(height / 2).strength(0.08));
-    };
-    applyForces();
-
-    const tick = () => {
-      nodes.forEach((n) => clamp(n, width, height));
-      linkSel.attr('x1', (l) => l.source.x).attr('y1', (l) => l.source.y)
-        .attr('x2', (l) => l.target.x).attr('y2', (l) => l.target.y);
-      nodeSel.attr('transform', (d) => `translate(${d.x},${d.y})`);
+    function showPop(node) {
+      const { tagsOf, drawnTopics } = state;
+      const pop = ensurePop();
+      pop.replaceChildren();
+      const tags = tagsOf.get(node.id) || [];
+      pop.append(
+        el('div', { class: 'graph__pop-head' }, [
+          el('span', { class: 'graph__pop-kind', text: labelType(node.type) }),
+          el('strong', { class: 'graph__pop-title', text: node.label }),
+        ]),
+        tags.length
+          ? el('ul', { class: 'graph__pop-tags' }, tags.map((t) => {
+            const drawn = drawnTopics.has(t.id);
+            const chip = el('li', { class: drawn ? 'is-drawn' : '' });
+            if (drawn) {
+              const btn = el('button', { type: 'button', text: `#${t.label}`, title: '이 주제로 이동' });
+              btn.addEventListener('click', () => applyFocus(t.id));
+              chip.append(btn);
+            } else {
+              chip.textContent = `#${t.label}`;
+            }
+            return chip;
+          }))
+          : el('p', { class: 'graph__pop-empty', text: '태그가 없어요.' }),
+        node.url ? el('a', { class: 'graph__pop-link', href: node.url, target: '_blank', rel: 'noopener', text: '열기 ↗' }) : null,
+      );
+      pop.hidden = false;
+      state.popNode = node;
       placePop();
-    };
-
-    Object.assign(state, { svg, sim, nodes, links, nodeSel, linkSel, tagsOf, drawnTopics, focused: null, popNode: null, width, height });
-
-    if (prefersReducedMotion()) {
-      sim.stop();
-      for (let i = 0; i < STATIC_TICKS; i += 1) sim.tick();
-      tick();
-    } else {
-      sim.on('tick', tick);
     }
 
-    nodeSel.call(d3.drag()
-      .on('start', (event, d) => { if (!event.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
-      .on('drag', (event, d) => { d.fx = event.x; d.fy = event.y; })
-      .on('end', (event, d) => { if (!event.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+    function hidePop() {
+      const pop = container.querySelector('.graph__pop');
+      if (pop) pop.hidden = true;
+      state.popNode = null;
+    }
 
-    const toggle = (d) => applyFocus(state.focused === d.id ? null : d.id);
-    nodeSel.on('click', (event, d) => { event.stopPropagation(); toggle(d); });
-    nodeSel.on('keydown', (event, d) => {
-      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(d); }
-      if (event.key === 'Escape') applyFocus(null);
-    });
-    svg.on('click', () => applyFocus(null));
+    function placePop() {
+      const { popNode, width, height } = state;
+      if (!popNode) return;
+      const pop = container.querySelector('.graph__pop');
+      if (!pop || pop.hidden) return;
+      const rect = container.getBoundingClientRect();
+      const scale = rect.width / width;
+      const r = RADIUS[popNode.type] * nodeScale(width);
+      const popW = pop.offsetWidth;
+      const popH = pop.offsetHeight;
+      let left = popNode.x * scale - popW / 2;
+      left = Math.max(4, Math.min(rect.width - popW - 4, left));
+      let top = (popNode.y + r) * scale + POP_GAP;
+      const above = top + popH > height * scale - 4; // 아래 공간이 없으면 위로
+      if (above) top = (popNode.y - r) * scale - POP_GAP - popH;
+      pop.classList.toggle('is-above', above);
+      pop.style.left = `${Math.round(left)}px`;
+      pop.style.top = `${Math.round(Math.max(4, top))}px`;
+    }
 
-    state.resize = () => {
-      ({ width, height } = size(container));
-      state.width = width; state.height = height;
-      svg.attr('viewBox', [0, 0, width, height]);
+    /* drawing */
+    function render() {
+      hidePop();
+      container.querySelectorAll('svg').forEach((s) => s.remove());
+      container.classList.remove('has-focus');
+
+      const { nodes, links, tagsOf, drawnTopics, hiddenCount } = visibleGraph(graph, state.showAll);
+      if (hint) {
+        hint.hidden = state.showAll || hiddenCount === 0;
+        hint.textContent = `주제 ${hiddenCount}개는 접혀 있어요`;
+      }
+
+      let { width, height } = size(container, nodes.length);
+      const svg = d3.select(container).insert('svg', '.graph__pop').attr('viewBox', [0, 0, width, height]);
+      const linkGroup = svg.append('g');
+      const nodeGroup = svg.append('g');
+
+      const linkSel = linkGroup.selectAll('line').data(links).join('line').attr('class', 'link');
+      const nodeSel = drawNodes(nodeGroup, nodes, colorOf, nodeScale(width), tagsOf, key);
+
+      const sim = d3.forceSimulation(nodes);
+      const applyForces = () => {
+        const spread = spreadFor(width);
+        sim
+          .force('link', d3.forceLink(links).id((d) => d.id).distance(linkDistance(spread)).strength(0.9))
+          .force('charge', d3.forceManyBody().strength((d) => CHARGE[d.type] * spread))
+          .force('collide', d3.forceCollide().radius((d) => RADIUS[d.type] * nodeScale(width) + 10))
+          .force('x', d3.forceX(width / 2).strength(0.06))
+          .force('y', d3.forceY(height / 2).strength(0.08));
+      };
       applyForces();
-      if (prefersReducedMotion()) { for (let i = 0; i < 60; i += 1) sim.tick(); tick(); }
-      else sim.alpha(0.4).restart();
-    };
-  }
 
-  function mount(container, graph, colorOf) {
-    if (!window.d3) {
-      container.textContent = '그래프 라이브러리를 불러오지 못했어요.';
-      return;
+      const tick = () => {
+        nodes.forEach((n) => clamp(n, width, height));
+        linkSel.attr('x1', (l) => l.source.x).attr('y1', (l) => l.source.y)
+          .attr('x2', (l) => l.target.x).attr('y2', (l) => l.target.y);
+        nodeSel.attr('transform', (d) => `translate(${d.x},${d.y})`);
+        placePop();
+      };
+
+      Object.assign(state, { svg, sim, nodes, links, nodeSel, linkSel, tagsOf, drawnTopics, focused: null, popNode: null, width, height });
+
+      if (prefersReducedMotion()) {
+        sim.stop();
+        for (let i = 0; i < STATIC_TICKS; i += 1) sim.tick();
+        tick();
+      } else {
+        sim.on('tick', tick);
+      }
+
+      nodeSel.call(d3.drag()
+        .on('start', (event, d) => { if (!event.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+        .on('drag', (event, d) => { d.fx = event.x; d.fy = event.y; })
+        .on('end', (event, d) => { if (!event.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+      const toggle = (d) => applyFocus(state.focused === d.id ? null : d.id);
+      nodeSel.on('click', (event, d) => { event.stopPropagation(); toggle(d); });
+      nodeSel.on('keydown', (event, d) => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(d); }
+        if (event.key === 'Escape') applyFocus(null);
+      });
+      svg.on('click', () => applyFocus(null));
+
+      state.resize = () => {
+        ({ width, height } = size(container, nodes.length));
+        state.width = width; state.height = height;
+        svg.attr('viewBox', [0, 0, width, height]);
+        applyForces();
+        if (prefersReducedMotion()) { for (let i = 0; i < 60; i += 1) sim.tick(); tick(); }
+        else sim.alpha(0.4).restart();
+      };
     }
-    const empty = document.getElementById('graph-empty');
-    if (empty) empty.hidden = graph.links.length > 0;
+
+    if (emptyMsg) emptyMsg.hidden = graph.links.length > 0;
     if (!graph.nodes.length) {
       container.textContent = '아직 그릴 노드가 없어요.';
-      return;
+      return null;
     }
-
-    const toggleAll = document.getElementById('graph-all-topics');
-    state = { container, graph, colorOf, showAll: Boolean(toggleAll && toggleAll.checked) };
     render();
-
     if (toggleAll) {
       toggleAll.addEventListener('change', () => {
         state.showAll = toggleAll.checked;
@@ -362,19 +365,41 @@ window.KGGraph = (function () {
       });
     }
 
-    let resizeTimer = null;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => { if (state && state.resize) state.resize(); }, 150);
-    });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && state && state.focused) applyFocus(null); });
+    return {
+      has: (id) => graph.nodes.some((n) => n.id === id),
+      focus(id) {
+        applyFocus(id);
+        container.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'center' });
+      },
+      clearFocus() { if (state.focused) applyFocus(null); },
+      resize() { if (state.resize) state.resize(); },
+    };
   }
 
-  function focus(id) {
-    if (!state || !state.nodeSel) return;
-    applyFocus(id);
-    state.container.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'center' });
+  /* --------------------------------------------------------- public api */
+  function mount(panel, graph, colorOf) {
+    const container = panel.querySelector('.graph') || panel;
+    if (!window.d3) {
+      container.textContent = '그래프 라이브러리를 불러오지 못했어요.';
+      return null;
+    }
+    const inst = create(panel, graph, colorOf, instances.length);
+    if (inst) instances.push(inst);
+    return inst;
   }
+
+  // 멤버 카드의 "그래프에서 보기": 그 멤버가 속한 반의 그래프를 찾아 포커스한다.
+  function focus(id) {
+    const inst = instances.find((i) => i.has(id));
+    if (inst) inst.focus(id);
+  }
+
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => instances.forEach((i) => i.resize()), RESIZE_DEBOUNCE_MS);
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') instances.forEach((i) => i.clearFocus()); });
 
   return { mount, focus };
 })();

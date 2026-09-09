@@ -24,6 +24,12 @@ touch members/$GH_ID/notes/.gitkeep members/$GH_ID/labs/.gitkeep
 
 폴더를 만든 뒤 루트 `README.md`의 멤버 표에 자기 행을 추가합니다.
 
+### 반 (cohort)
+
+- 현황판 지식그래프는 반별로 따로 그립니다. 반 명단은 `members/cohorts.json`에 있습니다.
+- 새로 합류하면 아무것도 안 해도 됩니다. 명단에 없는 멤버는 자동으로 마지막 반 다음 반(열린 반)에 들어갑니다.
+- 반을 닫거나 새 반을 열 때만 운영자가 `cohorts.json`에 `"B": ["id", ...]`처럼 명단을 추가합니다. 파일에 적힌 순서가 곧 반 순서입니다.
+
 ## 네이밍 규칙
 
 ### 프론트매터 (notes / labs 공통)

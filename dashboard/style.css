@@ -359,7 +359,7 @@ a.reading__title:hover { text-decoration: underline; }
 .panel--graph { padding: 0.75rem; overflow: hidden; }
 .graph { position: relative; width: 100%; min-height: 320px; border-radius: var(--radius-sm); }
 .graph svg { display: block; width: 100%; height: auto; touch-action: none; }
-.graph .link { stroke: var(--sky-700); stroke-width: 1.5; stroke-opacity: 0.28; transition: stroke-opacity var(--duration) ease; }
+.graph .link { stroke: var(--cohort-accent, var(--sky-700)); stroke-width: 1.5; stroke-opacity: 0.28; transition: stroke-opacity var(--duration) ease; }
 .graph .node circle { stroke: #fff; stroke-width: 2.5; filter: drop-shadow(0 3px 6px rgba(30, 95, 184, 0.22)); }
 .graph .node--member circle { stroke-width: 3.5; }
 .graph .node--note circle { fill: #fff; stroke: var(--sky-300); }
@@ -379,7 +379,7 @@ a.reading__title:hover { text-decoration: underline; }
 .graph.has-focus .link.is-dim { stroke-opacity: 0.06; }
 .graph.has-focus .link.is-lit { stroke-opacity: 0.9; stroke-width: 2.5; }
 .graph .node--note:hover circle, .graph .node--lab:hover circle { stroke-width: 4; }
-.graph .node.is-focused circle { stroke: var(--sky-700); stroke-width: 4; }
+.graph .node.is-focused circle { stroke: var(--cohort-accent, var(--sky-700)); stroke-width: 4; }
 
 .graph__pop {
   position: absolute; z-index: 2; max-width: min(320px, calc(100% - 8px));
@@ -417,7 +417,7 @@ a.reading__title:hover { text-decoration: underline; }
 .switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .switch__track { position: relative; width: 32px; height: 18px; border-radius: 999px; background: var(--sky-200); transition: background var(--duration) ease; }
 .switch__track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(30, 95, 184, 0.3); transition: transform var(--duration) var(--ease-out); }
-.switch input:checked + .switch__track { background: var(--sky-500); }
+.switch input:checked + .switch__track { background: var(--cohort-accent, var(--sky-500)); }
 .switch input:checked + .switch__track::after { transform: translateX(14px); }
 .switch input:focus-visible + .switch__track { outline: 3px solid var(--sky-500); outline-offset: 2px; }
 .legend {
@@ -427,7 +427,7 @@ a.reading__title:hover { text-decoration: underline; }
 }
 .legend li { display: inline-flex; align-items: center; gap: 0.4rem; }
 .dot { width: 12px; height: 12px; border: 2px solid #fff; border-radius: 50%; display: inline-block; box-shadow: 0 1px 3px rgba(30, 95, 184, 0.3); }
-.dot--member { background: var(--sky-500); }
+.dot--member { background: var(--cohort-accent, var(--sky-500)); }
 .dot--note { background: #fff; border-color: var(--sky-300); }
 .dot--lab { background: var(--mint); }
 .dot--topic { background: var(--sun); }
@@ -436,6 +436,60 @@ a.reading__title:hover { text-decoration: underline; }
   margin: 0; padding: 0.45rem 0.9rem;
   border-radius: 999px; background: var(--sun); box-shadow: 0 6px 16px rgba(255, 190, 60, 0.35);
   font-size: 0.88rem; font-weight: 500;
+}
+
+/* -------------------------------------------------------------- cohorts */
+/* 반마다 강조색(--cohort-accent)이 다르다. A반 하늘, B반 노을, C반 풀밭. 패널 배경·리본·선·스위치가 그 색을 따른다. */
+.cohorts { display: grid; gap: var(--gap); }
+.cohort {
+  --cohort-accent: var(--sky-500);
+  position: relative;
+  background: color-mix(in srgb, var(--cohort-accent) 7%, rgba(255, 255, 255, 0.86));
+  border-color: color-mix(in srgb, var(--cohort-accent) 30%, #fff);
+}
+.cohort::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 6px; background: var(--cohort-accent); }
+.cohort__head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.9rem; padding: 0.7rem 0.5rem 0.6rem; }
+.sticker--cohort {
+  background: var(--cohort-accent); color: #fff; font-size: 1.05rem; padding: 0 0.75em;
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--cohort-accent) 40%, transparent);
+  transform: rotate(-2deg);
+}
+.cohort__avatars { display: flex; align-items: center; }
+.cohort__avatars img, .cohort__avatars span {
+  flex: none; width: 28px; height: 28px; margin-left: -8px; border-radius: 50%;
+  border: 2px solid #fff; background: var(--c, var(--cohort-accent)); object-fit: cover;
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--cohort-accent) 35%, transparent);
+}
+.cohort__avatars span { display: inline-grid; place-items: center; color: #fff; font-family: var(--font-display); font-size: 0.8rem; text-transform: uppercase; }
+.cohort__avatars > :first-child { margin-left: 0; }
+.cohort__meta { font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; color: var(--muted); }
+.cohort .graph { background: rgba(255, 255, 255, 0.55); }
+.cohort .graph__empty { background: var(--cohort-accent); color: #fff; box-shadow: 0 6px 16px color-mix(in srgb, var(--cohort-accent) 40%, transparent); }
+
+.cohort--next {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem 1rem;
+  padding: 1rem 1.3rem; overflow: visible;
+  background: color-mix(in srgb, var(--cohort-accent) 5%, rgba(255, 255, 255, 0.6));
+  border: 2px dashed color-mix(in srgb, var(--cohort-accent) 55%, #fff); box-shadow: none;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.cohort--next::before { display: none; }
+.cohort--next .sticker--cohort { opacity: 0.9; }
+.cohort__next-text { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+.members__cohort {
+  --cohort-accent: var(--sky-500);
+  grid-column: 1 / -1;
+  display: flex; align-items: center; gap: 0.7rem;
+  margin: 0.2rem 0 -0.3rem; font-weight: 400;
+}
+.members__cohort:not(:first-child) { margin-top: 1rem; }
+.members__cohort::after { content: ""; flex: 1; height: 3px; border-radius: 999px; background: color-mix(in srgb, var(--cohort-accent) 28%, #fff); }
+.members__cohort-meta { font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; color: var(--muted); }
+.card__cohort {
+  flex: none; padding: 0 0.55em; border-radius: 999px;
+  border: 1.5px solid var(--cohort-accent, var(--sky-500)); color: var(--cohort-accent, var(--sky-500));
+  font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; line-height: 1.6;
 }
 
 /* -------------------------------------------------------------- members */

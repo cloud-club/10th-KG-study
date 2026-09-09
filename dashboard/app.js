@@ -2,7 +2,13 @@
 (function () {
   'use strict';
 
-  const COLORS = ['#3b8beb', '#ff7a90', '#35c39a', '#8f7bff', '#ffa14d', '#1fb6c8'];
+  // 반(cohort)마다 다른 계열의 색을 쓴다. A반 하늘 → B반 노을 → C반 풀밭, 그 다음은 다시 처음부터.
+  const COHORT_THEMES = [
+    { name: '하늘', accent: '#3b8beb', palette: ['#3b8beb', '#8f7bff', '#1fb6c8', '#5b6ee1', '#2f9bd6', '#7c5cff', '#2a8fb8', '#4c7bf0'] },
+    { name: '노을', accent: '#ff7a90', palette: ['#ff7a90', '#ffa14d', '#e8607a', '#f2b544', '#ff6b6b', '#e0862f', '#f0839c', '#d9534f'] },
+    { name: '풀밭', accent: '#35c39a', palette: ['#35c39a', '#7dc242', '#1fa78a', '#9bc53d', '#2fb885', '#5fae3b', '#43cba9', '#7ab648'] },
+  ];
+  const NEUTRAL_COLOR = '#8aa0b8'; // 반 정보가 없는 멤버
   const MAX_ITEMS_PER_LIST = 2;
   const DAY_MS = 86400000;
 
@@ -51,13 +57,23 @@
     return d ? Math.max(0, Math.floor((Date.now() - d) / DAY_MS)) : 0;
   }
 
-  function memberColorMap(members) {
+  function cohortTheme(index) {
+    return COHORT_THEMES[((index % COHORT_THEMES.length) + COHORT_THEMES.length) % COHORT_THEMES.length];
+  }
+
+  // 멤버 색은 자기 반 팔레트 안에서 순서대로. 같은 반끼리 같은 계열, 다른 반과는 대비.
+  function memberColorMap(members, cohorts) {
+    const cohortIndex = new Map(cohorts.map((c, i) => [c.id, i]));
+    const used = new Map();
     const map = new Map();
-    members.forEach((m) => map.set(m.id, COLORS[map.size % COLORS.length]));
-    return (id) => {
-      if (!map.has(id)) map.set(id, COLORS[map.size % COLORS.length]); // 목데이터 등 미등록 멤버도 색을 받는다
-      return map.get(id);
-    };
+    members.forEach((m) => {
+      const ci = cohortIndex.has(m.cohort) ? cohortIndex.get(m.cohort) : cohorts.length;
+      const n = used.get(ci) || 0;
+      used.set(ci, n + 1);
+      const palette = cohortTheme(ci).palette;
+      map.set(m.id, palette[n % palette.length]);
+    });
+    return (id) => map.get(id) || NEUTRAL_COLOR;
   }
 
   const KIND_LABEL = { note: '노트', lab: '실습', reading: '읽을거리', shared: '공유 프로젝트', commit: '커밋', streak: '연속 출석', level: '레벨 업' };
@@ -229,12 +245,15 @@
     }
   }
 
-  function renderMember(member, color) {
+  function renderMember(member, color, cohort, theme) {
     const tpl = $('#member-card-template').content.cloneNode(true);
     const card = $('.card', tpl);
     const idle = member.counts.notes + member.counts.labs === 0;
     card.style.setProperty('--accent', color);
+    card.style.setProperty('--cohort-accent', theme.accent);
     card.dataset.member = member.id;
+    card.dataset.cohort = cohort.id;
+    $('.card__cohort', tpl).textContent = cohort.label;
     if (idle) card.classList.add('is-idle');
 
     const avatar = $('.card__avatar', tpl);
@@ -275,13 +294,84 @@
     return tpl;
   }
 
-  function renderMembers(members, colorOf) {
+  function renderMembers(members, cohorts, colorOf) {
     const grid = $('#member-grid');
     if (!members.length) {
       grid.append(el('p', { class: 'panel', style: 'padding:1.2rem', text: '아직 멤버가 없어요. members/<github-id>/ 폴더를 만들어 시작해 보세요.' }));
       return;
     }
-    members.forEach((m) => grid.append(renderMember(m, colorOf(m.id))));
+    const byCohort = new Map(cohorts.map((c) => [c.id, []]));
+    members.forEach((m) => {
+      if (!byCohort.has(m.cohort)) byCohort.set(m.cohort, []);
+      byCohort.get(m.cohort).push(m);
+    });
+    [...byCohort.entries()].forEach(([cohortId, list], i) => {
+      if (!list.length) return;
+      const cohort = cohorts.find((c) => c.id === cohortId) || { id: cohortId, label: `${cohortId}반` };
+      const theme = cohortTheme(i);
+      grid.append(el('h3', { class: 'members__cohort', style: `--cohort-accent:${theme.accent}` }, [
+        el('span', { class: 'sticker sticker--cohort', text: cohort.label }),
+        el('span', { class: 'members__cohort-meta', text: `${list.length}명` }),
+      ]));
+      list.forEach((m) => grid.append(renderMember(m, colorOf(m.id), cohort, theme)));
+    });
+  }
+
+  /* ------------------------------------------------------------ graphs */
+  function smallAvatar(member, id, color) {
+    const img = el('img', {
+      src: member ? member.avatar : `https://github.com/${id}.png?size=64`,
+      alt: member ? member.name : id, title: member ? member.name : id,
+      width: 28, height: 28, loading: 'lazy', style: `--c:${color}`,
+    });
+    img.addEventListener('error', () => { img.replaceWith(el('span', { style: `--c:${color}`, text: id.slice(0, 1) })); });
+    return img;
+  }
+
+  function countType(graph, type) {
+    return graph.nodes.filter((n) => n.type === type).length;
+  }
+
+  // 아직 아무도 없는 열린 반: 그래프 대신 "다음 반 자리" 안내판
+  function renderNextCohort(cohort, theme) {
+    return el('article', { class: 'cohort cohort--next', style: `--cohort-accent:${theme.accent}`, 'aria-label': `${cohort.label} 자리` }, [
+      el('span', { class: 'sticker sticker--cohort', text: cohort.label }),
+      el('p', { class: 'cohort__next-text' }, [
+        '다음에 합류하는 멤버들의 자리예요. ',
+        el('code', { text: 'members/<github-id>/' }),
+        ' 폴더가 생기면 여기에 새 그래프가 자라나요.',
+      ]),
+    ]);
+  }
+
+  function renderGraphs(cohorts, members, colorOf) {
+    const box = $('#graph-cohorts');
+    const byId = new Map(members.map((m) => [m.id, m]));
+    if (!cohorts.length) {
+      box.append(el('p', { class: 'panel', style: 'padding:1.2rem', text: '아직 그릴 그래프가 없어요.' }));
+      return;
+    }
+    cohorts.forEach((cohort, i) => {
+      const theme = cohortTheme(i);
+      if (!cohort.members.length) {
+        box.append(renderNextCohort(cohort, theme));
+        return;
+      }
+      const tpl = $('#graph-panel-template').content.cloneNode(true);
+      const panel = $('.cohort', tpl);
+      panel.style.setProperty('--cohort-accent', theme.accent);
+      panel.dataset.cohort = cohort.id;
+      panel.setAttribute('aria-label', `${cohort.label} 지식그래프`);
+      $('.cohort__name', tpl).textContent = cohort.label;
+      const avatars = $('.cohort__avatars', tpl);
+      cohort.members.forEach((id) => avatars.append(smallAvatar(byId.get(id), id, colorOf(id))));
+      const g = cohort.graph;
+      $('.cohort__meta', tpl).textContent =
+        `${cohort.members.length}명 · 노트 ${countType(g, 'note')} · 실습 ${countType(g, 'lab')} · 주제 ${countType(g, 'topic')}`;
+      $('.graph', tpl).setAttribute('aria-label', `${cohort.label} 멤버, 노트, 실습, 주제를 잇는 그래프`);
+      box.append(tpl);
+      if (window.KGGraph) window.KGGraph.mount(panel, g, colorOf); // DOM 에 붙은 뒤에 마운트해야 폭을 잰다
+    });
   }
 
   /* --------------------------------------------------------- activity */
@@ -324,15 +414,16 @@
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       const data = await load();
-      const colorOf = memberColorMap(data.members);
+      const cohorts = data.cohorts || [];
+      const colorOf = memberColorMap(data.members, cohorts);
       renderHero(data);
       renderStats(data);
       renderFeed(data.feed || [], data.feed_source, colorOf);
       renderReadings(data.readings || [], colorOf);
-      renderMembers(data.members, colorOf);
+      renderMembers(data.members, cohorts, colorOf);
       renderActivity(data.activity, colorOf);
       renderFooter(data);
-      if (window.KGGraph) window.KGGraph.mount($('#graph'), data.graph, colorOf);
+      renderGraphs(cohorts, data.members, colorOf);
     } catch (err) {
       console.error(err);
       $('#digest').textContent = '데이터를 불러오지 못했어요.';

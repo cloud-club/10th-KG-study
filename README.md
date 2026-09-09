@@ -70,3 +70,4 @@ python3 -m http.server -d dashboard 8000                  # http://localhost:800
 |-----------|------|
 | sese2204 | [members/sese2204](members/sese2204) |
 | heebindev | [members/heebindev](members/heebindev) |
+| lys0611 | [members/lys0611](members/lys0611) |

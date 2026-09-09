@@ -15,4 +15,4 @@
 ## 진행 현황
 
 - [x] 1주차: 지식 그래프 기초 용어 정리
-- [ ] 2주차: grep, Elasticsearch BM25, pgvector 실습
+- [ ] 2주차: grep, Elasticsearch BM25, pgvector 실습 (진행 중)

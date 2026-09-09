@@ -25,4 +25,5 @@
 
 | # | 실습 | 상태 |
 |---|------|------|
-| 01 | | 예정 |
+| 01 | [카카오톡 대화 파싱 → PostgreSQL 적재](labs/01-kakao-ingest/README.md) | 완료 |
+| 02 | [대화 청킹 → 로컬 임베딩 → pgvector / pg_trgm 하이브리드 검색](labs/02-kakao-chunk-embed/README.md) | 완료 |

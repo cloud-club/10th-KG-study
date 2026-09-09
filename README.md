@@ -69,3 +69,4 @@ python3 -m http.server -d dashboard 8000                  # http://localhost:800
 | GitHub ID | 폴더 |
 |-----------|------|
 | sese2204 | [members/sese2204](members/sese2204) |
+| lys0611 | [members/lys0611](members/lys0611) |

@@ -43,7 +43,10 @@ def search(query: str, limit: int = 5):
     proc = subprocess.run(cmd, capture_output=True, text=True)
     elapsed = time.perf_counter() - t0
 
-    hits = [l for l in proc.stdout.splitlines() if l.strip()]
+    # collect_notion.py가 각 파일 맨 위에 심어 둔 <!--meta ...--> 줄은
+    # 코퍼스 내용이 아니라 파이프라인이 만든 부산물이다. 검색 결과에서 뺀다.
+    hits = [l for l in proc.stdout.splitlines()
+            if l.strip() and "<!--meta " not in l]
     return hits[:limit], len(hits), elapsed
 
 
@@ -53,11 +56,20 @@ def main() -> None:
         return
     query = sys.argv[1]
     hits, total, elapsed = search(query)
-    print(f'[0세대] "{query}" — {total}건 / {elapsed*1000:.0f}ms (전체 스캔)')
+    print(f'[0세대] "{query}" — {total}건 / {elapsed*1000:.0f}ms (전체 스캔, 순위 없음)')
     if not hits:
         print("  (없음) 표현이 한 글자만 달라도 못 찾는다.")
     for h in hits:
-        print("  ", h[:160])
+        # 긴 절대경로가 정작 중요한 본문을 밀어내지 않게 파일명만 남긴다.
+        path, _, rest = h.partition(":")
+        lineno, _, body = rest.partition(":")
+        name = path.rsplit("/", 1)[-1]
+        # 매칭된 부분이 줄 뒤쪽에 있으면 그 앞을 잘라내 보이게 한다.
+        idx = body.find(query)
+        if idx > 50:
+            body = "…" + body[idx - 20:]
+        print(f"  {name}:{lineno}")
+        print(f"      {body.strip()[:100]}")
 
 
 if __name__ == "__main__":

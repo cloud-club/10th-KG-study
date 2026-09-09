@@ -19,24 +19,39 @@ import gen2_pgvector
 LIMIT = 3
 RESULTS = Path(__file__).resolve().parent.parent / "results"
 
-# 질문 10개. 유형을 고르게 섞어야 표가 의미를 갖는다 —
-# 한쪽으로 몰면 "역시 벡터가 최고" 같은 뻔한 결론만 나온다.
-# 실제 코퍼스를 보고 문구는 조정할 것.
+# 프로브 쿼리 10개. 부류를 정해두고 개수를 맞춘다 —
+# 한쪽으로 몰면 "역시 벡터가 최고" 같은 뻔한 결론만 나오고
+# 정작 알고 싶은 **경계선**이 안 보인다.
+#   A 정확 키워드·고유명사·ID  4개  → 0세대가 이길 것으로 예상
+#   B 표현 불일치·의미 검색     3개  → 2세대가 이길 것으로 예상
+#   C 오타·띄어쓰기 파괴        3개  → 0·1세대가 무너지는 지점
 QUESTIONS = [
-    # --- 0세대가 이길 것으로 예상되는 구간: 정확 매칭 ---
-    ("Q01", "HTTP 404", "정확 식별자", "의미 없는 문자열. 임베딩이 오히려 뭉갠다"),
-    ("Q02", "OPENAI_API_KEY", "코드/설정 심볼", "정확·결정적이어야 한다"),
-    # --- 1세대가 이길 것으로 예상되는 구간: 키워드 + 형태소 ---
-    ("Q03", "학교", "조사 결합", "grep -w는 '학교에서'를 놓친다. nori는 잡는다"),
-    ("Q04", "쿠버네티스 배포", "복합 키워드", "두 단어 다 있는 문서를 BM25가 위로 올린다"),
-    ("Q05", "정처기", "고유 축약어", "사전에 없는 신조어. nori는 쪼개고 n-gram이 잡는다"),
-    # --- 2세대가 이길 것으로 예상되는 구간: 표기 변이 + 개념 ---
-    ("Q06", "엘라스틱서치", "한영 혼용", "본문이 Elasticsearch면 grep도 BM25도 0건"),
-    ("Q07", "지식 그래프", "띄어쓰기 변이", "'지식그래프'와는 grep에겐 남남"),
-    ("Q08", "검색이 왜 어려운가", "개념 질의", "문자열로 존재하지 않는 질문"),
-    ("Q09", "면접에서 받은 피드백", "자연어 질의", "문서에 이 표현이 그대로 없을 가능성이 높다"),
-    ("Q10", "성능을 개선한 경험", "의미 검색", "동의어가 여러 갈래로 흩어져 있다"),
+    # --- A. 정확 키워드·고유명사·ID ---
+    ("Q01", "SeCause", "A 고유명사", "프로젝트명. 의미가 없어 임베딩이 오히려 뭉갠다"),
+    ("Q02", "@Transactional", "A 코드 심볼", "정확·결정적이어야 한다"),
+    ("Q03", "Write-Behind", "A 기술 용어", "하이픈 복합어. nori가 어떻게 쪼개는지가 갈림길"),
+    ("Q04", "청바지", "A 고유명사(함정)", "내 프로젝트명이지만 일반명사라 벡터가 의류로 끌려갈 수 있다"),
+    # --- B. 표현 불일치·의미 검색 ---
+    ("Q05", "성능을 개선한 경험", "B 의미 검색", "동의어가 여러 갈래로 흩어져 있다"),
+    ("Q06", "면접에서 받은 피드백", "B 자연어 질의", "이 표현이 문서에 그대로 없을 가능성이 높다"),
+    ("Q07", "검색이 왜 어려운가", "B 개념 질의", "문자열로 존재하지 않는 질문"),
+    # --- C. 오타·띄어쓰기 파괴 ---
+    ("Q08", "트러블 슈팅", "C 띄어쓰기 파괴", "원문은 '트러블슈팅'(14건). 띄어쓴 건 1건뿐"),
+    ("Q09", "엘라스틱 서치", "C 띄어쓰기+한영", "원문은 '엘라스틱서치'(4건). 띄어쓴 형태는 0건"),
+    ("Q10", "쿠버네티즈", "C 오타", "원문은 '쿠버네티스'(9건). 오타는 0건 — grep·BM25 둘 다 무너진다"),
 ]
+
+
+def warmup() -> None:
+    """임베딩 모델을 미리 올려둔다.
+
+    이걸 안 하면 첫 벡터 검색에 모델 로딩(수 초)이 섞여 들어가서
+    "벡터 검색은 10초 걸린다"는 엉뚱한 수치가 표에 박힌다.
+    """
+    try:
+        gen2_pgvector.embedder()
+    except Exception:
+        pass
 
 
 def probe(query: str, limit: int = LIMIT):
@@ -82,54 +97,69 @@ def show(qid: str, query: str, kind: str, note: str) -> None:
 
 
 def table() -> None:
-    """승패 표를 마크다운으로 저장한다.
+    """비교 결과를 순위 기록으로 저장한다.
+
+    점수는 방식마다 척도가 달라서(BM25 점수 vs 코사인 유사도 vs 없음) 나란히
+    놓으면 비교가 안 된다. 그래서 **무엇이 몇 위로 나왔는지**만 적는다.
+    순위는 척도가 달라도 비교가 된다.
 
     승자 판정은 자동으로 못 한다 — 정답 레이블이 없기 때문이다.
-    그래서 건수·지연만 채우고 '판정' 칸은 비워 둔 뒤, 아래에 각 질문의
-    실제 상위 결과를 함께 적어서 눈으로 판정할 수 있게 한다.
-    (이 한계 자체가 다음 단계인 '골든셋이 필요하다'로 이어진다)
+    이 한계가 그대로 다음 단계('골든셋이 필요하다')의 이유가 된다.
     """
     RESULTS.mkdir(exist_ok=True)
-    rows, details = [], []
+    summary, blocks = [], []
 
     for qid, query, kind, note in QUESTIONS:
         res = probe(query)
-        def cell(key):
-            total, ms, _ = res[key]
-            return "오류" if total is None else f"{total}건 / {ms:.0f}ms"
-        rows.append(f"| {qid} | {query} | {kind} | {cell('gen0')} | {cell('gen1')} | {cell('gen2')} |  |")
 
-        details.append(f"### {qid} — {query}  ({kind})\n\n> 예상: {note}\n")
-        for key, label in (("gen0", "0세대 grep"), ("gen1", "1세대 BM25"), ("gen2", "2세대 벡터")):
-            total, ms, hits = res[key]
-            details.append(f"**{label}** — " + ("오류" if total is None else f"{total}건 / {ms:.0f}ms"))
-            details.append("")
-            for h in hits or ["(결과 없음)"]:
-                details.append(f"- {h[:160]}")
-            details.append("")
+        def hits(key):
+            return res[key][2] or []
+
+        found = {k: ("없음" if not res[k][0] else f"{res[k][0]}건") for k in res}
+        summary.append(f"| {qid} | `{query}` | {kind} | {found['gen0']} | {found['gen1']} | {found['gen2']} |  |")
+
+        blocks.append(f"### {qid} — `{query}`  ({kind})\n")
+        blocks.append(f"> {note}\n")
+        blocks.append("| 순위 | 0세대 grep | 1세대 BM25 | 2세대 벡터 |")
+        blocks.append("|------|-----------|-----------|-----------|")
+        for i in range(LIMIT):
+            def cell(key):
+                h = hits(key)
+                if i >= len(h):
+                    return "—"
+                return h[i][:70].replace("|", "\\|").strip()
+            blocks.append(f"| {i+1} | {cell('gen0')} | {cell('gen1')} | {cell('gen2')} |")
+        blocks.append("")
 
     md = [
-        "# 질문 10개 × 세 방식 비교",
+        "# 프로브 쿼리 10개 × 세 방식 비교",
         "",
-        "각 칸은 `히트 수 / 소요시간`. '판정'은 위 결과를 보고 직접 채운다.",
+        "온톨로지 스터디 2주차 실습. 같은 질문을 grep / Elasticsearch BM25 / pgvector에",
+        "똑같이 던지고 **무엇이 몇 위로 나왔는지**를 기록한다.",
         "",
-        "| # | 질문 | 유형 | 0세대 grep | 1세대 BM25 | 2세대 벡터 | 판정 |",
-        "|---|------|------|-----------|-----------|-----------|------|",
-        *rows,
+        "점수를 안 쓰고 순위를 쓰는 이유: BM25 점수와 코사인 유사도는 척도가 달라",
+        "나란히 놓으면 비교가 되지 않는다. 순위는 척도가 달라도 비교된다.",
         "",
-        "## 상세 결과",
+        "## 요약",
         "",
-        *details,
+        "| # | 쿼리 | 부류 | grep | BM25 | 벡터 | 판정 |",
+        "|---|------|------|------|------|------|------|",
+        *summary,
+        "",
+        "## 쿼리별 순위",
+        "",
+        *blocks,
     ]
-    out = RESULTS / "comparison.md"
+    out = RESULTS / "compare.md"
     out.write_text("\n".join(md), encoding="utf-8")
-    print(f"표 저장: {out}")
+    print(f"비교 결과 저장: {out}")
 
 
 def main() -> None:
     if len(sys.argv) < 2:
         sys.exit('사용법: python src/query.py "<질문>" | --all | --table')
     arg = sys.argv[1]
+    warmup()
     if arg == "--table":
         table()
     elif arg in ("--all", "--demo"):

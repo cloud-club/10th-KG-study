@@ -22,8 +22,6 @@ from pgvector.psycopg import register_vector
 from common import CHUNKS, EMBED_DIM, EMBED_MODEL, PG_DSN, PG_TABLE
 
 DDL = f"""
-CREATE EXTENSION IF NOT EXISTS vector;
-
 DROP TABLE IF EXISTS {PG_TABLE};
 CREATE TABLE {PG_TABLE} (
     id        text PRIMARY KEY,
@@ -57,6 +55,9 @@ def embedder():
 
 def connect():
     conn = psycopg.connect(PG_DSN, autocommit=True)
+    # register_vector는 DB에 vector 타입이 이미 있어야 동작한다.
+    # 그래서 확장 설치가 먼저다 (순서를 바꾸면 "vector type not found"로 죽는다).
+    conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
     register_vector(conn)
     return conn
 

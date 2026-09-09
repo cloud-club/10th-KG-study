@@ -120,6 +120,32 @@ def analyze(text: str) -> None:
         print(f"  {name:22s}: {[t['token'] for t in toks]}")
 
 
+def explain(query: str) -> None:
+    """BM25 점수가 어떻게 만들어졌는지 분해해서 본다.
+
+    발표용. 수식을 설명하는 것보다 실제 점수가 idf / tf / 문서길이로
+    쪼개지는 걸 보여주는 게 훨씬 빠르다.
+    """
+    es = client()
+    hit = es.search(index=ES_INDEX, query={"match": {"text": query}}, size=1,
+                    _source=["title"])["hits"]["hits"][0]
+    ex = es.explain(index=ES_INDEX, id=hit["_id"], query={"match": {"text": query}})
+
+    print(f'[1세대] "{query}" BM25 점수 분해')
+    print(f'  문서: {hit["_source"]["title"]}  (총점 {ex["explanation"]["value"]:.4f})\n')
+
+    def walk(node, depth=0):
+        desc = node["description"]
+        # 잎에 해당하는 idf/tf/길이 항만 골라 보여준다
+        keep = any(k in desc for k in ("idf", "tf,", "freq", "dl", "avgdl", "boost", "score(")) 
+        if keep or depth < 2:
+            print(f'  {"  "*depth}{node["value"]:>10.4f}  {desc[:88]}')
+        for child in node.get("details", []):
+            walk(child, depth + 1)
+
+    walk(ex["explanation"])
+
+
 def search(query: str, limit: int = 5, field: str = "text"):
     es = client()
     res = es.search(
@@ -139,6 +165,8 @@ def main() -> None:
         show_mapping()
     elif arg == "analyze":
         analyze(sys.argv[2])
+    elif arg == "explain":
+        explain(sys.argv[2])
     else:
         for field in ("text", "text.ngram"):
             hits, total, took = search(arg, field=field)

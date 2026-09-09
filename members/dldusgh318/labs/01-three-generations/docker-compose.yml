@@ -11,6 +11,9 @@ services:
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
     ports:
       - "9200:9200"
+    volumes:
+      # 볼륨이 없으면 컨테이너를 지우는 순간 역색인이 통째로 사라진다.
+      - esdata:/usr/share/elasticsearch/data
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
       interval: 10s
@@ -37,4 +40,5 @@ services:
       retries: 10
 
 volumes:
+  esdata:
   pgdata:

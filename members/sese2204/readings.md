@@ -1,6 +1,6 @@
 # 읽을거리
 
-## 1주차 · 고전 RAG 훑기
+## 2주차 · 고전 RAG 훑기
 
 - [Lewis et al., Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (2020)](https://arxiv.org/abs/2005.11401) — RAG라는 이름의 출발점. 검색기+생성기 결합의 원형
 - [Karpukhin et al., Dense Passage Retrieval (2020)](https://arxiv.org/abs/2004.04906) — BM25를 dense 검색이 처음 제대로 이긴 논문

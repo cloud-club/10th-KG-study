@@ -44,8 +44,9 @@ XP_PER_LEVEL = 100
 KIND_ORDER = {"level": 0, "streak": 1, "lab": 2, "note": 3, "reading": 4, "shared": 5, "commit": 6}
 READINGS_FILE = "readings.md"      # members/<id>/readings.md — 주차별 읽을거리
 SKIP_DIRS = {"<github-id>", "_template"}
+COHORTS_PATH = MEMBERS_DIR / "cohorts.json"   # 반별 명단 {"A": [id, ...]}. 명단에 없는 멤버는 마지막 반 다음 반(열린 반)으로
 INFRA_PREFIXES = ("dashboard/", "scripts/", ".github/", "templates/", ".cache/")
-INFRA_FILES = {"README.md", "CONTRIBUTING.md", ".gitignore"}
+INFRA_FILES = {"README.md", "CONTRIBUTING.md", ".gitignore", "members/cohorts.json"}
 BINARY_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".pdf", ".zip", ".lock", ".ipynb", ".parquet", ".db"}
 PLACEHOLDERS = {
     "NN. 주제",
@@ -497,6 +498,75 @@ def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict
     }
 
 
+# ----------------------------------------------------------------- cohorts
+
+def cohort_label(cohort_id: str) -> str:
+    return f"{cohort_id}반"
+
+
+def next_cohort_id(existing: list[str]) -> str:
+    """A → B → C … 마지막 반 다음 글자. 알파벳 한 글자가 아니면 뒤에 2를 붙인다."""
+    if not existing:
+        return "A"
+    last = existing[-1]
+    if len(last) == 1 and "A" <= last < "Z":
+        return chr(ord(last) + 1)
+    return f"{last}2"
+
+
+def load_cohorts(path: Path) -> list[dict]:
+    """members/cohorts.json → [{"id": "A", "members": [...]}, ...] (파일 순서 유지). 없거나 깨졌으면 []."""
+    if not path.exists():
+        return []
+    try:
+        raw = json.loads(read_text(path))
+    except ValueError as exc:
+        print(f"[dashboard] {path.name} 파싱 실패, 반 구분 없이 진행: {exc}", file=sys.stderr)
+        return []
+    if not isinstance(raw, dict):
+        print(f'[dashboard] {path.name} 은 {{"A": ["id", ...]}} 형식이어야 합니다', file=sys.stderr)
+        return []
+    cohorts = []
+    for cid, ids in raw.items():
+        if not isinstance(ids, list) or not all(isinstance(i, str) for i in ids):
+            print(f"[dashboard] {path.name}: {cid} 반 명단은 문자열 배열이어야 합니다", file=sys.stderr)
+            continue
+        cohorts.append({"id": str(cid), "members": ids})
+    return cohorts
+
+
+def assign_cohorts(member_ids: list[str], config: list[dict]) -> tuple[list[dict], dict[str, str]]:
+    """명단대로 반을 나누고, 명단에 없는 멤버는 마지막 반 다음 반(열린 반)에 넣는다.
+
+    반환: (반 목록, 멤버 id → 반 id). 열린 반은 비어 있어도 목록에 남긴다 (현황판이 '다음 반 자리'로 그린다).
+    """
+    known = set(member_ids)
+    cohort_of: dict[str, str] = {}
+    cohorts = []
+    for c in config:
+        members = []
+        for mid in c["members"]:
+            if mid not in known:
+                print(f"[dashboard] cohorts.json: {c['id']} 반의 {mid} 는 members/ 에 폴더가 없어 건너뜀", file=sys.stderr)
+            elif mid in cohort_of:
+                print(f"[dashboard] cohorts.json: {mid} 는 이미 {cohort_of[mid]} 반이라 {c['id']} 반 중복은 무시", file=sys.stderr)
+            else:
+                cohort_of[mid] = c["id"]
+                members.append(mid)
+        cohorts.append({"id": c["id"], "label": cohort_label(c["id"]), "members": members, "open": False})
+    open_id = next_cohort_id([c["id"] for c in cohorts])
+    rest = [mid for mid in member_ids if mid not in cohort_of]
+    cohort_of.update({mid: open_id for mid in rest})
+    cohorts.append({"id": open_id, "label": cohort_label(open_id), "members": rest, "open": True})
+    return cohorts, cohort_of
+
+
+def build_cohort_graphs(cohorts: list[dict], members: list[dict]) -> list[dict]:
+    """반마다 그 반 멤버만으로 그래프를 따로 만든다. 주제가 겹쳐도 반 사이에는 선을 긋지 않는다."""
+    by_id = {m["id"]: m for m in members}
+    return [{**c, "graph": build_graph([by_id[mid] for mid in c["members"] if mid in by_id])} for c in cohorts]
+
+
 # --------------------------------------------------------------- assembling
 
 def build_graph(members: list[dict]) -> dict:
@@ -642,6 +712,7 @@ def write_step_summary(data: dict) -> None:
     lines = [
         "## 현황판 빌드", "",
         f"- 멤버 {t['members']} · 노트 {t['notes']} · 실습 {t['labs']} · 읽을거리 {t['readings']} · 커밋 {t['commits']}",
+        "- 반: " + " · ".join(f"{c['label']} {len(c['members'])}명{' (열린 반)' if c['open'] else ''}" for c in data["cohorts"]),
         f"- 요약/칭호: **{s['digest_source']}**{model}",
         f"- 중계 피드: **{data['feed_source']}** ({len(data['feed'])}건)",
         "", f"> {s['digest']}", "",
@@ -665,6 +736,8 @@ def main() -> int:
     for c in commits:
         by_member[c["member"]].append(c)
     members = [scan_member(d, repo, today, by_member.get(d.name, [])) for d in dirs]
+    cohorts, cohort_of = assign_cohorts([m["id"] for m in members], load_cohorts(COHORTS_PATH))
+    members = [{**m, "cohort": cohort_of[m["id"]]} for m in members]
 
     totals = {
         "members": len(members),
@@ -672,6 +745,7 @@ def main() -> int:
         "labs": sum(m["counts"]["labs"] for m in members),
         "commits": len(commits),
         "readings": sum(m["counts"]["readings"] for m in members),
+        "cohorts": sum(1 for c in cohorts if c["members"]),
     }
     started = git(["log", "--reverse", "--format=%ad", "--date=short"]).splitlines()
     study = {"started_at": started[0] if started else today.isoformat()}
@@ -690,17 +764,18 @@ def main() -> int:
         "feed": strip_private(feed),
         "feed_source": feed_source,
         "members": strip_private(members),
-        "graph": build_graph(members),
+        "cohorts": build_cohort_graphs(cohorts, members),
         "activity": build_activity(commits, repo),
         "readings": build_readings(members),
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     write_step_summary(data)
+    cohort_summary = "/".join(f"{c['label']}{len(c['members'])}" for c in data["cohorts"])
     print(
         f"[dashboard] {OUT_PATH.relative_to(ROOT)} 생성: 멤버 {totals['members']}, "
         f"노트 {totals['notes']}, 실습 {totals['labs']}, 읽을거리 {totals['readings']}, 커밋 {totals['commits']}, "
-        f"LLM={study.get('digest_source')}, 피드={feed_source}({len(feed)})"
+        f"LLM={study.get('digest_source')}, 피드={feed_source}({len(feed)}), 반={cohort_summary}"
     )
     return 0
 

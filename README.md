@@ -12,7 +12,12 @@
 ├── README.md
 ├── CONTRIBUTING.md        # 참여 방법, 네이밍 규칙
 ├── .gitignore
+├── docker-compose.yml     # 로컬 인프라: Postgres(pgvector) + Elasticsearch(nori) + Neo4j(APOC)
+├── .env.example           # 인프라 비밀번호·포트 (cp .env.example .env)
+├── infra/                 # 인프라 설정, 사용법 (infra/README.md)
+├── data/                  # 각자 받아온 데이터셋 (git 무시, 컨테이너에 마운트됨)
 ├── members/               # 멤버별 개인 작업 공간
+│   ├── cohorts.json       # 반(A반/B반…) 명단 — 현황판 지식그래프를 반별로 나눠 그림
 │   └── <github-id>/
 │       ├── README.md      # 자기소개, 목표
 │       ├── readings.md    # 주차별 읽을거리·참고자료 (현황판에 모아서 표시)
@@ -44,12 +49,31 @@ cp templates/note-template.md members/$GH_ID/notes/01-topic.md
 cp templates/readings-template.md members/$GH_ID/readings.md
 ```
 
+## 로컬 인프라 (Docker)
+
+실습용 DB 세 개를 한 번에 띄웁니다. 자세한 건 [infra/README.md](infra/README.md).
+
+```bash
+cp .env.example .env
+docker compose up -d      # PostgreSQL 17 + pgvector, Elasticsearch 9 + nori, Neo4j 5.26 + APOC
+bash infra/check.sh       # 정상 기동 확인
+```
+
+| 서비스 | 접속 |
+|--------|------|
+| PostgreSQL + pgvector | `postgresql://kg:kg@localhost:5432/kg` |
+| Elasticsearch + nori | `http://localhost:9200` |
+| Neo4j + APOC | `bolt://localhost:7687`, Browser `http://localhost:7474` (neo4j / kgstudy2026) |
+
+받아온 데이터셋은 `data/<github-id>/` 아래에 두면 컨테이너에서 바로 읽을 수 있고 git 에는 올라가지 않습니다.
+
 ## 현황판 (dashboard)
 
 `main`에 푸시하면 GitHub Actions가 `members/`를 스캔해 노트·실습·커밋·활동 히트맵을 뽑고,
 GPT가 멤버별 칭호·요약·태그와 스터디 소식을 붙여 GitHub Pages로 배포합니다.
 
 - 노트/실습 맨 위 프론트매터의 `tags`가 지식그래프의 주제 노드가 됩니다. 비워두면 GPT가 채워줍니다.
+- 지식그래프는 **반(cohort) 단위**로 따로 그립니다. `members/cohorts.json`에 `{"A": ["id", ...]}`처럼 반별 명단을 적고, 명단에 없는 새 멤버는 자동으로 마지막 반 다음 반(지금은 B반)에 들어갑니다. 반마다 색 계열이 달라(A반 하늘, B반 노을, C반 풀밭) 멤버 카드·피드·읽을거리에서도 어느 반인지 보입니다. B반이 다 찼으면 `"B": [...]`를 추가해 닫고, 그다음 합류자는 C반으로 갑니다.
 - "주차별 읽을거리"는 각자 `members/<id>/readings.md`의 `## N주차` 아래 불릿을 모아 주차별로 보여줍니다. `[제목](링크) — 메모` 형식이면 링크·도메인·메모까지 뽑히고, 링크 없는 책 제목도 됩니다.
 - "중계석"은 최근 커밋의 diff를 GPT가 읽고 무슨 작업인지 캐스터 톤으로 중계합니다. 같은 멤버가 같은 날 올린 커밋은 한 사건으로 묶이고, 한 멤버는 피드에서 커밋 사건을 최대 3개까지만 차지합니다 (한 명이 도배하지 않도록). `members/`, `shared/` 어디든 스터디 작업 커밋이면 잡히고, 3일 이상 연속 출석과 레벨 업도 사건으로 올라갑니다. 현황판 코드나 템플릿만 바꾼 커밋은 제외합니다.
 - 커밋은 멤버 폴더 경로, GitHub 로그인, 이메일 순으로 멤버에 연결됩니다. `shared/` 커밋도 히트맵과 최근 활동에 포함됩니다.
@@ -69,3 +93,6 @@ python3 -m http.server -d dashboard 8000                  # http://localhost:800
 | GitHub ID | 폴더 |
 |-----------|------|
 | sese2204 | [members/sese2204](members/sese2204) |
+| heebindev | [members/heebindev](members/heebindev) |
+| lys0611 | [members/lys0611](members/lys0611) |
+| e0ng | [members/e0ng](members/e0ng) |

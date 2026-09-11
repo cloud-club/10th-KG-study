@@ -1,152 +1,104 @@
 ---
-title: 역색인과 BM25 — 키워드 검색(1세대)이 잡는 것과 놓치는 것
+title: 역색인과 BM25 — 카톡 검색에 대입해 보기
 date: 2026-09-09
 tags: [inverted-index, tf-idf, bm25, elasticsearch, lucene, nori, tokenization, ngram, korean]
 status: done
 ---
 
-# 01. 역색인과 BM25 — 키워드 검색(1세대)이 잡는 것과 놓치는 것
+# 01. 역색인과 BM25 — 카톡 검색에 대입해 보기
 
-> 참고 자료:
-> - Robertson et al., *Okapi at TREC-3* (1994) — BM25의 원 출처
-> - Elastic, [Similarity module (BM25 파라미터)](https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity) · [Practical BM25 Part 2](https://www.elastic.co/blog/practical-bm25-part-2-the-bm25-algorithm-and-its-variables), [Part 3](https://www.elastic.co/blog/practical-bm25-part-3-considerations-for-picking-b-and-k1-in-elasticsearch)
-> - Lucene, [BM25Similarity javadoc](https://lucene.apache.org/core/8_1_1/core/org/apache/lucene/search/similarities/BM25Similarity.html) — IDF 식 그대로
-> - Elastic, [Korean (nori) analysis plugin](https://www.elastic.co/docs/reference/elasticsearch/plugins/analysis-nori) · [nori_tokenizer](https://www.elastic.co/docs/reference/elasticsearch/plugins/analysis-nori-tokenizer)
-> - 실습: [labs/01-ingest](../labs/01-ingest/README.md) 의 `kakao_chunks` 인덱스
+이번 실습에서 먼저 확인하고 싶었던 것은 단순했다. 카톡에서 `마감 일정`을 찾을 때 문자열 검색, BM25, 벡터 검색은 실제로 무엇을 다르게 가져오는가? 세 방법에 같은 질문을 던져 보니 차이는 검색 알고리즘보다도 “문서를 어떤 단위로 자르고, 질문을 어떤 토큰으로 해석했는가”에서 먼저 나타났다.
 
-## 한 줄 요약
+## 문자열 검색에서 막힌 지점
 
-grep은 "문자열이 그대로 있는가"만 보고 순위가 없다. 역색인은 문서를 **단어 → 문서 목록**으로 뒤집어 놓아 검색을 O(문서 수)에서 O(매칭 단어 수)로 바꾸고, BM25는 그 위에서 "이 단어가 이 문서에 얼마나 특징적인가"를 점수로 매긴다. 한국어에서는 **무엇을 단어로 볼 것인가(토크나이징)**가 이 모든 것의 전제다.
+`ILIKE '%마감 일정%'`은 두 단어가 그 순서로 붙어 있는 문자열만 찾는다. 내 데이터에는 그런 메시지가 없어서 결과가 0건이었다. `마감`, `데드라인`, `제출일`, `언제까지`가 사람에게는 비슷한 말이어도 문자열 검색에는 전부 다른 값이다.
 
-## 핵심 개념
+속도와 검색 품질도 구분해야 한다. `pg_trgm` 같은 인덱스는 부분 문자열 검색을 빠르게 만들 수 있지만, 동의어를 이해하거나 결과에 관련도 순위를 붙여 주지는 않는다. “grep이 느리다”보다 “표현이 조금만 달라도 못 찾고, 찾은 뒤 무엇이 더 중요한지도 모른다”가 이번 데이터에서 더 큰 한계였다.
 
-- **0세대 grep의 한계**: 표현 불일치(`마감`≠`데드라인`), 순위 없음, 띄어쓰기·조사 하나에 깨짐, 매번 전체 스캔.
-- **역색인(inverted index)**: term → postings(문서 id, 빈도, 위치). Lucene은 이것을 불변 세그먼트로 쓰고 주기적으로 병합한다(→ [03. DDIA 3장](03-ddia-ch3-storage-and-search.md)의 LSM 계열).
-- **TF-IDF → BM25**: 단어 빈도(TF)는 **포화**시키고(k1), 문서 길이로 **정규화**하고(b), 흔한 단어는 IDF로 깎는다. Elasticsearch 기본 유사도가 BM25, 기본값 `k1=1.2`, `b=0.75`.
-- **한국어 토크나이징**: 형태소 분석(nori, mecab-ko-dic 사전) vs n-gram(사전 없이 글자 조각). 각각 이기는 상황이 다르다.
-- **`match` 쿼리는 기본 OR**: "마감 일정"은 `마감 OR 일정`으로 풀린다. 하나만 맞아도 걸린다.
+## 역색인은 문서를 뒤집어 저장한다
 
-## 상세 정리
+문서를 매번 처음부터 읽는 대신, 역색인은 토큰별로 그 토큰이 나온 문서 목록(postings)을 저장한다.
 
-### 1. grep으로는 왜 안 되는가
+```text
+d1: 부산 숙소 예약했어요
+d2: 숙소는 내가 알아볼게
+d3: 부산 언제 갈까
 
-| 문제 | 예 (카톡 데이터) |
-|---|---|
-| 표현 불일치 | 질문 "마감 일정" ↔ 본문 "제출일", "언제까지", "데드라인" |
-| 순위 없음 | `ILIKE '%일정%'` 결과 300건이 시간순으로만 나열됨 |
-| 형태 변화 | "예약했어요", "예약할까", "예약은" 이 모두 다른 문자열 |
-| 비용 | 문서 수에 비례해 매번 전체 스캔 (pg_trgm 인덱스로 속도만 보조 가능) |
-
-실습에서 `messages.text ILIKE '%…%'` 가 정확히 이 0세대다. "마감 일정" 은 두 단어가 붙어 있는 메시지가 없어 **0건**이었다.
-
-### 2. 역색인 구조
-
-```
-문서: d1 "부산 숙소 예약했어요"   d2 "숙소는 내가 알아볼게"   d3 "부산 언제 갈까"
-사전(term)   postings
-부산      →  d1(tf1, pos0), d3(tf1, pos0)
-숙소      →  d1(tf1, pos1), d2(tf1, pos0)
-예약      →  d1(tf1, pos2)
+부산 → d1(pos 0), d3(pos 0)
+숙소 → d1(pos 1), d2(pos 0)
+예약 → d1(pos 2)
 ```
 
-- 질문이 오면 사전에서 term을 찾고 postings를 교집합/합집합한다. 문서 전체를 읽지 않는다.
-- postings에 **위치**가 있어 `match_phrase`(인접 매칭), 하이라이트(`«일정»`)가 가능하다.
-- Lucene은 색인을 **불변 세그먼트** 파일로 쓰고 새 문서는 새 세그먼트로 추가, 백그라운드에서 병합한다. 그래서 색인 직후 바로 검색되지 않고 `refresh`(기본 1초) 후에 보인다. 실습의 `index_es.py` 가 마지막에 `indices.refresh` 를 호출하는 이유.
+질의가 들어오면 해당 토큰의 postings만 읽어 합치거나 교차한다. 실제 비용은 토큰 수 하나로 정해지는 것이 아니라 postings 길이, 교집합 방식, 상위 몇 건을 뽑는지 등에 따라 달라지지만, 적어도 모든 문서 본문을 훑는 방식은 아니다. 위치 정보가 있으면 단어의 순서와 인접 여부를 보는 구문 검색이나 하이라이트도 가능하다.
 
-### 3. TF-IDF에서 BM25로
+Lucene은 이 색인을 불변 세그먼트로 기록하고 작은 세그먼트를 나중에 병합한다. Elasticsearch의 `refresh`는 새 세그먼트를 검색 가능한 상태로 열어 주는 작업이다. 기본 설정에서는 대체로 1초 주기로 갱신되지만, 최근 30초 동안 검색 요청이 있었던 인덱스라는 조건도 있다. 이번 실습 코드는 대량 색인이 끝난 뒤 `indices.refresh()`를 직접 호출하므로, 이어지는 확인 쿼리가 주기적 refresh를 기다리지 않는다.
 
+## BM25 점수를 읽는 법
+
+BM25는 역색인에서 찾은 후보에 관련도 점수를 준다. 흔히 쓰는 한 토큰의 식은 다음과 같다.
+
+```text
+score(t, D) = IDF(t) × tf × (k1 + 1)
+                         ───────────────────────────────────
+                         tf + k1 × (1 - b + b × |D| / avgdl)
+
+IDF(t) = ln(1 + (N - n(t) + 0.5) / (n(t) + 0.5))
 ```
-score(D, Q) = Σ_{t ∈ Q}  IDF(t) · ( f(t,D) · (k1 + 1) ) / ( f(t,D) + k1 · (1 − b + b · |D| / avgdl) )
-IDF(t)      = ln( 1 + (N − n(t) + 0.5) / (n(t) + 0.5) )        ← Lucene 구현
+
+여기서 `tf`는 문서 안의 토큰 빈도, `|D|`는 문서 길이, `avgdl`은 평균 문서 길이다. `k1`은 단어가 반복될 때 점수가 얼마나 빨리 포화되는지, `b`는 문서 길이를 얼마나 보정할지를 조절한다. Elasticsearch의 BM25 기본값은 `k1=1.2`, `b=0.75`다.
+
+BM25를 “TF-IDF와 달리 빈도를 포화시킨다”라고만 외우면 조금 거칠다. TF-IDF도 구현에 따라 로그 TF처럼 반복 효과를 줄일 수 있다. 다만 BM25의 식에는 포화와 길이 정규화가 명시적으로 들어 있고, 그래서 긴 청크나 같은 단어를 여러 번 쓴 청크를 다루는 방식이 더 분명하다.
+
+위 식은 설명할 때 많이 쓰는 형태다. 현재 Lucene의 `BM25Similarity`는 분자의 `(k1 + 1)`을 생략한다. 같은 필드 안에서는 모든 문서에 공통으로 곱해지는 값이라 순위는 바뀌지 않는다. 여러 필드에 서로 다른 BM25 설정을 섞는 경우에는 점수 크기까지 완전히 같다고 볼 수는 없다.
+
+## 한국어에서는 분석기가 먼저다
+
+BM25는 문자열이 아니라 분석기가 만든 토큰을 센다. 한국어 카톡은 조사와 어미가 붙고 띄어쓰기도 자주 흔들리므로, 공백만 기준으로 잘라서는 부족하다.
+
+이번 인덱스의 기본 `text` 필드는 Nori를 사용한다. `decompound_mode=mixed`로 복합명사의 원형과 분해형을 함께 남기고, `nori_part_of_speech`로 조사·어미 등 기본 stop tag를 제거했다. 팀명이나 서비스명처럼 사전에 없는 고유어가 계속 잘못 잘리면 `user_dictionary`를 추가하는 쪽이 무작정 n-gram 범위를 넓히는 것보다 관리하기 쉽다.
+
+보조 필드인 `text.ngram`은 2~3글자 조각을 저장한다. 사전에 없는 신조어와 이름 일부를 찾는 데 도움이 되지만, 토큰 수와 오탐도 함께 늘어난다. 로컬 분석기로 같은 문장을 넣어 보니 차이가 선명했다.
+
+```text
+입력: 부산숙소 예약했어요
+
+korean(nori)
+['부산', '숙소', '예약']
+
+korean_ngram(2~3글자)
+['부산', '부산숙', '산숙', '산숙소', '숙소',
+ '예약', '예약했', '약했', '약했어', '했어', '했어요', '어요']
 ```
 
-| 기호 | 뜻 | 기본값 / 효과 |
+Nori는 `예약했어요`를 의미 있는 어간인 `예약`으로 정리했다. n-gram은 `산숙`, `약했`처럼 의미 없는 조각도 함께 만든다. 그래서 일반 문장은 Nori, 철자 일부·별명·신조어 같은 예외는 n-gram 보조 필드로 실험해 보는 구성이 적당해 보인다.
+
+## `마감 일정` 검색 결과
+
+실제 팀리더 방에 같은 질문을 던진 결과는 다음과 같았다.
+
+| 방식 | 상위 결과 | 메모 |
 |---|---|---|
-| f(t,D) | 문서 D 안의 term 빈도 | 많을수록 점수↑, 단 **포화**됨 |
-| k1 | TF 포화 강도 | ES 기본 1.2. 0이면 "있냐 없냐"만, 크면 빈도가 계속 반영 |
-| b | 문서 길이 정규화 | ES 기본 0.75. 0이면 길이 무시, 1이면 평균 대비 길이로 완전 정규화 |
-| N, n(t) | 전체 문서 수, t를 포함한 문서 수 | 흔한 단어(n(t) 큼)는 IDF↓ |
+| 문자열 `ILIKE '%마감 일정%'` | 0건 | 두 단어가 붙어 있는 메시지가 없음 |
+| BM25 + Nori | 1위 `#1908`, 7.12 | 일정 조율 내용. `match`의 기본 연산자가 OR라 `일정`만으로도 높은 점수를 받음 |
+| BM25 + Nori | 2위 `#1463`, 7.00 | 실제 마감 관련 내용 |
+| 벡터 | 1위 `#1653`, 0.592 | `제출일`을 논의한 청크 |
+| 벡터 | 2위 `#1695`, 0.573 | `언제까지 완성`할지를 묻는 청크 |
 
-- Lucene 최신 `BM25Similarity`는 분자의 `(k1+1)`을 생략한다(순위는 같고 점수 크기만 다름). 옛 동작은 `LegacyBM25Similarity`.
-- Elastic 블로그의 결론: 대부분 코퍼스에 기본값 `b=0.75, k1=1.2`가 잘 맞고, 튜닝 전에 분석기·쿼리 설계·필드 부스팅을 먼저 손보라.
+BM25 결과가 이상하다기보다 쿼리가 생각보다 느슨했다. Elasticsearch `match` 쿼리의 기본 연산자는 OR라서 두 토큰 중 하나만 있어도 후보가 된다. `operator: and`나 `minimum_should_match: 2`를 쓰면 두 토큰을 모두 요구할 수 있다. `match_phrase`는 여기서 한 단계 더 나아가 분석된 토큰의 순서와 인접성까지 본다. 세 옵션을 같은 것으로 취급하면 안 된다.
 
-**왜 TF-IDF가 아니고 BM25인가.** TF-IDF는 단어가 10번 나오면 1번보다 10배 중요하다고 본다. BM25는 "몇 번 이상 나오면 더 봐줄 것 없다"(포화)와 "긴 문서가 단어를 많이 포함하는 건 당연하다"(길이 정규화)를 넣은 것이다. 짧은 카톡 청크에서는 길이 정규화가 특히 크게 작동한다.
+반대로 조건을 엄격하게 해도 `제출일`이나 `언제까지` 같은 표현 불일치는 해결되지 않는다. 이 부분은 벡터가 잘 잡았다. BM25와 벡터의 상위 5개 중 공통 청크는 `#1463` 하나뿐이었다. 둘 중 하나가 무조건 낫다기보다, 서로 다른 실패를 한다는 쪽에 가깝다.
 
-### 4. 한국어 토크나이징 — 형태소(nori) vs n-gram
+## 다음에 확인할 것
 
-BM25 점수는 "term"을 어떻게 자르느냐에 완전히 의존한다. 영어는 공백으로 자르면 대충 되지만 한국어는 `예약했어요` 안에 `예약`이 들어 있어도 문자열이 다르다.
+- `operator: and`, `minimum_should_match`, `match_phrase`를 나눠 실행하고 정밀도와 재현율 변화를 기록한다.
+- 실제 별명과 프로젝트명을 Nori 사용자 사전에 넣기 전후의 토큰을 비교한다.
+- `text`와 `text.ngram`을 각각 검색해 초성체·오타·이름 일부에서 어느 쪽이 도움이 되는지 본다.
+- BM25 점수와 코사인 유사도는 단위와 분포가 다르므로 직접 더하지 않고, 3주차에는 순위 기반 RRF로 합친다.
 
-**nori (형태소 분석)**
-- 사전 기반: nori 플러그인은 mecab-ko-dic 사전으로 한국어 형태소 분석을 한다. 공식 이미지에 없어 `elasticsearch-plugin install analysis-nori` 로 노드마다 설치한다.
-- `decompound_mode`: 복합명사 처리. `none`은 분해 안 함, `discard`(기본)는 `가곡역 → 가곡, 역` 으로 분해하고 원형을 버림, `mixed`는 `가곡역, 가곡, 역` 으로 원형도 유지. 실습은 `mixed`(원형 매칭과 부분 매칭 둘 다 살리기).
-- `user_dictionary`: 팀 용어(프로젝트명, 서비스명)를 명사(NNG)로 등록해 분해를 막을 수 있다.
-- 토큰 필터: `nori_part_of_speech`(조사·어미 등 기본 stoptags 제거), `nori_readingform`(한자→한글 읽기), `lowercase`.
+## 확인한 자료
 
-**n-gram (글자 조각)**
-- 사전 없이 `부산숙소 → 부산, 산숙, 숙소`(2-gram) 처럼 자른다. 신조어·오타·초성체(`ㄱㄱ`, `ㅇㅇ`)에 강하고 사전에 없는 말도 걸린다.
-- 대신 인덱스가 커지고 노이즈 매칭이 늘어난다(`산숙` 같은 무의미 토큰). ES `ngram` 토크나이저는 `min_gram`/`max_gram`을 쓰고, 둘의 차가 `index.max_ngram_diff`(기본 1)를 넘으면 에러.
-
-| | nori (형태소) | n-gram |
-|---|---|---|
-| 사전 | 필요 (mecab-ko-dic) | 불필요 |
-| `예약했어요` | `예약` 으로 정규화 → `예약` 질의와 매칭 | `예약, 약했, 했어, 어요` — `예약` 질의는 2-gram `예약` 로 매칭 |
-| 신조어·초성·오타 | 사전에 없으면 이상하게 잘림 | 강함 |
-| 인덱스 크기 / 노이즈 | 작음 / 적음 | 큼 / 많음 |
-| 카톡에서 | 일반 대화 문장 | 줄임말·은어·이름 변형 |
-
-실습은 `text`(nori) + `text.ngram`(2~3gram) 두 필드를 함께 색인해 두었다. 분담 과제 "nori vs n-gram 비교"는 같은 질문을 두 필드에 던져 보면 된다.
-
-### 5. 내 데이터에서 본 것 — "마감 일정"
-
-| 방식 | 결과 | 해석 |
-|---|---|---|
-| grep `ILIKE '%마감 일정%'` | 0건 | 두 단어가 붙어서 나온 메시지가 없음 |
-| BM25 (nori) | top-1 = 투표 공지 청크(score 7.1) | `match`가 OR로 풀려 `일정`만 3번 반복된 짧은 공지가 1위. `마감`을 포함한 진짜 정답 청크는 2위 |
-| 벡터 | top-1 = "제출일" 논의 청크 | 단어가 없어도 뜻으로 잡음 (→ [02](02-embeddings-cosine-hnsw.md)) |
-
-BM25가 틀린 게 아니라 **질문을 OR로 해석한 것**이 문제였다. `minimum_should_match: "2"` 나 `match_phrase` 를 쓰면 `마감`과 `일정`이 둘 다 있는 청크만 남는다. 반대로 그렇게 조이면 "제출일" 같은 표현 불일치는 영원히 못 잡는다 — 이것이 2세대(벡터)와 3주차 하이브리드의 동기다.
-
-## 예시 / 코드
-
-실습에서 쓴 분석기 설정(`src/index_es.py`):
-
-```json
-{
-  "tokenizer": { "nori_mixed": { "type": "nori_tokenizer", "decompound_mode": "mixed" } },
-  "analyzer": {
-    "korean": { "type": "custom", "tokenizer": "nori_mixed",
-                "filter": ["nori_part_of_speech", "nori_readingform", "lowercase"] },
-    "korean_ngram": { "type": "custom", "tokenizer": "ngram_2_3", "filter": ["lowercase"] }
-  }
-}
-```
-
-```bash
-python src/index_es.py --analyze "부산 여행 숙소 예약했어요"
-# korean       : ['부산', '여행', '숙소', '예약']
-# korean_ngram : ['부산', '산 ', ' 여', '여행', ...]
-```
-
-BM25 한 항을 손으로 계산해 보기:
-
-```python
-import math
-def bm25_term(tf, dl, avgdl, N, n, k1=1.2, b=0.75):
-    idf = math.log(1 + (N - n + 0.5) / (n + 0.5))
-    return idf * (tf * (k1 + 1)) / (tf + k1 * (1 - b + b * dl / avgdl))
-# '일정' 이 3번 나오는 30단어 공지 vs 1번 나오는 200단어 대화 (평균 길이 100, N=2000, n=150)
-print(bm25_term(3, 30, 100, 2000, 150), bm25_term(1, 200, 100, 2000, 150))
-```
-
-## 궁금한 점 / 더 알아볼 것
-
-- [ ] `minimum_should_match`·`match_phrase`를 넣으면 "마감 일정" 표가 어떻게 바뀌나 — 정밀도↑ 재현율↓를 수치로
-- [ ] 팀 용어를 `user_dictionary`에 넣었을 때 nori 토큰이 어떻게 달라지나
-- [ ] 초성체(`ㄱㄱ`, `ㅇㅇ`)와 줄임말은 nori에서 어떻게 잘리나 — n-gram 필드로 보완되는지
-- [ ] BM25 점수는 인덱스마다 스케일이 달라 벡터 코사인과 직접 비교가 안 된다 → 3주차 RRF가 점수 대신 **순위**를 쓰는 이유
-
-## 스터디에서 나눌 이야기
-
-- `decompound_mode`를 `mixed`로 한 이유와 `discard`와의 차이를 실제 토큰으로 보여주기
-- "BM25가 이기는 질문"의 공통점: 고유명사·숫자·짧은 키워드. "지는 질문": 동의어·풀어 쓴 질문
-- 카톡은 문서가 짧다 → `b`(길이 정규화)를 낮추면 어떻게 되는지 누가 실험해 볼 만함
+- Robertson et al., [Okapi at TREC-3](https://trec.nist.gov/pubs/trec3/t3_proceedings.html)
+- Apache Lucene, [BM25Similarity](https://lucene.apache.org/core/10_2_2/core/org/apache/lucene/search/similarities/BM25Similarity.html) · [BM25의 `(k1+1)` 변경 기록](https://github.com/apache/lucene/blob/main/lucene/MIGRATE.md)
+- Elastic, [Similarity settings](https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity) · [`match` query](https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-match-query)
+- Elastic, [Nori tokenizer](https://www.elastic.co/docs/reference/elasticsearch/plugins/analysis-nori-tokenizer) · [n-gram tokenizer](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-ngram-tokenizer.html)
+- Elastic, [Near real-time search와 refresh](https://www.elastic.co/docs/manage-data/data-store/near-real-time-search)

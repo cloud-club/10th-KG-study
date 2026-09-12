@@ -37,7 +37,8 @@ FEED_TEMPLATES = {
     "level": "⬆️ 클둥이 {member} {title}! 꾸준함의 승리입니다.",
 }
 MAX_DIFF_CHARS = 2500
-FEED_FIELDS = ("id", "date", "member", "kind", "title", "url", "count", "commits", "summary", "tags", "items", "stats", "files")
+FEED_FIELDS = ("id", "date", "member", "name", "kind", "title", "url", "count", "commits", "summary", "tags", "items", "stats", "files")
+FEED_CACHE_VERSION = 2  # 캐시 키에 넣는다. 중계 문구 규칙이 바뀌면 올려서 다시 생성 (v2: 아이디 대신 이름으로 부름)
 GROUP_TEMPLATE = "📦 클둥이 {member}, 하루에 커밋 {count}건 몰아치기! 최신은 '{title}'."
 
 SYSTEM_PROMPT = (
@@ -180,14 +181,14 @@ def member_prompt(member: dict) -> str:
     items = member["notes"] + member["labs"]
     counts = member["counts"]
     return (
-        f"멤버 GitHub ID: {member['id']}\n"
+        f"멤버 이름: {member['name']} (GitHub ID: {member['id']})\n"
         f"자기소개: {member['intro'] or '(없음)'}\n"
         f"통계: 노트 {counts['notes']}개, 실습 {counts['labs']}개, 커밋 {counts['commits']}회, "
         f"연속 활동 {member['streak']}일\n\n"
         "아래 자료를 읽고 JSON 으로 답해라.\n"
         "{\n"
         '  "title": "이 멤버에게 어울리는 RPG 스타일 칭호 (12자 이내, 예: 트리플 추출 견습생)",\n'
-        '  "summary": "지금까지 무엇을 공부했고 어디까지 왔는지 2문장 (친근한 말투)",\n'
+        '  "summary": "지금까지 무엇을 공부했고 어디까지 왔는지 2문장 (친근한 말투, 멤버를 부를 땐 GitHub ID 말고 이름으로)",\n'
         '  "highlights": ["눈에 띄는 포인트 1", "포인트 2"],\n'
         '  "items": {\n'
         '    "<id>": {"tags": ["소문자 영어 키워드 3~5개, 기존 태그가 있으면 그대로 두고 부족한 것만 보충"],\n'
@@ -205,7 +206,7 @@ def digest_prompt(members: list[dict], totals: dict) -> str:
     for m in members:
         c = m["counts"]
         lines.append(
-            f"- {m['id']}: 노트 {c['notes']}, 실습 {c['labs']}, 커밋 {c['commits']}, "
+            f"- {m['name']} (@{m['id']}): 노트 {c['notes']}, 실습 {c['labs']}, 커밋 {c['commits']}, "
             f"연속 {m['streak']}일, 최근 활동 {m['last_active'] or '없음'}, "
             f"칭호 '{m['title']}', 요약: {m['summary']}"
         )
@@ -216,7 +217,7 @@ def digest_prompt(members: list[dict], totals: dict) -> str:
         "JSON 으로 답해라.\n"
         "{\n"
         '  "digest": "스터디 전체 분위기를 전하는 2~3문장. 잘하고 있는 점을 짚고 가볍게 응원",\n'
-        '  "shoutouts": ["멤버 id 를 언급하며 칭찬 한 줄 (최대 3개)"]\n'
+        '  "shoutouts": ["멤버 이름(GitHub ID 말고)을 언급하며 칭찬 한 줄 (최대 3개)"]\n'
         "}\n"
     )
 
@@ -232,7 +233,7 @@ def event_block(e: dict) -> str:
     messages = ("\n".join(f"  - {c['message']}" for c in e.get("commits") or [])
                 if count > 1 else e["title"])
     return (
-        f"### id={e['id']}\n날짜: {e['date']} | 멤버: {e['member']} | 종류: {KIND_LABEL.get(e['kind'], e['kind'])}"
+        f"### id={e['id']}\n날짜: {e['date']} | 멤버: {e.get('name') or e['member']} (@{e['member']}) | 종류: {KIND_LABEL.get(e['kind'], e['kind'])}"
         + (f" | 같은 날 커밋 {count}건을 한 사건으로 묶음" if count > 1 else "") + "\n"
         f"커밋 메시지/제목: {messages}\n변경: {stat_line}\n파일: {files}\n연결된 노트/실습: {items}\n"
         + (f"diff 발췌:\n```\n{diff}\n```\n" if diff else "")
@@ -243,7 +244,7 @@ def feed_prompt(events: list[dict]) -> str:
     return (
         "아래는 KG 스터디 레포에서 최근 일어난 일들이다. 커밋은 diff 발췌를 실제로 읽고 무엇을 했는지 파악한 뒤, "
         "스포츠 중계 캐스터처럼 한 줄로 중계해라.\n"
-        "규칙: 한국어. text 는 50~80자, 멤버 id 를 '클둥이 ○○'라고 부르고 (클라우드 클럽 애칭, 예: '클둥이 sese2204') 어떤 작업(무슨 코드/노트를 어떻게)인지 드러나야 한다. "
+        "규칙: 한국어. text 는 50~80자, 멤버를 '클둥이 ○○'라고 부르되 ○○ 에는 GitHub ID 가 아니라 이름을 쓴다 (클라우드 클럽 애칭, 예: '클둥이 박세현'). 어떤 작업(무슨 코드/노트를 어떻게)인지 드러나야 한다. "
         "summary 는 캐스터 톤 없이 실제 변경 내용을 사실대로 1문장 (diff 에 없는 내용은 지어내지 말 것). "
         "tags 는 그 작업의 주제 키워드 2~4개, 소문자 영어. 이모지는 text 에만 최대 1개, 전체의 절반 이상은 이모지 없이.\n"
         'JSON 으로 답해라: {"lines": [{"id": "<id 그대로>", "text": "...", "summary": "...", "tags": ["..."]}]}\n\n'
@@ -256,7 +257,7 @@ def feed_prompt(events: list[dict]) -> str:
 def fallback_commentary(event: dict) -> str:
     count = event.get("count") or 1
     template = GROUP_TEMPLATE if count > 1 else FEED_TEMPLATES.get(event["kind"], "클둥이 {member}, {title}.")
-    return template.format(member=event["member"], title=event["title"][:60], count=count)
+    return template.format(member=event.get("name") or event["member"], title=event["title"][:60], count=count)
 
 
 def fallback_summary_line(event: dict) -> str:
@@ -291,7 +292,7 @@ def fallback_summary(member: dict) -> str:
 def fallback_digest(members: list[dict], totals: dict) -> str:
     if not members:
         return "아직 멤버가 없어요. members/ 아래에 폴더를 만들어 시작해 보세요."
-    active = [m["id"] for m in members if m["counts"]["notes"] + m["counts"]["labs"] > 0]
+    active = [m["name"] for m in members if m["counts"]["notes"] + m["counts"]["labs"] > 0]
     who = ", ".join(active) if active else "모두"
     return (
         f"{totals['members']}명이 노트 {totals['notes']}개, 실습 {totals['labs']}개, "
@@ -312,7 +313,7 @@ def feed_texts(events: list[dict], api_key: str, cache: dict) -> dict[str, dict]
     results: dict[str, dict] = {}
     pending = []
     for e in events:
-        key = f"feed:{resolved_model()}:{e['id']}"
+        key = f"feed:v{FEED_CACHE_VERSION}:{resolved_model()}:{e['id']}"
         if key in cache:
             results[e["id"]] = cache[key]
         else:
@@ -329,7 +330,7 @@ def feed_texts(events: list[dict], api_key: str, cache: dict) -> dict[str, dict]
             "tags": [str(t).strip().lower() for t in line.get("tags") or [] if str(t).strip()][:MAX_TAGS],
         }
         results[str(line["id"])] = entry
-        cache[f"feed:{resolved_model()}:{line['id']}"] = entry
+        cache[f"feed:v{FEED_CACHE_VERSION}:{resolved_model()}:{line['id']}"] = entry
     if not result:
         log("중계 문장 생성 실패 → 템플릿 사용")
     return results

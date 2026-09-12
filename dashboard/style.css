@@ -486,6 +486,7 @@ a.reading__title:hover { text-decoration: underline; }
 .members__cohort:not(:first-child) { margin-top: 1rem; }
 .members__cohort::after { content: ""; flex: 1; height: 3px; border-radius: 999px; background: color-mix(in srgb, var(--cohort-accent) 28%, #fff); }
 .members__cohort-meta { font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; color: var(--muted); }
+.card__handle { display: block; margin-top: 0.1rem; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--muted); }
 .card__cohort {
   flex: none; padding: 0 0.55em; border-radius: 999px;
   border: 1.5px solid var(--cohort-accent, var(--sky-500)); color: var(--cohort-accent, var(--sky-500));

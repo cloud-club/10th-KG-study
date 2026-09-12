@@ -282,7 +282,7 @@ class FeedTests(unittest.TestCase):
 
     def test_feed_texts_uses_per_event_cache_and_batches_new_ones(self):
         llm._state["model"] = "gpt-5-mini"
-        cache = {"feed:gpt-5-mini:commit:old": {"text": "cached", "summary": "", "tags": []}}
+        cache = {f"feed:v{llm.FEED_CACHE_VERSION}:gpt-5-mini:commit:old": {"text": "cached", "summary": "", "tags": []}}
         events = [
             {"id": "commit:old", "date": "d", "member": "a", "kind": "note", "title": "t", "url": "", "summary": "", "tags": [],
              "items": [], "stats": None, "files": [], "_diff": ""},
@@ -294,7 +294,7 @@ class FeedTests(unittest.TestCase):
             texts = llm.feed_texts(events, "key", cache)
         self.assertEqual(texts["commit:old"]["text"], "cached")
         self.assertEqual(texts["commit:new"], {"text": "새 중계", "summary": "요약", "tags": ["nlp"]})
-        self.assertIn("feed:gpt-5-mini:commit:new", cache)
+        self.assertIn(f"feed:v{llm.FEED_CACHE_VERSION}:gpt-5-mini:commit:new", cache)
         prompt = fake.call_args[0][0]
         self.assertIn("commit:new", prompt)
         self.assertNotIn("commit:old", prompt)
@@ -424,3 +424,40 @@ class CohortTests(unittest.TestCase):
         self.assertEqual([n["id"] for n in out[0]["graph"]["nodes"]], ["m:kim", "n:kim/n1", "t:rag"])
         self.assertEqual([n["id"] for n in out[1]["graph"]["nodes"]], ["m:park", "n:park/n1", "t:rag"])
         self.assertEqual(out[0]["members"], ["kim"])
+
+
+class NameTests(unittest.TestCase):
+    def test_member_name_precedence(self):
+        names = {"sese2204": "박세현", "Yeongeunn": "나영은"}
+        self.assertEqual(bd.member_name("sese2204", {"name": "세현"}, "# sese2204", names), "세현")
+        self.assertEqual(bd.member_name("sese2204", {}, "# sese2204", names), "박세현")
+        self.assertEqual(bd.member_name("yeongeunn", {}, "", names), "나영은")  # 폴더 이름 대소문자가 달라도
+        self.assertEqual(bd.member_name("kim", {}, "# 김철수\n", {}), "김철수")
+        self.assertEqual(bd.member_name("kim", {}, "# Kim\n", {}), "kim")  # 제목이 아이디 그대로면 아이디
+        self.assertEqual(bd.member_name("kim", {}, "", {}), "kim")
+
+    def test_load_names_skips_bad_values(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "names.json"
+            path.write_text('{"a": "가", "b": "", "c": 3, "d": " 다 "}', encoding="utf-8")
+            with mock.patch("sys.stderr"):
+                self.assertEqual(bd.load_names(path), {"a": "가", "d": "다"})
+            path.write_text("[]", encoding="utf-8")
+            with mock.patch("sys.stderr"):
+                self.assertEqual(bd.load_names(path), {})
+            self.assertEqual(bd.load_names(Path(tmp) / "missing.json"), {})
+
+    def test_feed_events_carry_member_name(self):
+        member = {"id": "kim", "name": "김철수", "last_active": "2026-09-10", "folder_url": "u", "streak": 3,
+                  "progress": {"level": 1}, "notes": [], "labs": []}
+        events = bd.milestone_events([member])
+        self.assertEqual([(e["member"], e["name"]) for e in events], [("kim", "김철수")])
+        commit = {"sha": "abcdef1234567890", "date": "2026-09-10", "message": "docs: x", "files": ["members/kim/notes/01.md"],
+                  "kind": "note", "member": "kim"}
+        with mock.patch.object(bd, "sum_numstat", return_value=None), mock.patch.object(bd, "group_diff_excerpt", return_value=""):
+            event = bd.commit_event([commit], {"kim": member}, {"url": "https://github.com/x/y"})
+        self.assertEqual(event["name"], "김철수")
+        with mock.patch.object(bd, "sum_numstat", return_value=None), mock.patch.object(bd, "group_diff_excerpt", return_value=""):
+            event = bd.commit_event([{**commit, "member": "ghost"}], {"kim": member}, {"url": "https://github.com/x/y"})
+        self.assertEqual(event["name"], "ghost")  # 폴더 없는 작성자는 아이디 그대로

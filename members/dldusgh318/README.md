@@ -12,12 +12,16 @@
 
 | # | 주제 | 상태 |
 |---|------|------|
-| 01 | [0세대 — grep은 왜 문서 검색에 실패하는가](notes/01-grep-limits.md) | 완료 |
-| 02 | [1세대 — 역색인과 BM25](notes/02-inverted-index-bm25.md) | 완료 |
-| 03 | [2세대 — 임베딩과 벡터 검색](notes/03-embedding-vector-search.md) | 완료 |
+| 01 | [0세대 — grep은 왜 문서 검색에 실패하는가](notes/week2/01-grep-limits.md) | 완료 |
+| 02 | [1세대 — 역색인과 BM25](notes/week2/02-inverted-index-bm25.md) | 완료 |
+| 03 | [2세대 — 임베딩과 벡터 검색](notes/week2/03-embedding-vector-search.md) | 완료 |
+| 04 | [하이브리드 검색 — RRF](notes/week3/04-hybridSearch-rrf) | 완료 |
+| 05 | [RAG — 검색 결과에서 근거 있는 답변까지](notes/week3/05-rag-loop) | 완료 |
 
 ### labs
 
 | # | 실습 | 상태 |
 |---|------|------|
 | 01 | [검색의 세 세대 (grep / ES BM25 / pgvector)](labs/01-three-generations) | 진행 중 |
+
+- [W3 실습 실행 안내](labs/01-three-generations/WEEK3.md)

@@ -157,6 +157,23 @@ def search(query: str, limit: int = 5, field: str = "text"):
     return res["hits"]["hits"], res["hits"]["total"]["value"], res["took"]
 
 
+def search_bm25(query: str, limit: int = 50) -> list[dict]:
+    """Nori 기반 BM25 결과를 W3 공통 형식으로 반환한다."""
+    hits, _total, _took = search(query, limit=limit, field="text")
+    return [
+        {
+            "id": hit["_id"],
+            "rank": rank,
+            "score": float(hit["_score"]),
+            "title": hit["_source"].get("title", ""),
+            "source": hit["_source"].get("source", ""),
+            "heading": hit["_source"].get("heading", ""),
+            "text": hit["_source"].get("text", ""),
+        }
+        for rank, hit in enumerate(hits, start=1)
+    ]
+
+
 def main() -> None:
     arg = sys.argv[1] if len(sys.argv) > 1 else "mapping"
     if arg == "index":

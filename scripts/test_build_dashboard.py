@@ -302,7 +302,7 @@ class FeedTests(unittest.TestCase):
 
     def test_feed_texts_strips_speaker_prefix_from_new_and_cached_lines(self):
         llm._state["model"] = "gpt-5-mini"
-        cache = {"feed:gpt-5-mini:commit:old": {"text": "캐스터: 옛 중계", "summary": "", "tags": []}}
+        cache = {f"feed:v{llm.FEED_CACHE_VERSION}:gpt-5-mini:commit:old": {"text": "캐스터: 옛 중계", "summary": "", "tags": []}}
         events = [
             {"id": "commit:old", "date": "d", "member": "a", "kind": "note", "title": "t", "url": "", "summary": "", "tags": [],
              "items": [], "stats": None, "files": [], "_diff": ""},
@@ -314,7 +314,7 @@ class FeedTests(unittest.TestCase):
             texts = llm.feed_texts(events, "key", cache)
         self.assertEqual(texts["commit:old"]["text"], "옛 중계")
         self.assertEqual(texts["commit:new"]["text"], "새 중계")
-        self.assertEqual(cache["feed:gpt-5-mini:commit:new"]["text"], "새 중계")
+        self.assertEqual(cache[f"feed:v{llm.FEED_CACHE_VERSION}:gpt-5-mini:commit:new"]["text"], "새 중계")
         llm._state["model"] = None
 
     def test_strip_speaker_leaves_plain_text(self):

@@ -24,6 +24,11 @@ touch members/$GH_ID/notes/.gitkeep members/$GH_ID/labs/.gitkeep
 
 폴더를 만든 뒤 루트 `README.md`의 멤버 표에 자기 행을 추가합니다.
 
+### 이름 표시
+
+- 현황판은 GitHub 아이디 대신 이름을 보여줍니다. 운영자가 `members/names.json`에 `"github-id": "이름"`을 추가합니다.
+- 다르게 불리고 싶으면 본인 `README.md` 맨 위에 프론트매터로 `name: 원하는 이름`을 적으세요. 이게 `names.json`보다 우선합니다.
+
 ### 반 (cohort)
 
 - 현황판 지식그래프는 반별로 따로 그립니다. 반 명단은 `members/cohorts.json`에 있습니다.

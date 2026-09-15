@@ -44,9 +44,10 @@ XP_PER_LEVEL = 100
 KIND_ORDER = {"level": 0, "streak": 1, "lab": 2, "note": 3, "reading": 4, "shared": 5, "commit": 6}
 READINGS_FILE = "readings.md"      # members/<id>/readings.md — 주차별 읽을거리
 SKIP_DIRS = {"<github-id>", "_template"}
+NAMES_PATH = MEMBERS_DIR / "names.json"       # {"github-id": "이름"} — 현황판에 아이디 대신 이름을 보여준다
 COHORTS_PATH = MEMBERS_DIR / "cohorts.json"   # 반별 명단 {"A": [id, ...]}. 명단에 없는 멤버는 마지막 반 다음 반(열린 반)으로
 INFRA_PREFIXES = ("dashboard/", "scripts/", ".github/", "templates/", ".cache/")
-INFRA_FILES = {"README.md", "CONTRIBUTING.md", ".gitignore", "members/cohorts.json"}
+INFRA_FILES = {"README.md", "CONTRIBUTING.md", ".gitignore", "members/cohorts.json", "members/names.json"}
 BINARY_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".pdf", ".zip", ".lock", ".ipynb", ".parquet", ".db"}
 PLACEHOLDERS = {
     "NN. 주제",
@@ -462,7 +463,7 @@ def member_dirs() -> list[Path]:
             if d.is_dir() and not d.name.startswith(".") and d.name not in SKIP_DIRS]
 
 
-def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict]) -> dict:
+def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict], names: dict[str, str] | None = None) -> dict:
     member_id = member_dir.name
     readme = member_dir / "README.md"
     meta, body = parse_frontmatter(read_text(readme)) if readme.exists() else ({}, "")
@@ -479,7 +480,7 @@ def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict
 
     return {
         "id": member_id,
-        "name": str(meta.get("name") or clean_title(first_heading(body)) or member_id),
+        "name": member_name(member_id, meta, body, names or {}),
         "avatar": f"https://github.com/{member_id}.png?size=160",
         "url": f"https://github.com/{member_id}",
         "folder_url": f"{repo['url']}/tree/{repo['branch']}/members/{member_id}",
@@ -496,6 +497,41 @@ def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict
         "readings": readings,
         "_commits": commits,
     }
+
+
+# ------------------------------------------------------------------- names
+
+def load_names(path: Path) -> dict[str, str]:
+    """members/names.json → {"id": "이름"}. 없거나 깨졌으면 {}. 문자열이 아닌 값은 건너뛴다."""
+    if not path.exists():
+        return {}
+    try:
+        raw = json.loads(read_text(path))
+    except ValueError as exc:
+        print(f"[dashboard] {path.name} 파싱 실패, 이름 없이 진행: {exc}", file=sys.stderr)
+        return {}
+    if not isinstance(raw, dict):
+        print(f'[dashboard] {path.name} 은 {{"github-id": "이름"}} 형식이어야 합니다', file=sys.stderr)
+        return {}
+    names = {}
+    for mid, name in raw.items():
+        if isinstance(name, str) and name.strip():
+            names[str(mid)] = name.strip()
+        else:
+            print(f"[dashboard] {path.name}: {mid} 의 이름은 비어 있지 않은 문자열이어야 합니다", file=sys.stderr)
+    return names
+
+
+def member_name(member_id: str, meta: dict, body: str, names: dict[str, str]) -> str:
+    """표시 이름 우선순위: README 프론트매터 name → names.json (대소문자 무시) → README 첫 제목 → 아이디."""
+    if meta.get("name"):
+        return str(meta["name"]).strip()
+    by_lower = {k.lower(): v for k, v in names.items()}
+    mapped = names.get(member_id) or by_lower.get(member_id.lower())
+    if mapped:
+        return mapped
+    heading = clean_title(first_heading(body))
+    return heading if heading and heading.lower() != member_id.lower() else member_id
 
 
 # ----------------------------------------------------------------- cohorts
@@ -654,6 +690,7 @@ def commit_event(group: list[dict], members_by_id: dict, repo: dict) -> dict:
     return {
         "id": f"commit:{latest['sha'][:12]}" if single else f"commits:{latest['member']}:{latest['date']}:{latest['sha'][:7]}",
         "date": latest["date"], "member": latest["member"], "kind": latest["kind"] if single else classify_commit(files),
+        "name": (members_by_id.get(latest["member"]) or {}).get("name") or latest["member"],
         "title": latest["message"], "url": f"{repo['url']}/commit/{latest['sha']}",
         "count": len(group),
         "commits": [{"message": c["message"], "url": f"{repo['url']}/commit/{c['sha']}"} for c in group[:MAX_COMMITS_IN_EVENT]],
@@ -673,7 +710,7 @@ def commit_events(commits: list[dict], members_by_id: dict, repo: dict) -> list[
 def milestone_events(members: list[dict]) -> list[dict]:
     events = []
     for m in members:
-        base = {"member": m["id"], "date": m["last_active"], "url": m["folder_url"], "count": 1, "commits": [],
+        base = {"member": m["id"], "name": m["name"], "date": m["last_active"], "url": m["folder_url"], "count": 1, "commits": [],
                 "summary": "", "tags": [], "items": [], "stats": None, "files": [], "_diff": ""}
         if m["streak"] >= STREAK_MILESTONE:
             events.append({**base, "id": f"streak:{m['id']}:{m['streak']}", "kind": "streak",
@@ -735,7 +772,8 @@ def main() -> int:
     by_member: dict[str, list[dict]] = defaultdict(list)
     for c in commits:
         by_member[c["member"]].append(c)
-    members = [scan_member(d, repo, today, by_member.get(d.name, [])) for d in dirs]
+    names = load_names(NAMES_PATH)
+    members = [scan_member(d, repo, today, by_member.get(d.name, []), names) for d in dirs]
     cohorts, cohort_of = assign_cohorts([m["id"] for m in members], load_cohorts(COHORTS_PATH))
     members = [{**m, "cohort": cohort_of[m["id"]]} for m in members]
 

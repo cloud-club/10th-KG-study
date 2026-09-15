@@ -9,6 +9,8 @@
     { name: '풀밭', accent: '#35c39a', palette: ['#35c39a', '#7dc242', '#1fa78a', '#9bc53d', '#2fb885', '#5fae3b', '#43cba9', '#7ab648'] },
   ];
   const NEUTRAL_COLOR = '#8aa0b8'; // 반 정보가 없는 멤버
+  let names = new Map(); // github id → 표시 이름 (data.members 에서 채움)
+  const nameOf = (id) => names.get(id) || id;
   const MAX_ITEMS_PER_LIST = 2;
   const DAY_MS = 86400000;
 
@@ -147,7 +149,7 @@
       el('header', { class: 'post__head' }, [
         avatarFor(f.member),
         el('div', { class: 'post__who' }, [
-          el('a', { class: 'post__name', href: `https://github.com/${f.member}`, target: '_blank', rel: 'noopener', text: f.member }),
+          el('a', { class: 'post__name', href: `https://github.com/${f.member}`, target: '_blank', rel: 'noopener', text: f.name || nameOf(f.member), title: `@${f.member}` }),
           el('span', { class: 'post__meta' }, meta),
         ]),
       ]),
@@ -182,7 +184,7 @@
       : el('span', { class: 'reading__title', text: item.title });
     const meta = [hostOf(item.url), item.note].filter(Boolean);
     return el('li', { class: 'reading', style: `--c:${colorOf(item.member)}` }, [
-      el('a', { class: 'chip reading__who', href: `https://github.com/${item.member}`, target: '_blank', rel: 'noopener', text: item.member }),
+      el('a', { class: 'chip reading__who', href: `https://github.com/${item.member}`, target: '_blank', rel: 'noopener', text: nameOf(item.member), title: `@${item.member}` }),
       el('div', { class: 'reading__body' }, [
         title,
         meta.length ? el('span', { class: 'reading__meta', text: meta.join(' · ') }) : null,
@@ -195,7 +197,7 @@
     const summary = el('summary', { class: 'readings__week' }, [
       el('span', { class: 'readings__name', text: name }),
       group.label ? el('span', { class: 'readings__label', text: group.label }) : null,
-      el('span', { class: 'readings__count', text: `${group.items.length}개 · ${group.members.join(', ')}` }),
+      el('span', { class: 'readings__count', text: `${group.items.length}개 · ${group.members.map(nameOf).join(', ')}` }),
     ]);
     return el('details', { class: 'readings__group', open: isLatest ? '' : undefined }, [
       summary,
@@ -265,6 +267,9 @@
     const nameLink = $('.card__name a', tpl);
     nameLink.textContent = member.name;
     nameLink.href = member.url;
+    const handle = $('.card__handle', tpl);
+    if (member.name !== member.id) handle.textContent = `@${member.id}`;
+    else handle.remove();
     $('.sticker--level', tpl).textContent = `Lv.${member.progress.level}`;
     $('.card__summary', tpl).textContent = member.summary;
     const highlights = $('.card__highlights', tpl);
@@ -384,7 +389,7 @@
     activity.forEach((c) => {
       list.append(el('li', {}, [
         el('span', { class: 'activity__date', text: shortDate(c.date) }),
-        el('span', { class: 'activity__who', style: `--c:${colorOf(c.member)}`, text: c.member }),
+        el('span', { class: 'activity__who', style: `--c:${colorOf(c.member)}`, text: nameOf(c.member), title: `@${c.member}` }),
         el('a', { class: 'activity__msg', href: c.url, target: '_blank', rel: 'noopener', text: c.message }),
       ]));
     });
@@ -415,6 +420,7 @@
     try {
       const data = await load();
       const cohorts = data.cohorts || [];
+      names = new Map(data.members.map((m) => [m.id, m.name]));
       const colorOf = memberColorMap(data.members, cohorts);
       renderHero(data);
       renderStats(data);

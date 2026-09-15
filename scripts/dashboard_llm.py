@@ -244,7 +244,7 @@ def feed_prompt(events: list[dict]) -> str:
     return (
         "아래는 KG 스터디 레포에서 최근 일어난 일들이다. 커밋은 diff 발췌를 실제로 읽고 무엇을 했는지 파악한 뒤, "
         "스포츠 중계 캐스터처럼 한 줄로 중계해라.\n"
-        "규칙: 한국어. text 는 50~80자, 멤버를 '클둥이 ○○'라고 부르되 ○○ 에는 GitHub ID 가 아니라 이름을 쓴다 (클라우드 클럽 애칭, 예: '클둥이 박세현'). 어떤 작업(무슨 코드/노트를 어떻게)인지 드러나야 한다. "
+        "규칙: 한국어. text 는 50~80자, '캐스터:' 같은 화자 표시 없이 멘트로 바로 시작한다. 멤버를 '클둥이 ○○'라고 부르되 ○○ 에는 GitHub ID 가 아니라 이름을 쓴다 (클라우드 클럽 애칭, 예: '클둥이 박세현'). 어떤 작업(무슨 코드/노트를 어떻게)인지 드러나야 한다. "
         "summary 는 캐스터 톤 없이 실제 변경 내용을 사실대로 1문장 (diff 에 없는 내용은 지어내지 말 것). "
         "tags 는 그 작업의 주제 키워드 2~4개, 소문자 영어. 이모지는 text 에만 최대 1개, 전체의 절반 이상은 이모지 없이.\n"
         'JSON 으로 답해라: {"lines": [{"id": "<id 그대로>", "text": "...", "summary": "...", "tags": ["..."]}]}\n\n'
@@ -308,6 +308,14 @@ def apply_fallbacks(members: list[dict]) -> None:
 
 # ---------------------------------------------------------------- applying
 
+SPEAKER_PREFIX_RE = re.compile(r"^\s*(?:캐스터|해설자?|중계)\s*[:：]\s*")
+
+
+def strip_speaker(text: str) -> str:
+    """LLM 이 붙이는 '캐스터:' 같은 화자 표시를 떼고 멘트만 남긴다."""
+    return SPEAKER_PREFIX_RE.sub("", text).strip()
+
+
 def feed_texts(events: list[dict], api_key: str, cache: dict) -> dict[str, dict]:
     """사건별 중계 결과. 이미 캐시된 사건은 건너뛰고, 새 사건만 한 번에 묶어 호출한다."""
     results: dict[str, dict] = {}
@@ -315,7 +323,7 @@ def feed_texts(events: list[dict], api_key: str, cache: dict) -> dict[str, dict]
     for e in events:
         key = f"feed:v{FEED_CACHE_VERSION}:{resolved_model()}:{e['id']}"
         if key in cache:
-            results[e["id"]] = cache[key]
+            results[e["id"]] = {**cache[key], "text": strip_speaker(cache[key].get("text") or "")}
         else:
             pending.append(e)
     if not pending:
@@ -325,7 +333,7 @@ def feed_texts(events: list[dict], api_key: str, cache: dict) -> dict[str, dict]
         if not (isinstance(line, dict) and line.get("id") and str(line.get("text") or "").strip()):
             continue
         entry = {
-            "text": str(line["text"]).strip(),
+            "text": strip_speaker(str(line["text"])),
             "summary": str(line.get("summary") or "").strip(),
             "tags": [str(t).strip().lower() for t in line.get("tags") or [] if str(t).strip()][:MAX_TAGS],
         }

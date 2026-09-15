@@ -300,6 +300,27 @@ class FeedTests(unittest.TestCase):
         self.assertNotIn("commit:old", prompt)
         llm._state["model"] = None
 
+    def test_feed_texts_strips_speaker_prefix_from_new_and_cached_lines(self):
+        llm._state["model"] = "gpt-5-mini"
+        cache = {"feed:gpt-5-mini:commit:old": {"text": "캐스터: 옛 중계", "summary": "", "tags": []}}
+        events = [
+            {"id": "commit:old", "date": "d", "member": "a", "kind": "note", "title": "t", "url": "", "summary": "", "tags": [],
+             "items": [], "stats": None, "files": [], "_diff": ""},
+            {"id": "commit:new", "date": "d", "member": "a", "kind": "lab", "title": "t2", "url": "", "summary": "", "tags": [],
+             "items": [], "stats": None, "files": [], "_diff": ""},
+        ]
+        fake = mock.Mock(return_value={"lines": [{"id": "commit:new", "text": " 캐스터 : 새 중계", "summary": "", "tags": []}]})
+        with mock.patch.object(llm, "cached_call", fake):
+            texts = llm.feed_texts(events, "key", cache)
+        self.assertEqual(texts["commit:old"]["text"], "옛 중계")
+        self.assertEqual(texts["commit:new"]["text"], "새 중계")
+        self.assertEqual(cache["feed:gpt-5-mini:commit:new"]["text"], "새 중계")
+        llm._state["model"] = None
+
+    def test_strip_speaker_leaves_plain_text(self):
+        self.assertEqual(llm.strip_speaker("클둥이 a, 노트 커밋!"), "클둥이 a, 노트 커밋!")
+        self.assertEqual(llm.strip_speaker("해설: 멘트"), "멘트")
+
 
 class ModelFallbackTests(unittest.TestCase):
     def setUp(self):

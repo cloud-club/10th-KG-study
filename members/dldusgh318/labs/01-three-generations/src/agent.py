@@ -4,6 +4,7 @@
 
     OPENAI_API_KEY=... OPENAI_MODEL=... ./.venv/bin/python src/agent.py "질문"
     ... src/agent.py "질문" --oracle <chunk_id> <chunk_id>
+    ... src/agent.py "질문" --compare --oracle <chunk_id> <chunk_id>
 """
 import argparse
 import json
@@ -16,7 +17,9 @@ from common import load_chunks_by_id
 from hybrid_search import hybrid_search
 
 TOP_K = 5
+CONTEXT_MAX_CHARS = 8_000
 API_URL = "https://api.openai.com/v1/responses"
+DEFAULT_MODEL = "gpt-5.6-luna"
 NOT_FOUND = "기록에서 찾을 수 없습니다."
 
 SYSTEM_INSTRUCTIONS = f"""당신은 개인 기록에 답하는 RAG 에이전트다.
@@ -47,15 +50,58 @@ ANSWER_SCHEMA = {
 }
 
 
-def assemble_context(chunks: list[dict]) -> tuple[str, dict[int, dict]]:
-    mapping = {number: chunk for number, chunk in enumerate(chunks, start=1)}
-    blocks = []
-    for number, chunk in mapping.items():
-        blocks.append(
+def assemble_context(
+    chunks: list[dict], *, max_chunks: int = TOP_K, max_chars: int = CONTEXT_MAX_CHARS,
+) -> tuple[str, dict[int, dict], dict]:
+    """검색 결과를 짧은 번호의 Context로 만들고 제외·잘림 내역을 남긴다."""
+    if max_chunks < 1:
+        raise ValueError("max_chunks는 1 이상이어야 합니다.")
+    if max_chars < 1:
+        raise ValueError("max_chars는 1 이상이어야 합니다.")
+
+    blocks: list[str] = []
+    mapping: dict[int, dict] = {}
+    excluded = [
+        {"id": chunk["id"], "reason": "beyond_top_k"}
+        for chunk in chunks[max_chunks:]
+    ]
+    truncated = []
+
+    for chunk in chunks[:max_chunks]:
+        number = len(mapping) + 1
+        separator = "\n\n" if blocks else ""
+        header = (
             f'[{number}]\ntitle: {chunk.get("title", "")}\n'
-            f'source: {chunk.get("source", "")}\ntext: {chunk["text"]}'
+            f'source: {chunk.get("source", "")}\ntext: '
         )
-    return "\n\n".join(blocks), mapping
+        available = max_chars - sum(len(block) for block in blocks) - len(separator) - len(header)
+        if available <= 0:
+            excluded.append({"id": chunk["id"], "reason": "context_budget"})
+            continue
+
+        original_text = chunk["text"]
+        included_text = original_text[:available]
+        context_chunk = {**chunk, "text": included_text}
+        mapping[number] = context_chunk
+        blocks.append(separator + header + included_text)
+        if len(included_text) < len(original_text):
+            truncated.append({
+                "id": chunk["id"],
+                "original_chars": len(original_text),
+                "included_chars": len(included_text),
+            })
+
+    context = "".join(blocks)
+    trace = {
+        "input_chunk_ids": [chunk["id"] for chunk in chunks],
+        "included_chunk_ids": [chunk["id"] for chunk in mapping.values()],
+        "excluded": excluded,
+        "truncated": truncated,
+        "max_chunks": max_chunks,
+        "max_chars": max_chars,
+        "context_chars": len(context),
+    }
+    return context, mapping, trace
 
 
 def verify_citations(payload: dict, mapping: dict[int, dict]) -> list[dict]:
@@ -76,17 +122,17 @@ def verify_citations(payload: dict, mapping: dict[int, dict]) -> list[dict]:
 
 def call_openai(question: str, context: str, *, model: str | None = None) -> dict:
     api_key = os.getenv("OPENAI_API_KEY")
-    model = model or os.getenv("OPENAI_MODEL")
+    model = model or os.getenv("OPENAI_MODEL") or DEFAULT_MODEL
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY 환경변수가 필요합니다.")
-    if not model:
-        raise RuntimeError("OPENAI_MODEL 환경변수 또는 --model이 필요합니다.")
     body = {
         "model": model,
         "store": False,
+        "reasoning": {"effort": "low"},
         "instructions": SYSTEM_INSTRUCTIONS,
         "input": f"Question:\n{question}\n\nContext:\n{context}",
         "text": {
+            "verbosity": "low",
             "format": {
                 "type": "json_schema", "name": "grounded_answer",
                 "strict": True, "schema": ANSWER_SCHEMA,
@@ -123,7 +169,7 @@ def answer_from_chunks(
     question: str, chunks: list[dict], *, model: str | None = None,
     generator: Callable[[str, str], dict] | None = None,
 ) -> dict:
-    context, mapping = assemble_context(chunks)
+    context, mapping, context_trace = assemble_context(chunks)
     payload = generator(question, context) if generator else call_openai(question, context, model=model)
     citations = verify_citations(payload, mapping)
     citation_verified = all(c["valid"] for c in citations) and (
@@ -134,7 +180,9 @@ def answer_from_chunks(
         "citations": citations,
         "model_grounded": bool(payload.get("grounded")),
         "citation_verified": citation_verified,
-        "context_chunk_ids": [chunk["id"] for chunk in chunks],
+        "semantic_correctness": "not_evaluated",
+        "context_chunk_ids": context_trace["included_chunk_ids"],
+        "context_trace": context_trace,
     }
 
 
@@ -150,18 +198,25 @@ def answer_with_chunks(question: str, chunk_ids: list[str], *, model: str | None
     return answer_from_chunks(question, [rows[chunk_id] for chunk_id in chunk_ids], model=model, generator=generator)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="개인 데이터 RAG Agent")
-    parser.add_argument("question")
-    parser.add_argument("--oracle", nargs="*", default=None, metavar="CHUNK_ID")
-    parser.add_argument("--model")
-    args = parser.parse_args()
-    if args.oracle is not None and not args.oracle:
-        parser.error("--oracle 뒤에 하나 이상의 chunk ID가 필요합니다.")
-    result = (
-        answer_with_chunks(args.question, args.oracle, model=args.model)
-        if args.oracle is not None else answer(args.question, model=args.model)
-    )
+def compare_normal_oracle(
+    question: str, oracle_chunk_ids: list[str], *, model: str | None = None, generator=None,
+) -> dict:
+    """검색 Context와 지정 Context를 동일한 생성·검증 경로로 비교한다."""
+    retrieved = hybrid_search(question, TOP_K)
+    normal = answer_from_chunks(question, retrieved, model=model, generator=generator)
+    oracle = answer_with_chunks(question, oracle_chunk_ids, model=model, generator=generator)
+    normal_ids = normal["context_chunk_ids"]
+    return {
+        "question": question,
+        "normal": normal,
+        "oracle": oracle,
+        "missing_oracle_from_normal": [chunk_id for chunk_id in oracle_chunk_ids if chunk_id not in normal_ids],
+        "shared_generation_path": "answer_from_chunks",
+    }
+
+
+def print_answer_result(label: str, result: dict) -> None:
+    print(f"\n=== {label} ===")
     print(result["answer"])
     print("\nCitations:")
     for citation in result["citations"]:
@@ -170,6 +225,51 @@ def main() -> None:
         print(f'      {citation["snippet"]}')
     print(f'\ngrounded(model): {result["model_grounded"]}')
     print(f'citation_verified: {result["citation_verified"]}')
+    print(f'semantic_correctness: {result["semantic_correctness"]}')
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="개인 데이터 RAG Agent")
+    parser.add_argument("question")
+    parser.add_argument("--oracle", nargs="*", default=None, metavar="CHUNK_ID")
+    parser.add_argument("--model")
+    parser.add_argument("--context-only", action="store_true", help="LLM을 호출하지 않고 조립된 Context만 출력")
+    parser.add_argument("--compare", action="store_true", help="Normal과 --oracle Context를 같은 경로로 비교")
+    args = parser.parse_args()
+    if args.oracle is not None and not args.oracle:
+        parser.error("--oracle 뒤에 하나 이상의 chunk ID가 필요합니다.")
+    if args.compare and args.oracle is None:
+        parser.error("--compare에는 --oracle chunk ID가 필요합니다.")
+    if args.context_only:
+        if args.oracle is not None:
+            rows = load_chunks_by_id()
+            missing = [chunk_id for chunk_id in args.oracle if chunk_id not in rows]
+            if missing:
+                parser.error(f"존재하지 않는 chunk ID: {', '.join(missing)}")
+            chunks = [rows[chunk_id] for chunk_id in args.oracle]
+        else:
+            chunks = hybrid_search(args.question, TOP_K)
+        context, mapping, trace = assemble_context(chunks)
+        print(context)
+        print("\nContext trace:")
+        print(json.dumps(trace, ensure_ascii=False, indent=2))
+        print("\nNumber to chunk ID:")
+        for number, chunk in mapping.items():
+            print(f"  [{number}] -> {chunk['id']}")
+        return
+
+    if args.compare:
+        comparison = compare_normal_oracle(args.question, args.oracle, model=args.model)
+        print_answer_result("Normal", comparison["normal"])
+        print_answer_result("Oracle", comparison["oracle"])
+        print("\n=== Comparison ===")
+        print(f'shared_generation_path: {comparison["shared_generation_path"]}')
+        missing = comparison["missing_oracle_from_normal"]
+        print("missing_oracle_from_normal: " + (", ".join(missing) if missing else "none"))
+        return
+
+    result = answer_with_chunks(args.question, args.oracle, model=args.model) if args.oracle is not None else answer(args.question, model=args.model)
+    print_answer_result("Answer", result)
 
 
 if __name__ == "__main__":

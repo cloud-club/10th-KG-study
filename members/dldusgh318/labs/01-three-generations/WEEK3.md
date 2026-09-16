@@ -101,19 +101,52 @@ qrels에서 묶음마다 다음 원칙을 적용한다.
 
 ## 3. RAG Agent
 
-OpenAI API 키와 사용할 모델을 환경변수로 전달한다. 키를 코드나 `.env` 파일에 저장하지 않는다.
+### 6번 Context 조립
+
+Hybrid 검색의 상위 5개 청크에 `[1]`부터 `[5]`까지 짧은 번호를 붙인다. LLM에 전달하는 내용은 `title`, `source`, `text`이며, 프로그램 내부의 번호 매핑에는 실제 chunk ID를 유지한다. 입력 청크, 포함 청크, top-5 밖의 제외 청크, 8,000자 제한으로 잘린 청크를 `context_trace`에 기록한다. 잘린 청크의 매핑에는 실제로 Context에 들어간 text만 보존하므로 이후 인용 검사가 포함되지 않은 문장을 통과시키지 않는다.
+
+API를 호출하지 않고 조립 결과만 확인할 수 있다.
+
+```bash
+./.venv/bin/python src/agent.py "Write-Behind의 동작 방식과 데이터 유실 위험은?" --context-only
+```
+
+이 질문의 실제 실행에서는 5개 청크가 모두 포함됐고 Context는 2,929자였다. 제외되거나 잘린 청크는 없었으며 `[1]`~`[5]`와 실제 chunk ID의 매핑을 확인했다.
+
+### 다음 단계: LLM 연결
+
+OpenAI API 키를 환경변수로 전달한다. 키를 코드나 `.env` 파일에 저장하지 않는다. 기본 모델은 비용을 고려해 `gpt-5.6-luna`를 사용하며 `OPENAI_MODEL`이나 `--model`로 바꿀 수 있다.
 
 ```bash
 export OPENAI_API_KEY="발급받은 키"
+# 선택 사항
 export OPENAI_MODEL="사용할 모델 ID"
 ./.venv/bin/python src/agent.py "내가 Redis를 공부하면서 중요하게 생각했던 내용은?"
 ```
 
-이 명령을 실행하면 질문과 Hybrid top-5 청크의 `title`, `source`, `text`가 OpenAI API로 전송된다. API 요청에는 `store=false`를 설정한다.
+이 명령을 실행하면 질문과 Hybrid top-5 청크의 `title`, `source`, `text`가 OpenAI Responses API로 전송된다. API 요청에는 `store=false`를 설정하고 JSON Schema 구조화 출력을 사용한다.
 
-LLM에는 `[1]`부터 `[5]`까지만 보여주고 프로그램 내부에서 실제 chunk ID를 보존한다. 답변은 JSON Schema로 받고, 모든 snippet에 대해 `snippet in chunk.text`를 검사한다. 이 검사는 인용문이 원문에 존재하는지만 보장하며 답변 전체의 의미적 정확성을 대신하지 않는다.
+LLM에는 `[1]`부터 `[5]`까지만 보여주고 프로그램 내부에서 실제 chunk ID를 보존한다. 답변은 JSON Schema로 받고, 인용 번호가 Context에 있는지, snippet이 비어 있지 않은지, `snippet in chunk.text`인지 검사한다. `citation_verified`는 이 기계적 검사를 통과했다는 뜻이다. 답변 전체가 질문에 정확히 답했는지는 별도로 판단해야 한다.
+
+### 7번 LLM·인용 검증 결과
+
+`Write-Behind의 동작 방식과 데이터 유실 위험은?` 질문을 실제 API로 실행했다. 모델은 캐시에 먼저 저장한 뒤 DB에 비동기로 반영하며, 반영 전에 캐시가 사라지면 데이터가 유실될 수 있다고 답했다. 두 개의 인용이 실제 Context 청크의 원문 부분 문자열로 확인되어 `citation_verified=true`가 됐다. 모델의 자기 보고인 `grounded=true`도 별도로 표시한다.
+
+프로그램은 인용의 형식과 원문 존재 여부만 자동 판정한다. 의미 정확성은 자동 판정하지 않고 `semantic_correctness=not_evaluated`로 남긴다.
 
 ## 4. Multi-hop와 Oracle 실험
+
+### 8번 Normal·Oracle 동일 경로 확인
+
+Normal은 Hybrid top-5를, Oracle은 사람이 지정한 청크를 사용한다. Context 입력을 고르는 부분만 다르고 두 방식 모두 `answer_from_chunks()`에서 Context 조립, LLM 생성, 인용 검증을 수행한다.
+
+```bash
+./.venv/bin/python src/agent.py "질문" --compare --oracle <chunk_id> <chunk_id>
+```
+
+R01의 라벨링된 relevant 청크 5개를 Oracle로 지정해 실제 비교했다. Normal 검색도 같은 5개를 모두 찾았기 때문에 `missing_oracle_from_normal`은 없었다. 청크 순서는 달랐지만 두 답변은 Write-Behind의 비동기 DB 반영 방식과 캐시 장애 시 유실 위험을 동일하게 설명했다. Normal과 Oracle 모두 `grounded=true`, `citation_verified=true`였고 의미 정확성은 `not_evaluated`로 남겼다.
+
+이 결과는 두 경로의 생성·검증 절차가 같다는 정상 동작 확인이다. Normal도 정답 청크를 모두 찾은 사례이므로 retrieval 실패를 보여주는 실험은 아니다.
 
 실제 데이터에서 답을 확인한 질문만 사례 파일에 넣는다.
 

@@ -1,3 +1,5 @@
+import io
+import json
 import sys
 import unittest
 from unittest.mock import patch
@@ -5,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from agent import NOT_FOUND, answer_from_chunks, assemble_context, verify_citations
+from agent import DEFAULT_MODEL, NOT_FOUND, answer_from_chunks, assemble_context, call_openai, compare_normal_oracle, verify_citations
 from evaluate import _evaluation_queries, _recall, build_pool, render_pool, make_pool
 from hybrid_search import reciprocal_rank_fusion
 
@@ -36,13 +38,14 @@ class CitationTest(unittest.TestCase):
         self.chunks = [hit("chunk-a", 1, "Redis는 메모리에 데이터를 저장한다."), hit("chunk-b", 2, "다른 기록")]
 
     def test_context_uses_short_numbers_but_mapping_keeps_ids(self):
-        context, mapping = assemble_context(self.chunks)
+        context, mapping, trace = assemble_context(self.chunks)
         self.assertIn("[1]", context)
         self.assertNotIn("id: chunk-a", context)
         self.assertEqual(mapping[1]["id"], "chunk-a")
+        self.assertEqual(trace["included_chunk_ids"], ["chunk-a", "chunk-b"])
 
     def test_verifies_verbatim_substring(self):
-        _, mapping = assemble_context(self.chunks)
+        _, mapping, _ = assemble_context(self.chunks)
         citations = verify_citations(
             {"citations": [{"source": 1, "snippet": "메모리에 데이터를 저장"}, {"source": 2, "snippet": "없는 문장"}]},
             mapping,
@@ -50,12 +53,66 @@ class CitationTest(unittest.TestCase):
         self.assertTrue(citations[0]["valid"])
         self.assertFalse(citations[1]["valid"])
 
+    def test_rejects_empty_and_unknown_citations(self):
+        _, mapping, _ = assemble_context(self.chunks)
+        citations = verify_citations(
+            {"citations": [{"source": 1, "snippet": ""}, {"source": 99, "snippet": "다른 기록"}]},
+            mapping,
+        )
+        self.assertEqual([citation["valid"] for citation in citations], [False, False])
+
+    def test_openai_request_uses_structured_output_without_storage(self):
+        response = {
+            "output": [{"content": [{"type": "output_text", "text": json.dumps({
+                "answer": "답", "citations": [{"source": 1, "snippet": "근거"}], "grounded": True,
+            }, ensure_ascii=False)}]}]
+        }
+
+        class FakeResponse(io.BytesIO):
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                self.close()
+
+        captured = {}
+
+        def fake_urlopen(request, timeout):
+            captured["body"] = json.loads(request.data)
+            captured["timeout"] = timeout
+            return FakeResponse(json.dumps(response, ensure_ascii=False).encode())
+
+        with patch.dict("os.environ", {"OPENAI_API_KEY": "test-key"}, clear=True), patch("agent.urlopen", side_effect=fake_urlopen):
+            payload = call_openai("질문", "[1]\ntext: 근거")
+
+        self.assertEqual(payload["answer"], "답")
+        self.assertEqual(captured["body"]["model"], DEFAULT_MODEL)
+        self.assertFalse(captured["body"]["store"])
+        self.assertEqual(captured["body"]["text"]["format"]["type"], "json_schema")
+        self.assertIn("Question:\n질문", captured["body"]["input"])
+
+    def test_context_tracks_top_k_exclusion_and_truncation(self):
+        chunks = [hit("a", 1, "12345"), hit("b", 2, "67890"), hit("c", 3, "last")]
+        first_header_size = len("[1]\ntitle: a\nsource: test\ntext: ")
+        context, mapping, trace = assemble_context(
+            chunks, max_chunks=2, max_chars=first_header_size + 3,
+        )
+        self.assertEqual(mapping[1]["text"], "123")
+        self.assertNotIn(2, mapping)
+        self.assertEqual(len(context), first_header_size + 3)
+        self.assertEqual(trace["truncated"], [{"id": "a", "original_chars": 5, "included_chars": 3}])
+        self.assertEqual(trace["excluded"], [
+            {"id": "c", "reason": "beyond_top_k"},
+            {"id": "b", "reason": "context_budget"},
+        ])
+
     def test_answer_marks_invalid_citation(self):
         def fake_generator(_question, _context):
             return {"answer": "답", "citations": [{"source": 1, "snippet": "환각"}], "grounded": True}
 
         result = answer_from_chunks("질문", self.chunks, generator=fake_generator)
         self.assertFalse(result["citation_verified"])
+        self.assertEqual(result["semantic_correctness"], "not_evaluated")
 
     def test_no_data_answer_can_have_no_citation(self):
         def fake_generator(_question, _context):
@@ -63,6 +120,25 @@ class CitationTest(unittest.TestCase):
 
         result = answer_from_chunks("질문", self.chunks, generator=fake_generator)
         self.assertTrue(result["citation_verified"])
+
+    def test_normal_and_oracle_use_same_generation_and_verification_path(self):
+        normal_chunks = [hit("normal", 1, "normal evidence")]
+        oracle_chunk = hit("oracle", 1, "oracle evidence")
+        seen_contexts = []
+
+        def fake_generator(_question, context):
+            seen_contexts.append(context)
+            snippet = "normal evidence" if "normal evidence" in context else "oracle evidence"
+            return {"answer": "답", "citations": [{"source": 1, "snippet": snippet}], "grounded": True}
+
+        with patch("agent.hybrid_search", return_value=normal_chunks), patch("agent.load_chunks_by_id", return_value={"oracle": oracle_chunk}):
+            result = compare_normal_oracle("질문", ["oracle"], generator=fake_generator)
+
+        self.assertEqual(len(seen_contexts), 2)
+        self.assertTrue(result["normal"]["citation_verified"])
+        self.assertTrue(result["oracle"]["citation_verified"])
+        self.assertEqual(result["shared_generation_path"], "answer_from_chunks")
+        self.assertEqual(result["missing_oracle_from_normal"], ["oracle"])
 
 
 class EvaluationTest(unittest.TestCase):

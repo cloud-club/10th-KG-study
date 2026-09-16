@@ -1,0 +1,4 @@
+# grep과 Elasticsearch 단계는 표준 라이브러리만 사용한다.
+# pgvector 단계에서 PostgreSQL에 연결할 때 필요하다.
+psycopg[binary]>=3.2,<4
+

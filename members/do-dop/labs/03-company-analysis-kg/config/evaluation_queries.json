@@ -2,6 +2,7 @@
   {
     "id": "q001",
     "query": "삼성전자 HBM4E 12단 제품의 용량은 얼마인가?",
+    "grep_query": "HBM4E 12단",
     "type": "keyword",
     "expected_answer": "48GB",
     "relevant_document_ids": ["newsroom_004"],
@@ -10,6 +11,7 @@
   {
     "id": "q002",
     "query": "SK하이닉스가 용인 반도체 클러스터에 투자하는 목적은 무엇인가?",
+    "grep_query": "용인 반도체 클러스터",
     "type": "keyword",
     "expected_answer": "메모리 수요에 대응하기 위해 용인 반도체 클러스터 2기 Fab Phase 1~6을 건설하고 중장기 생산 기반을 확보하기 위해서다.",
     "relevant_document_ids": ["dart_005"],
@@ -18,6 +20,7 @@
   {
     "id": "q003",
     "query": "AMD의 차세대 AI 가속기에 고대역폭 메모리를 공급하는 회사는 어디인가?",
+    "grep_query": "AMD에 HBM4를 공급",
     "type": "semantic",
     "expected_answer": "삼성전자",
     "relevant_document_ids": ["newsroom_003"],
@@ -26,6 +29,7 @@
   {
     "id": "q004",
     "query": "미국에 AI 데이터센터 생태계를 지원할 회사를 새로 세우려는 기업은 어디인가?",
+    "grep_query": "미국 ‘AI Company’",
     "type": "semantic",
     "expected_answer": "SK하이닉스",
     "relevant_document_ids": ["newsroom_009"],
@@ -34,6 +38,7 @@
   {
     "id": "q005",
     "query": "SK하이닉스의 2025년 2분기 영업이익은 얼마인가?",
+    "grep_query": "영업이익 9조 2,129억 원",
     "type": "keyword",
     "expected_answer": "9조 2,129억 원",
     "relevant_document_ids": ["newsroom_006"],
@@ -42,6 +47,7 @@
   {
     "id": "q006",
     "query": "반도체 공장의 설비 이상과 고장을 가상 환경에서 예측하려는 기업은 어디인가?",
+    "grep_query": "설비 이상 감지",
     "type": "semantic",
     "expected_answer": "삼성전자",
     "relevant_document_ids": ["newsroom_005"],
@@ -50,6 +56,7 @@
   {
     "id": "q007",
     "query": "SK하이닉스 HBM4는 HBM3E와 비교해 대역폭과 전력 효율이 얼마나 개선됐는가?",
+    "grep_query": "2배로 늘어난 대역폭과 40% 향상된 전력 효율",
     "type": "keyword",
     "expected_answer": "대역폭은 2배로 늘었고 전력 효율은 40% 향상됐다.",
     "relevant_document_ids": ["newsroom_008"],
@@ -58,6 +65,7 @@
   {
     "id": "q008",
     "query": "청주 M17과 P&T7에는 각각 얼마를 투자할 계획인가?",
+    "grep_query": "M17에 80조 원",
     "type": "semantic",
     "expected_answer": "M17에 80조 원, P&T7 등 첨단 패키징 시설에 20조 원을 투자할 계획이다.",
     "relevant_document_ids": ["newsroom_010"],
@@ -66,6 +74,7 @@
   {
     "id": "q009",
     "query": "AMD에 HBM4를 공급하면서 엔비디아와 반도체 AI 팩토리도 구축하는 기업은 어디인가?",
+    "grep_query": "AMD에 HBM4를 공급",
     "type": "multi_hop",
     "expected_answer": "삼성전자",
     "relevant_document_ids": ["newsroom_003", "newsroom_005"],
@@ -74,6 +83,7 @@
   {
     "id": "q010",
     "query": "HBM4 양산 체제를 구축했고 미국에 AI 설루션 회사도 세우려는 기업은 어디인가?",
+    "grep_query": "HBM4 개발에 성공",
     "type": "multi_hop",
     "expected_answer": "SK하이닉스",
     "relevant_document_ids": ["newsroom_008", "newsroom_009"],

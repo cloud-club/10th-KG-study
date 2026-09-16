@@ -42,6 +42,8 @@ def main() -> None:
     parser.add_argument("--grading", type=Path, default=LAB_ROOT / "results/private/grading.csv")
     parser.add_argument("--answers", type=Path, default=LAB_ROOT / "results/private/answers.jsonl")
     parser.add_argument("--md-out", type=Path, default=LAB_ROOT / "results/generation-summary.md")
+    parser.add_argument("--grader", default="사람 1인", help="요약에 표기할 채점자")
+    parser.add_argument("--graded-on", default=None, help="채점일(YYYY-MM-DD)")
     args = parser.parse_args()
 
     with args.grading.open(encoding="utf-8", newline="") as handle:
@@ -81,9 +83,10 @@ def main() -> None:
         "# W3 생성(답변) 평가 결과",
         "",
         f"> 모델 `{model}` · 문항 {len(rows)}개 (답 있음 {len(answerable)} / 답 없음 {len(unanswerable)}) · "
-        f"채점 완료 {len(graded)} + {len(graded_refusal)}",
+        f"채점 완료 {len(graded)} + {len(graded_refusal)} · 채점자 {args.grader}"
+        + (f" · {args.graded_on}" if args.graded_on else ""),
         "",
-        "채점은 사람이 `grading.csv`에 기록했다. 인용 precision/recall은 ALCE 방식대로 구조(`[C#]` 존재)가 아니라 실제 지지 여부를 본 값이다.",
+        "채점은 `grading.csv`에 문항별로 기록했다. 인용 precision/recall은 ALCE 방식대로 구조(`[C#]` 존재)가 아니라 실제 지지 여부를 본 값이다.",
         "",
         "| 지표 | 값 | 설명 |",
         "|---|---:|---|",
@@ -112,7 +115,7 @@ def main() -> None:
             "",
             "## 읽을 때 주의",
             "",
-            "- 채점자 1인의 소규모 수동 평가다. 절대 수치보다 유형 간 차이와 실패 유형 분포를 본다.",
+            f"- {args.grader}의 소규모 수동 평가다. 절대 수치보다 유형 간 차이와 실패 유형 분포를 본다.",
             "- 답변·질문 원문은 비공개 CSV/JSONL에만 있다.",
             "",
         ]

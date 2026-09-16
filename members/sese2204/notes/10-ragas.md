@@ -161,6 +161,15 @@ multi_responses, persona_name, query_style, query_length   (합성 테스트셋 
 | 대화 | TopicAdherence, 턴별 Faithfulness | `reference_topics` |
 | 스타일·안전 | RubricsScore, AspectCritic | 루브릭 |
 
+#### 3-6. RAGAS에 없는 것: 거부(negative rejection)와 부재 근거 인지
+
+"근거가 없으면 모른다고 답하는가"는 RAGAS 지표가 아니라 RGB 벤치마크의 negative rejection 축이다([09번 노트](09-chatbot-evaluation.md) 3절). RAGAS는 오히려 **반대로 동작**한다. AnswerRelevancy는 역질문을 만들 때 답이 noncommittal인지("I don't know", "I'm not sure", "It depends")를 같이 판정하고, 전부 noncommittal이면 점수를 0으로 만든다(소스 `_answer_relevance.py`: `score = cosine_sim.mean() * int(not all_noncommittal)`). 즉 근거가 없어 정직하게 회피한 답이 감점된다.
+
+그래서 코퍼스에 답이 없는 질문(unanswerable)을 골든셋에 넣을 때는:
+- `reference`를 "해당 정보 없음"으로 두고 FactualCorrectness를 쓰거나,
+- AspectCritic / RubricsScore로 "근거가 없으면 모른다고 답했는가"를 직접 정의하고,
+- 그 항목에서는 AnswerRelevancy를 집계에서 빼야 한다.
+
 문서의 조언: "약한 신호를 주는 지표를 늘리지 말고, 강하고 신뢰할 수 있는 신호를 주는 지표 몇 개를 골라라." 객관성 기준은 **평가자 간 일치율 80% 이상**.
 
 ### 4. 합성 테스트셋 생성 — 지식그래프 기반

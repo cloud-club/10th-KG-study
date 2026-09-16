@@ -1,0 +1,1 @@
+"""Persistent dense vector index."""

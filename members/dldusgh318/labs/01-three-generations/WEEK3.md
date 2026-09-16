@@ -153,8 +153,42 @@ R01의 라벨링된 relevant 청크 5개를 Oracle로 지정해 실제 비교했
 ```bash
 ./.venv/bin/python src/failure_experiment.py template
 # data/week3/cases.json을 사람이 작성
+./.venv/bin/python src/failure_experiment.py check
 ./.venv/bin/python src/failure_experiment.py run
 ```
+
+`check`는 API 키 없이 각 질문의 Hybrid top-5에 정답 청크가 몇 개 포함되는지만 확인한다. `run`은 API 키를 사용해 같은 사례의 Normal·Oracle 답변을 생성한다. 검색 누락과 답변 생성 실패를 분리해서 보기 위한 순서다.
+
+실제 원문을 확인해 다음 네 종류의 사례를 구성한다.
+
+- single-hop: 같은 클래스 내부의 `@Transactional` 호출과 Spring AOP 프록시
+- 2-hop: SeCause의 Spring `AFTER_COMMIT` 처리에서 FastAPI Redis/RQ 워커까지의 흐름
+- aggregation: 지원자 수 집계의 DB 배치 쿼리, Redis 증분·캐시, DB 폴백
+- 3-hop: 운영 RDS 인증 실패의 원인, 설정 수정, 내·외부 헬스 체크 검증
+
+Hybrid top-5 검색 점검 결과는 다음과 같다.
+
+| 사례 | 유형 | 정답 청크 포함 | 누락 |
+|---|---|---:|---:|
+| S01 | single-hop | 1/1 | 0 |
+| M01 | 2-hop | 2/2 | 0 |
+| A01 | aggregation | 1/3 | 2 |
+| H01 | 3-hop | 1/3 | 2 |
+
+A01은 DB 그룹핑 쿼리와 Redis 증분·캐시 구현 청크를 놓쳤고, H01은 원인과 설정 수정 청크를 놓쳤다. 이는 검색 단계에서 관찰한 누락이다. 아직 Normal 답변의 오답이나 최종 실패 유형으로 확정한 결과는 아니다.
+
+Normal·Oracle 답변을 실제 생성한 뒤 기대 답과 비교하고 사용자 확인을 받아 다음과 같이 판정했다.
+
+| 사례 | Normal | Oracle | 최종 판정 |
+|---|---|---|---|
+| S01 single-hop | 정답 | 정답 | 성공 |
+| M01 2-hop | 정답 | 정답 | 성공 |
+| A01 aggregation | 정답 | 정답 | citation |
+| H01 3-hop | 오답·불완전 | 정답 | retrieval |
+
+A01은 지정한 gold 청크 2개를 놓쳤지만 같은 내용을 담은 다른 포트폴리오 청크를 검색해 답의 의미는 정확했다. 다만 Normal 인용 하나가 실제 Context의 부분 문자열과 일치하지 않아 citation 실패로 기록했다. 검색에서 gold ID가 빠졌다는 사실만으로 retrieval 실패로 판정하지 않았다.
+
+H01은 원인과 설정 수정 청크가 top-5에서 빠졌다. Normal은 일반적인 RDS 인증 실패와 검증 과정만 설명하고 실제 원인과 수정 방법은 찾지 못했다고 답했다. 같은 생성·검증 경로에서 gold 청크를 넣은 Oracle은 원인, 수정, 검증을 모두 정확히 답했으므로 retrieval 실패로 기록했다.
 
 Oracle Context를 한 건 직접 실행할 수도 있다.
 
@@ -162,4 +196,4 @@ Oracle Context를 한 건 직접 실행할 수도 있다.
 ./.venv/bin/python src/agent.py "질문" --oracle <chunk_id> <chunk_id>
 ```
 
-실험기는 Normal·Oracle 답변, top-5, 누락된 gold chunks, citation 검증 결과를 `data/week3/failure_runs.jsonl`에 남긴다. 답변의 정답 여부와 `retrieval / assembly / composition / citation / no_data` 판정은 사람이 기록한다. 측정 전에는 실패 원인을 자동으로 단정하지 않는다.
+실험기는 Normal·Oracle 답변, top-5, 누락된 gold chunks, citation 검증 결과를 `data/week3/failure_runs.jsonl`에 남긴다. 답변의 정답 여부와 `retrieval / assembly / composition / citation / no_data` 판정은 사람이 기록한다. `retrieval`은 필요한 청크 누락, `assembly`는 검색됐지만 Context 제외·절단, `composition`은 근거가 있는데 답을 잘못 종합, `citation`은 인용 검증 실패, `no_data`는 원문에 답할 근거가 없는 경우다. 측정 전에는 실패 원인을 자동으로 단정하지 않는다.

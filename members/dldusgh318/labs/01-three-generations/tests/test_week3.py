@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from agent import DEFAULT_MODEL, NOT_FOUND, answer_from_chunks, assemble_context, call_openai, compare_normal_oracle, verify_citations
 from evaluate import _evaluation_queries, _recall, build_pool, render_pool, make_pool
+from failure_experiment import check_retrieval, load_cases
 from hybrid_search import reciprocal_rank_fusion
 
 
@@ -190,6 +191,33 @@ class EvaluationTest(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 make_pool()
             search.assert_not_called()
+
+
+class FailureExperimentTest(unittest.TestCase):
+    def test_load_cases_rejects_unknown_gold_chunk(self):
+        payload = {"cases": [{
+            "id": "S01", "kind": "single-hop", "question": "질문",
+            "expected": "기대 답", "gold_chunks": ["missing"],
+        }]}
+        with patch("failure_experiment.CASES") as cases_path, patch("failure_experiment.load_chunks_by_id", return_value={}):
+            cases_path.exists.return_value = True
+            cases_path.read_text.return_value = json.dumps(payload)
+            with self.assertRaises(SystemExit):
+                load_cases()
+
+    def test_check_retrieval_reports_missing_gold_without_llm(self):
+        case = {
+            "id": "M01", "kind": "2-hop", "question": "질문",
+            "expected": "기대 답", "gold_chunks": ["a", "b"],
+        }
+        with patch("failure_experiment.load_cases", return_value=[case]), \
+             patch("failure_experiment.hybrid_search", return_value=[hit("a", 1)]), \
+             patch("failure_experiment.RETRIEVAL_CHECK") as result_path:
+            records = check_retrieval()
+
+        self.assertEqual(records[0]["missing_gold_chunks"], ["b"])
+        self.assertEqual(records[0]["retrieval_coverage"], 0.5)
+        result_path.write_text.assert_called_once()
 
 
 if __name__ == "__main__":

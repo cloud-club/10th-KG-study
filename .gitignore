@@ -45,3 +45,11 @@ outputs/
 # Dashboard (빌드 산출물 / LLM 캐시)
 dashboard/data.json
 .cache/
+
+# Obsidian per-user state (볼트 = wiki/)
+wiki/.obsidian/workspace*.json
+wiki/.obsidian/cache
+wiki/.trash/
+
+# Claude Code per-user overrides
+.claude/settings.local.json

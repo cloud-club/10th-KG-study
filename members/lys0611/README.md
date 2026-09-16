@@ -1,1 +1,28 @@
+# 이예승
 
+##  스터디 목표
+  - 내 카톡 데이터로 grep → BM25 → 벡터 → 하이브리드 → GraphRAG 변천사를 직접 재현하고, 각 단계가 무엇을 잡고 무엇을 놓치는지 표로 남기기
+  - 개인정보를 가명화한 상태로 파이프라인 전체를 공개 가능한 형태로 유지하기 (정본 ↔ 파생물 분리)
+
+## 데이터
+
+- 프로젝트 팀 단톡방 2개 (안드로이드 내보내기 txt). 실명은 가명으로 치환, 전화·계좌·주민번호 마스킹 후 사용
+
+## 진행 현황
+
+### notes
+
+| # | 주제 | 상태 |
+|---|------|------|
+| 01 | [역색인과 BM25 — 키워드 검색(1세대)](notes/01-inverted-index-bm25.md) | 완료 |
+| 02 | [임베딩·코사인 유사도·HNSW — 벡터 검색(2세대)](notes/02-embeddings-cosine-hnsw.md) | 완료 |
+| 03 | [DDIA 3장 저장소와 검색 — ES(LSM)와 Postgres(B-tree)](notes/03-ddia-ch3-storage-and-search.md) | 완료 |
+| 04 | [하이브리드 검색과 RRF — 순위를 합치면 무엇이 좋아지고 무엇을 잃는가](notes/04-hybrid-search-rrf-recall.md) | 완료 |
+| 05 | [RAG 루프와 근거 인용 — 검색이 성공해도 답이 안 나오는 이유](notes/05-rag-loop-citation-multihop.md) | 완료 |
+
+### labs
+
+| # | 실습 | 상태 |
+|---|------|------|
+| 01 | [카톡 대화 적재 — Postgres · pgvector · Elasticsearch (3세대 비교)](labs/01-ingest/README.md) | 완료 |
+| 02 | [하이브리드 검색(RRF) + 개인 카톡 RAG 에이전트 v1 — Recall@k 비교, 로컬 LLM 생성 평가, 못 답하는 질문](labs/02-hybrid-rag-agent/README.md) | 완료 (채점 검토 남음) |

@@ -43,9 +43,8 @@ def reciprocal_rank_fusion(
     return ordered[:limit] if limit is not None else ordered
 
 
-def hybrid_search(query: str, limit: int = 10, retrieve_limit: int = RETRIEVER_LIMIT) -> list[dict]:
-    bm25 = search_bm25(query, retrieve_limit)
-    vector = search_vector(query, retrieve_limit)
+def fuse_search_results(bm25: list[dict], vector: list[dict], limit: int = 10) -> list[dict]:
+    """이미 조회한 두 검색 결과를 RRF로 합친다."""
     bm25_ranks = {row["id"]: row["rank"] for row in bm25}
     vector_ranks = {row["id"]: row["rank"] for row in vector}
     results = reciprocal_rank_fusion([bm25, vector], limit=limit)
@@ -53,6 +52,12 @@ def hybrid_search(query: str, limit: int = 10, retrieve_limit: int = RETRIEVER_L
         row["bm25_rank"] = bm25_ranks.get(row["id"])
         row["vector_rank"] = vector_ranks.get(row["id"])
     return results
+
+
+def hybrid_search(query: str, limit: int = 10, retrieve_limit: int = RETRIEVER_LIMIT) -> list[dict]:
+    bm25 = search_bm25(query, retrieve_limit)
+    vector = search_vector(query, retrieve_limit)
+    return fuse_search_results(bm25, vector, limit)
 
 
 def main() -> None:

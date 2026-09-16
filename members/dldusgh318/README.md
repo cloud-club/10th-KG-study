@@ -22,6 +22,6 @@
 
 | # | 실습 | 상태 |
 |---|------|------|
-| 01 | [검색의 세 세대 (grep / ES BM25 / pgvector)](labs/01-three-generations) | 진행 중 |
+| 01 | [검색의 세 세대와 W3 RAG 실험 (grep / BM25 / Vector / Hybrid)](labs/01-three-generations/WEEK3.md) | 완료 |
 
-- [W3 실습 실행 안내](labs/01-three-generations/WEEK3.md)
+- W3 결과: Hybrid Macro Recall `@5=0.534`, `@10=0.734`; RAG 실패 사례는 citation 1건, retrieval 1건을 확인했다.

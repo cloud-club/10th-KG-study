@@ -121,3 +121,4 @@ python3 -m http.server -d dashboard 8000                  # http://localhost:800
 | do-dop | [members/do-dop](members/do-dop) |
 | kdyann | [members/kdyann](members/kdyann) |
 | kungbi | [members/kungbi](members/kungbi) |
+| sdunge | [members/sdunge](members/sdunge) |

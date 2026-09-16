@@ -366,8 +366,24 @@ def parse_readings(path: Path, member_id: str, repo: dict) -> list[dict]:
     return items
 
 
-def build_readings(members: list[dict]) -> list[dict]:
-    """전 멤버 읽을거리를 주차별로 묶어 최신 주차부터. 주차 없는 항목은 맨 뒤 '기타'."""
+def week1_monday(started_at: str) -> dt.date:
+    """스터디 첫 커밋이 속한 주의 월요일. 이 날부터 7일씩 1주차, 2주차 … 로 센다."""
+    start = dt.date.fromisoformat(started_at)
+    return start - dt.timedelta(days=start.weekday())
+
+
+def week_of(date: dt.date, monday: dt.date) -> int:
+    return (date - monday).days // 7 + 1
+
+
+def week_range(week: int, monday: dt.date) -> tuple[str, str]:
+    start = monday + dt.timedelta(days=(week - 1) * 7)
+    return start.isoformat(), (start + dt.timedelta(days=6)).isoformat()
+
+
+def build_readings(members: list[dict], monday: dt.date | None = None) -> list[dict]:
+    """전 멤버 읽을거리를 주차별로 묶어 최신 주차부터. 주차 없는 항목은 맨 뒤 '기타'.
+    monday(1주차 월요일)를 주면 주차마다 날짜 범위(starts/ends)를 붙인다."""
     groups: dict = defaultdict(list)
     for m in members:
         for item in m["readings"]:
@@ -376,9 +392,11 @@ def build_readings(members: list[dict]) -> list[dict]:
     for week in sorted((w for w in groups if w is not None), reverse=True) + ([None] if None in groups else []):
         items = groups[week]
         labels = [i["label"] for i in items if i["label"]]
+        starts, ends = week_range(week, monday) if (monday and week is not None) else ("", "")
         weeks.append({
             "week": week,
             "label": Counter(labels).most_common(1)[0][0] if labels else "",
+            "starts": starts, "ends": ends,
             "members": sorted({i["member"] for i in items}),
             "items": [{k: v for k, v in i.items() if k not in ("week", "label")} for i in items],
         })
@@ -390,11 +408,13 @@ def build_readings(members: list[dict]) -> list[dict]:
 def parse_note(path: Path, member_id: str, repo: dict) -> dict:
     meta, body = parse_frontmatter(read_text(path))
     rel = path.relative_to(ROOT).as_posix()
+    # notes/week3/06-x.md 처럼 하위 폴더에 둔 노트도 id 가 겹치지 않게 멤버 폴더 기준 상대 경로를 쓴다
+    inside = Path(rel).relative_to(f"members/{member_id}").as_posix()
     title = clean_title(meta.get("title")) or clean_title(first_heading(body)) or humanize(path.stem)
     return {
         "kind": "note",
-        "id": f"{member_id}/notes/{path.stem}",
-        "file": path.name,
+        "id": f"{member_id}/{inside[:-3] if inside.endswith('.md') else inside}",
+        "file": inside,
         "title": title,
         "date": find_date(meta, body, rel),
         "summary": clean_title(meta.get("summary")) or section_text(body, "한 줄 요약"),
@@ -481,8 +501,8 @@ def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict
     meta, body = parse_frontmatter(read_text(readme)) if readme.exists() else ({}, "")
     notes_dir, labs_dir = content_dir(member_dir, NOTES_DIR_NAMES), content_dir(member_dir, LABS_DIR_NAMES)
 
-    notes = sorted((parse_note(p, member_id, repo) for p in notes_dir.glob("*.md")) if notes_dir.exists() else [],
-                   key=lambda n: n["file"])
+    note_files = [p for p in notes_dir.rglob("*.md") if not any(part.startswith((".", "_")) for part in p.relative_to(notes_dir).parts)] if notes_dir.exists() else []
+    notes = sorted((parse_note(p, member_id, repo) for p in note_files), key=lambda n: n["file"])
     labs = sorted((parse_lab(d, member_id, repo) for d in labs_dir.iterdir() if d.is_dir() and not d.name.startswith("."))
                   if labs_dir.exists() else [], key=lambda l: l["file"])
     readings_path = member_dir / READINGS_FILE
@@ -798,7 +818,9 @@ def main() -> int:
         "cohorts": sum(1 for c in cohorts if c["members"]),
     }
     started = git(["log", "--reverse", "--format=%ad", "--date=short"]).splitlines()
-    study = {"started_at": started[0] if started else today.isoformat()}
+    started_at = started[0] if started else today.isoformat()
+    monday = week1_monday(started_at)
+    study = {"started_at": started_at, "week1_start": monday.isoformat(), "current_week": week_of(today, monday)}
 
     events = build_feed_events(commits, members, repo)
     llm = enrich_with_llm(members, totals, cache, events)
@@ -816,7 +838,7 @@ def main() -> int:
         "members": strip_private(members),
         "cohorts": build_cohort_graphs(cohorts, members),
         "activity": build_activity(commits, repo),
-        "readings": build_readings(members),
+        "readings": build_readings(members, monday),
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")

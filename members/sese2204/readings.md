@@ -12,7 +12,7 @@
 - 『AI 에이전트 엔지니어링』 (마이클 알바다 저 / 강민혁 역, 한빛미디어, 2026.01) — RAG 변천사 장을 참고
 - [zg(zvec-grep) — 키워드를 넘어서는 로컬 검색 인프라 (GeekNews)](https://news.hada.io/topic?id=33183) — Qwen 팀의 ripgrep 확장. 벡터 + BM25 하이브리드를 RRF로 합치고 16M 온디바이스 임베딩으로 코드·문서를 의미 검색. 하이브리드 검색 노트의 실전 사례
 
-## 4주차 · LLM 위키와 챗봇 평가
+## 3주차 · LLM 위키와 챗봇 평가
 
 - [Karpathy, LLM Wiki (gist, 2026-04-04)](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) — 소재/위키/스키마 3층, ingest·query·lint 3연산. 우리 `wiki/`가 따르는 패턴의 원문
 - [LangChain, Wiki Memory: File-Based Memory for AI Agents (2026-06)](https://www.langchain.com/blog/wiki-memory) — 위키를 에이전트 메모리로 보는 관점. RAG는 원문 청크, 위키는 미리 계산한 합성

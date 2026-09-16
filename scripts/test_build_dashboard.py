@@ -498,3 +498,40 @@ class FolderNameTests(unittest.TestCase):
             self.assertEqual(bd.content_dir(root, bd.NOTES_DIR_NAMES), root / "note")
             (root / "notes").mkdir()
             self.assertEqual(bd.content_dir(root, bd.NOTES_DIR_NAMES), root / "notes")
+
+
+class WeekCalendarTests(unittest.TestCase):
+    def test_week1_monday_aligns_to_monday(self):
+        self.assertEqual(bd.week1_monday("2026-08-31"), dt.date(2026, 8, 31))  # 월요일 그대로
+        self.assertEqual(bd.week1_monday("2026-09-03"), dt.date(2026, 8, 31))  # 목요일 → 그 주 월요일
+
+    def test_week_of_and_range(self):
+        monday = dt.date(2026, 8, 31)
+        self.assertEqual(bd.week_of(dt.date(2026, 8, 31), monday), 1)
+        self.assertEqual(bd.week_of(dt.date(2026, 9, 6), monday), 1)
+        self.assertEqual(bd.week_of(dt.date(2026, 9, 16), monday), 3)
+        self.assertEqual(bd.week_range(3, monday), ("2026-09-14", "2026-09-20"))
+
+    def test_build_readings_attaches_date_range(self):
+        def reading(member, week, title):
+            return {"week": week, "label": "", "title": title, "url": "", "note": "", "member": member, "source_url": ""}
+        members = [{"readings": [reading("kim", 3, "a"), reading("kim", None, "b")]}]
+        weeks = bd.build_readings(members, dt.date(2026, 8, 31))
+        self.assertEqual((weeks[0]["starts"], weeks[0]["ends"]), ("2026-09-14", "2026-09-20"))
+        self.assertEqual((weeks[1]["starts"], weeks[1]["ends"]), ("", ""))
+        self.assertNotIn("starts", bd.build_readings(members)[0]) if False else None
+        self.assertEqual(bd.build_readings(members)[0]["starts"], "")
+
+
+class NoteSubfolderTests(unittest.TestCase):
+    REPO = {"url": "https://github.com/x/y", "branch": "main"}
+
+    def test_parse_note_id_keeps_subfolder(self):
+        text = "---\ntitle: 멀티홉\ndate: 2026-09-16\ntags: [rag]\n---\n# 멀티홉\n"
+        with mock.patch.object(bd, "read_text", return_value=text):
+            note = bd.parse_note(bd.ROOT / "members/kim/notes/week3/06-multi-hop.md", "kim", self.REPO)
+            flat = bd.parse_note(bd.ROOT / "members/kim/notes/01-intro.md", "kim", self.REPO)
+        self.assertEqual(note["id"], "kim/notes/week3/06-multi-hop")
+        self.assertEqual(note["file"], "notes/week3/06-multi-hop.md")
+        self.assertEqual(flat["id"], "kim/notes/01-intro")
+        self.assertTrue(note["url"].endswith("members/kim/notes/week3/06-multi-hop.md"))

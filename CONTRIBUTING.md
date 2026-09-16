@@ -57,7 +57,7 @@ status: in-progress           # in-progress | done
 
 ### notes
 
-- 파일 하나가 주제 하나입니다. 폴더 이름은 `notes/` 입니다 (`note/` 로 만들어도 읽히지만 표준은 복수형).
+- 파일 하나가 주제 하나입니다. 폴더 이름은 `notes/` 입니다 (`note/` 로 만들어도 읽히지만 표준은 복수형). `notes/week3/` 처럼 하위 폴더로 나눠도 현황판이 읽습니다.
 - `NN-kebab-case-topic.md` 형식으로 번호를 붙여 순서를 유지합니다.
   - 예: `01-data-model.md`, `02-storage-and-search.md`
 - `templates/note-template.md`를 복사해서 시작합니다.
@@ -73,6 +73,7 @@ status: in-progress           # in-progress | done
 ### readings (주차별 읽을거리)
 
 - `members/<github-id>/readings.md` 파일 하나에 주차별로 모읍니다. `templates/readings-template.md`를 복사해서 시작합니다.
+- 주차 번호는 스터디 첫 주(8/31~9/6, OT)를 **1주차**로 셉니다. 현황판이 주차마다 날짜 범위와 "이번 주"를 표시하니 헷갈리면 그걸 보고 맞추세요.
 - `## N주차` 제목 아래 불릿 하나가 자료 하나입니다. `## 1주차 · RAG 기초`처럼 제목 뒤에 주제를 붙여도 됩니다.
 - 불릿은 `[제목](링크) — 한 줄 메모` 형식을 기본으로 하되, 링크만 적거나 책처럼 링크 없이 제목만 적어도 됩니다.
 - 현황판 "주차별 읽을거리"가 멤버 전체 파일을 합쳐 주차별로 보여줍니다. 주차 제목 밖의 불릿은 "기타"로 묶입니다.

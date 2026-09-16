@@ -192,26 +192,53 @@
     ]);
   }
 
-  function renderReadingWeek(group, isLatest, colorOf) {
+  // 주차 상태: 이번 주 / 아직 안 온 주차(라벨 실수일 가능성) / 지난 주차
+  function weekState(week, currentWeek) {
+    if (week === null || !currentWeek) return '';
+    if (week === currentWeek) return 'current';
+    return week > currentWeek ? 'future' : 'past';
+  }
+
+  function renderReadingWeek(group, isOpen, currentWeek, colorOf) {
     const name = group.week === null ? '기타' : `${group.week}주차`;
+    const state = weekState(group.week, currentWeek);
+    const range = group.starts ? `${shortDate(group.starts)} – ${shortDate(group.ends)}` : '';
     const summary = el('summary', { class: 'readings__week' }, [
       el('span', { class: 'readings__name', text: name }),
+      range ? el('span', { class: 'readings__range', text: range }) : null,
+      state === 'current' ? el('span', { class: 'readings__badge readings__badge--now', text: '이번 주' }) : null,
+      state === 'future' ? el('span', { class: 'readings__badge readings__badge--future', text: '아직 안 온 주차', title: '오늘 기준으로 아직 오지 않은 주차예요. readings.md 의 주차 번호를 확인해 보세요.' }) : null,
       group.label ? el('span', { class: 'readings__label', text: group.label }) : null,
       el('span', { class: 'readings__count', text: `${group.items.length}개 · ${group.members.map(nameOf).join(', ')}` }),
     ]);
-    return el('details', { class: 'readings__group', open: isLatest ? '' : undefined }, [
+    return el('details', { class: `readings__group${state ? ` is-${state}` : ''}`, open: isOpen ? '' : undefined }, [
       summary,
       el('ul', { class: 'readings__items' }, group.items.map((item) => renderReadingItem(item, colorOf))),
     ]);
   }
 
-  function renderReadings(weeks, colorOf) {
+  function renderReadings(weeks, study, colorOf) {
     const box = $('#readings-list');
+    const currentWeek = study.current_week || 0;
+    const hint = $('#readings-week-hint');
+    if (hint && currentWeek) {
+      const [s, e] = [study.week1_start, null];
+      const monday = parseDate(s);
+      if (monday) {
+        const start = new Date(monday.getTime() + (currentWeek - 1) * 7 * DAY_MS);
+        const end = new Date(start.getTime() + 6 * DAY_MS);
+        const fmt = (d) => `${d.getMonth() + 1}.${String(d.getDate()).padStart(2, '0')}`;
+        hint.textContent = `이번 주는 ${currentWeek}주차 (${fmt(start)} – ${fmt(end)}). 1주차는 ${fmt(monday)} 주부터.`;
+        hint.hidden = false;
+      }
+    }
     if (!weeks.length) {
       box.append(el('p', { class: 'readings__empty', text: '아직 올라온 읽을거리가 없어요. members/<id>/readings.md 에 "## 1주차" 아래로 링크를 적어 보세요.' }));
       return;
     }
-    weeks.forEach((group, i) => box.append(renderReadingWeek(group, i === 0, colorOf)));
+    // 이번 주가 있으면 이번 주를 펼치고, 없으면 맨 위(최신) 주차를 펼친다
+    const openWeek = weeks.some((w) => w.week === currentWeek) ? currentWeek : weeks[0].week;
+    weeks.forEach((group) => box.append(renderReadingWeek(group, group.week === openWeek, currentWeek, colorOf)));
   }
 
   /* ---------------------------------------------------------- members */
@@ -426,7 +453,7 @@
       renderHero(data);
       renderStats(data);
       renderFeed(data.feed || [], data.feed_source, colorOf);
-      renderReadings(data.readings || [], colorOf);
+      renderReadings(data.readings || [], data.study || {}, colorOf);
       renderMembers(data.members, cohorts, colorOf);
       renderActivity(data.activity, colorOf);
       renderFooter(data);

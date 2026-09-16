@@ -340,6 +340,16 @@ span.post__commit { font-weight: 500; }
 .readings__group:first-child > .readings__week { border-radius: var(--radius) var(--radius) 0 0; }
 .readings__name { font-family: var(--font-display); font-size: 1.25rem; line-height: 1.1; }
 .readings__label { font-weight: 700; }
+.readings__range { font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; color: var(--muted); }
+.readings__badge { padding: 0 0.6em; border-radius: 999px; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; line-height: 1.7; }
+.readings__badge--now { background: var(--sun); color: var(--sky-900); }
+.readings__badge--future { background: #fff; color: var(--coral); border: 1.5px dashed var(--coral); }
+.readings__group.is-current > .readings__week { background: var(--sky-50); }
+.readings__group.is-future > .readings__week .readings__name { color: var(--muted); }
+.readings__now {
+  padding: 0 0.7em; border: 1.5px dashed var(--sky-500); border-radius: 999px;
+  font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; line-height: 1.8; color: var(--sky-700);
+}
 .readings__count { margin-left: auto; font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; color: var(--muted); }
 .readings__items { list-style: none; margin: 0; padding: 0 1.1rem 0.8rem; display: grid; gap: 0.45rem; }
 .reading { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 0.7rem; padding: 0.4rem 0.7rem; border-left: 3px solid var(--c, var(--sky-500)); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: var(--sky-50); }

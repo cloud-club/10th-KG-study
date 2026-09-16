@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""키워드·벡터·하이브리드 검색의 Recall@K를 비교한다."""
+"""키워드·벡터·하이브리드 검색의 Recall@K·nDCG@K를 비교한다."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -23,6 +24,7 @@ from retrieval.vector.search import search_documents as vector_search
 
 QUESTIONS_PATH = LAB_ROOT / "data" / "evaluation" / "questions.jsonl"
 METHOD_LABELS = {"keyword": "키워드(BM25)", "vector": "벡터", "hybrid": "하이브리드"}
+METRICS = ("recall", "ndcg")
 
 
 def recall_at_k(retrieved_ids: list[str], reference_ids: list[str], k: int) -> float:
@@ -33,6 +35,29 @@ def recall_at_k(retrieved_ids: list[str], reference_ids: list[str], k: int) -> f
     return found / len(reference_ids)
 
 
+def ndcg_at_k(retrieved_ids: list[str], relevance: dict[str, int], k: int) -> float:
+    """graded relevance(0~3 등)로 nDCG@K를 계산한다. 등급이 없으면 정답 여부만(0/1) 반영한다."""
+    if not relevance:
+        raise ValueError("relevance 판정이 비어 있는 질문은 평가할 수 없습니다.")
+
+    def dcg(gains: list[int]) -> float:
+        return sum(gain / math.log2(index + 2) for index, gain in enumerate(gains))
+
+    gains = [relevance.get(chunk_id, 0) for chunk_id in retrieved_ids[:k]]
+    ideal_gains = sorted(relevance.values(), reverse=True)[:k]
+    idcg = dcg(ideal_gains)
+    return dcg(gains) / idcg if idcg > 0 else 0.0
+
+
+def question_relevance(question: dict) -> dict[str, int]:
+    """graded_relevance(TREC pooling + LLM judge 결과)가 있으면 그대로, 없으면 reference_chunk_ids를
+    이진(1점) relevance로 취급한다."""
+    graded = question.get("graded_relevance")
+    if graded:
+        return graded
+    return {chunk_id: 1 for chunk_id in question["reference_chunk_ids"]}
+
+
 def evaluate(
     questions: list[dict],
     es_client: Elasticsearch,
@@ -41,15 +66,16 @@ def evaluate(
     ks: list[int],
     rank_window: int,
     rank_constant: int,
-) -> dict[str, dict[int, float]]:
+) -> dict[str, dict[int, dict[str, float]]]:
     max_k = max(ks)
     effective_window = max(rank_window, max_k)
-    scores: dict[str, dict[int, list[float]]] = {
-        method: {k: [] for k in ks} for method in METHOD_LABELS
+    scores: dict[str, dict[int, dict[str, list[float]]]] = {
+        method: {k: {metric: [] for metric in METRICS} for k in ks} for method in METHOD_LABELS
     }
 
     for question in questions:
         reference_ids = question["reference_chunk_ids"]
+        relevance = question_relevance(question)
         results_by_method = {
             "keyword": keyword_search(es_client, question["question"], max_k),
             "vector": vector_search(postgres, question["question"], max_k),
@@ -65,25 +91,34 @@ def evaluate(
         for method, results in results_by_method.items():
             retrieved_ids = [result["id"] for result in results]
             for k in ks:
-                scores[method][k].append(recall_at_k(retrieved_ids, reference_ids, k))
+                scores[method][k]["recall"].append(recall_at_k(retrieved_ids, reference_ids, k))
+                scores[method][k]["ndcg"].append(ndcg_at_k(retrieved_ids, relevance, k))
 
     return {
-        method: {k: sum(values) / len(values) for k, values in k_scores.items()}
+        method: {
+            k: {metric: sum(values) / len(values) for metric, values in metric_scores.items()}
+            for k, metric_scores in k_scores.items()
+        }
         for method, k_scores in scores.items()
     }
 
 
-def print_table(scores: dict[str, dict[int, float]], ks: list[int]) -> None:
-    header = "방식".ljust(14) + "".join(f"recall@{k}".rjust(12) for k in ks)
+def print_table(scores: dict[str, dict[int, dict[str, float]]], ks: list[int]) -> None:
+    header = "방식".ljust(14) + "".join(
+        f"recall@{k}".rjust(12) + f"ndcg@{k}".rjust(11) for k in ks
+    )
     print(header)
     for method, label in METHOD_LABELS.items():
-        row = label.ljust(14) + "".join(f"{scores[method][k]:.3f}".rjust(12) for k in ks)
+        row = label.ljust(14) + "".join(
+            f"{scores[method][k]['recall']:.3f}".rjust(12) + f"{scores[method][k]['ndcg']:.3f}".rjust(11)
+            for k in ks
+        )
         print(row)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Ground Truth 질문으로 키워드·벡터·하이브리드 검색의 Recall@K를 비교합니다."
+        description="Ground Truth 질문으로 키워드·벡터·하이브리드 검색의 Recall@K·nDCG@K를 비교합니다."
     )
     parser.add_argument("--k", type=int, nargs="+", default=[1, 3, 5, 10], help="비교할 K 값 목록")
     parser.add_argument("--rank-window", type=int, default=20, help="하이브리드 RRF 후보 범위")

@@ -10,6 +10,7 @@ ROOT = Path(__file__).parents[1]
 
 elasticsearch_stub = types.ModuleType("elasticsearch")
 elasticsearch_stub.Elasticsearch = object
+elasticsearch_stub.helpers = types.SimpleNamespace()
 sys.modules.setdefault("elasticsearch", elasticsearch_stub)
 
 psycopg_stub = types.ModuleType("psycopg")
@@ -58,6 +59,29 @@ class RecallAtKTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "reference_chunk_ids"):
             recall_at_k.recall_at_k(["A"], [], k=1)
 
+    def test_ndcg_at_k_rewards_placing_higher_relevance_first(self):
+        relevance = {"A": 3, "B": 2, "C": 1}
+        self.assertEqual(recall_at_k.ndcg_at_k(["A", "B", "C"], relevance, k=3), 1.0)
+
+        reversed_ndcg = recall_at_k.ndcg_at_k(["C", "B", "A"], relevance, k=3)
+        self.assertLess(reversed_ndcg, 1.0)
+        self.assertGreater(reversed_ndcg, 0.0)
+
+    def test_ndcg_at_k_rejects_empty_relevance(self):
+        with self.assertRaisesRegex(ValueError, "relevance"):
+            recall_at_k.ndcg_at_k(["A"], {}, k=1)
+
+    def test_question_relevance_falls_back_to_binary_reference_ids(self):
+        question = {"reference_chunk_ids": ["A", "B"]}
+        self.assertEqual(recall_at_k.question_relevance(question), {"A": 1, "B": 1})
+
+    def test_question_relevance_prefers_graded_relevance(self):
+        question = {
+            "reference_chunk_ids": ["A"],
+            "graded_relevance": {"A": 3, "B": 1},
+        }
+        self.assertEqual(recall_at_k.question_relevance(question), {"A": 3, "B": 1})
+
     def test_evaluate_averages_recall_across_questions_per_method(self):
         questions = [
             {"question": "q1", "reference_chunk_ids": ["A"]},
@@ -83,9 +107,12 @@ class RecallAtKTest(unittest.TestCase):
                 rank_constant=60,
             )
 
-        self.assertEqual(scores["keyword"][1], 0.5)
-        self.assertEqual(scores["vector"][1], 0.0)
-        self.assertEqual(scores["hybrid"][1], 0.5)
+        self.assertEqual(scores["keyword"][1]["recall"], 0.5)
+        self.assertEqual(scores["keyword"][1]["ndcg"], 0.5)
+        self.assertEqual(scores["vector"][1]["recall"], 0.0)
+        self.assertEqual(scores["vector"][1]["ndcg"], 0.0)
+        self.assertEqual(scores["hybrid"][1]["recall"], 0.5)
+        self.assertEqual(scores["hybrid"][1]["ndcg"], 0.5)
 
 
 if __name__ == "__main__":

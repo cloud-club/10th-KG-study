@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sys
 import urllib.error
@@ -18,7 +17,7 @@ import psycopg
 SRC_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SRC_DIR))
 
-from common import LAB_ROOT
+from common import read_local_setting
 from retrieval.hybrid.search import hybrid_search
 
 
@@ -31,29 +30,6 @@ INSTRUCTIONS = f"""당신은 개인 Notion 메모에 근거해 답하는 한국�
 근거가 부족하면 추측하지 말고 '{NO_EVIDENCE}'라고 답하세요.
 메모는 과거 기록일 수 있으므로 현재 서비스 상태를 확인한 것처럼 단정하지 마세요.
 답변은 간결하고 명료하게 작성하세요."""
-
-
-def read_local_setting(name: str, default: str = "") -> str:
-    """쉘 환경변수를 우선하고, 없으면 이 랩의 .env에서 읽는다."""
-    if os.environ.get(name):
-        return os.environ[name]
-
-    path = LAB_ROOT / ".env"
-    if not path.exists():
-        return default
-    for raw_line in path.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#"):
-            continue
-        if line.startswith("export "):
-            line = line.removeprefix("export ").strip()
-        key, separator, value = line.partition("=")
-        if separator and key.strip() == name:
-            value = value.strip()
-            if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
-                value = value[1:-1]
-            return value or default
-    return default
 
 
 def build_context(results: list[dict]) -> str:

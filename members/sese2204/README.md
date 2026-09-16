@@ -20,6 +20,9 @@
 | 05 | [리랭커](notes/05-reranker.md) | 완료 |
 | 06 | [쿼리 재작성](notes/06-query-rewriting.md) | 완료 |
 | 07 | [RAG 평가와 실습 로드맵](notes/07-rag-evaluation.md) | 완료 |
+| 08 | [LLM 위키 — 검색 대신 컴파일하는 지식 베이스](notes/08-llm-wiki.md) | 완료 |
+| 09 | [챗봇 평가 기준 — 층위·기준·심판](notes/09-chatbot-evaluation.md) | 완료 |
+| 10 | [RAGAS — 방법론, 지표, 정답셋 유형](notes/10-ragas.md) | 완료 |
 
 ### labs
 

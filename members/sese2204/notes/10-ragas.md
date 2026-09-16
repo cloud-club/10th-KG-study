@@ -207,6 +207,34 @@ multi_responses, persona_name, query_style, query_length   (합성 테스트셋 
 
 **우리 실습과의 연결**: 카톡·노션 코퍼스로 KG를 만들면 그 자체가 골든셋 생성기가 된다. 특히 multi-hop 질문은 3주차 멀티홉 RAG 실습(bridge entity)의 정답셋을 자동으로 준다. 0.1 시절의 evolution 타입(simple / reasoning / multi_context / conditional)은 0.2에서 제거됐으니 구버전 자료에서만 볼 것.
 
+#### 4-1. 질문셋 유형 설계표
+
+RAGAS의 시나리오는 (노드, 질문 길이, 질문 스타일, 페르소나)의 조합이다. 여기에 RAGAS 밖의 축(답 가능 여부, 턴 구조)을 합치면 골든셋을 설계할 때 쓸 축이 여섯 개 나온다.
+
+| 축 | 값 | 어디서 온 개념 | 무엇을 재나 |
+|---|---|---|---|
+| **hop 수** | single-hop / multi-hop | RAGAS 합성기 | 청크 하나로 답하나, 엔티티로 이어진 여러 청크를 합쳐야 하나(정보 통합) |
+| **추상도** | specific / abstract | RAGAS 합성기 (`MultiHopAbstract`) | 특정 사실 질문 vs 여러 청크의 주제를 아우르는 질문 |
+| **길이** | short / medium / long | RAGAS `QueryLength` | 짧은 키워드형부터 상황 설명이 긴 질문까지 |
+| **스타일** | perfect grammar / poor grammar / misspelled / web-search-like | RAGAS `QueryStyle` | 오타·비문·검색어투에 검색기가 얼마나 강건한가 |
+| **페르소나** | 자유 정의 (예: 신입, 운영자, 감사) | RAGAS `Persona` | 같은 청크라도 역할에 따라 다른 관점의 질문 |
+| **답 가능 여부** | answerable / unanswerable | RGB negative rejection, MTRAG | 코퍼스에 답이 없을 때 거부하는가. **RAGAS 합성기는 못 만든다** — 직접 넣어야 함 |
+| **턴 구조** | single-turn / multi-turn(standalone) / multi-turn(non-standalone) | MTRAG | "그럼 그건 언제야?" 같은 지시대명사 해소, 후반 턴 열화 |
+
+구버전 RAGAS(0.1)의 evolution 타입도 이 축으로 옮겨진다: `simple`=single-hop specific, `reasoning`=single-hop이되 추론 요구, `multi_context`=multi-hop specific, `conditional`=조건절이 붙은 질문(현재는 스타일·길이 축으로 흡수).
+
+**골든셋 200개 배분 예시(제안)**
+
+| 유형 | 비율 | 개수 | 비고 |
+|---|---|---|---|
+| single-hop specific | 40% | 80 | 검색·생성 기본선 |
+| multi-hop specific | 20% | 40 | 3주차 멀티홉 실습과 공유 |
+| multi-hop abstract | 10% | 20 | 요약형 답변 |
+| unanswerable | 15% | 30 | 거부율 측정. AnswerRelevancy 집계에서 제외 |
+| multi-turn non-standalone (3~5턴) | 15% | 30 | 쿼리 재작성 효과 측정 |
+
+스타일·길이·페르소나는 위 유형 안에서 섞는다(예: 각 유형의 20%는 오타·검색어투). 비율은 제품의 실제 질문 로그 분포에 맞추는 게 원칙이고, 로그가 없으면 위 표로 시작해 프로덕션 실패 사례를 채워 넣는다([09번 노트](09-chatbot-evaluation.md) 9절).
+
 ### 5. 심판 정렬(judge alignment)
 
 문서가 실증한 흐름:

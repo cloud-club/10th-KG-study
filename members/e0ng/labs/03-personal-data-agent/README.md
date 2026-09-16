@@ -345,6 +345,42 @@ python src/evaluation/recall_at_k.py --k 1 3 5 10 --json
     - 하이브리드(0.775)가 벡터(0.675)보다도 recall@1에서 10%p 높다
     - RRF 융합이 벡터가 놓친 걸 키워드가 잡아주는 보완 효과를 실제로 만들어내고 있다는 근거로 볼 수 있다
 
+### 체계적 재구축 — TREC pooling + LLM-as-a-Judge
+
+10문항 버전은 질문이 자연어 하나뿐이고, LLM이 전체 청크에서 후보를 직접 골라 특정 검색 방식에 유리하게 편향될 수 있었다. 아래 방법론으로 다시 만들었다.
+
+> Ref. [검색 평가용 Ground Truth 구축 정리](https://dmoritle.tistory.com/199) (dmoritle, 2026-03-25)
+
+| 개념 | 설명 |
+| --- | --- |
+| **TREC pooling** | 정답 후보를 한 검색 방식 결과로만 뽑으면 그 방식에 유리하게 편향된다. BM25·벡터·하이브리드 결과를 union해 후보 풀을 만들면 이 편향을 줄일 수 있다. |
+| **LLM-as-a-Judge** | 사람이 일일이 채점하는 대신 LLM이 (쿼리, 후보) 관련도를 0~3점으로 채점한다. |
+| **nDCG@K** | Recall@K는 "정답을 찾았는지"만 보고 순서는 안 본다. nDCG@K는 0~3점 등급을 반영해 **좋은 근거일수록 상위에 있을 때** 더 높은 점수를 준다 — 랭킹 품질까지 보는 지표다. |
+
+```
+1. 토픽(소스 폴더) 층화 샘플링으로 청크 12개 선정
+2. 청크마다 단일 키워드 / 복합 키워드 / 자연어 질문 3종 생성 → 질문 36개
+3. 질문마다 키워드·벡터·하이브리드 top-20을 union (TREC pooling)
+4. 후보 전체를 LLM이 0(무관)~3(완벽)점 채점 → 2점 이상만 정답 채택, 전체 등급은 nDCG에 사용
+```
+
+```bash
+python src/evaluation/build_ground_truth.py --per-group 4
+python src/evaluation/recall_at_k.py --questions data/evaluation/questions_pooled.jsonl --k 1 3 5 10
+```
+
+| 방식 | recall@1 | ndcg@1 | recall@3 | ndcg@3 | recall@5 | ndcg@5 | recall@10 | ndcg@10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 키워드(BM25) | 0.345 | 0.852 | 0.594 | 0.823 | 0.727 | 0.815 | 0.842 | 0.824 |
+| 벡터 | 0.332 | 0.866 | 0.681 | 0.876 | 0.787 | 0.853 | 0.877 | 0.853 |
+| 하이브리드 | 0.357 | 0.926 | 0.673 | 0.904 | 0.757 | 0.879 | 0.888 | 0.878 |
+
+#### 확인 (36문항 기준)
+
+- **recall이 낮아진 건 평가가 더 엄격해졌기 때문** — 질문당 정답이 최대 17개까지 나와서(예전은 1~4개), top-1로 전부 잡기가 구조적으로 더 어려움
+- **쿼리 타입을 섞으니 키워드-벡터 격차가 거의 사라짐** — recall@1 키워드 0.345 vs 벡터 0.332로 거의 동률. 예전엔 자연어 질문뿐이라 벡터가 유리했던 것으로 보임. 타입별(단일/복합/자연어, 타입당 12문항)로는 우위가 안 갈려서 표본을 늘려 재검증 필요
+- **하이브리드는 recall보다 nDCG에서 강함** — recall은 벡터가 k=3/5/10에서 더 높지만, ndcg@1(0.926)·ndcg@3(0.904)은 하이브리드가 최고. "많이 찾기"보다 "가장 좋은 근거를 위로 두기"에 강하다는 뜻으로, 상위 몇 개만 근거로 쓰는 챗봇 구조엔 이쪽이 더 중요
+
 ---
 
 ## 사례 01) 근거는 존재하지만 검색이 못 찾은 경우
@@ -430,6 +466,8 @@ Recall@5 비교
 
 다음에는 구조가 느슨한(단계가 명확하지 않은) 노션 페이지로 같은 실험을 반복해서, 현재 RAG 구성이 어디까지 버티고 어디서 무너지는지 확인할 필요가 있다.
 
+TREC pooling으로 재구축한 36문항에서는 쿼리 타입(단일/복합 키워드, 자연어)별 키워드-벡터 우위가 깔끔하게 갈리지 않았다. 타입당 표본이 12개뿐이라 노이즈일 가능성이 크므로, `--per-group`을 늘려 타입별 표본을 키운 뒤 다시 확인할 필요가 있다.
+
 ## 구조
 
 ```text
@@ -443,7 +481,9 @@ personal-data-agent/
 ├── data/
 │   ├── raw/notion_data/               # Notion export, Git 제외
 │   ├── processed/documents.jsonl      # 생성 결과, Git 제외
-│   └── evaluation/questions.jsonl     # Recall@K Ground Truth 질문
+│   └── evaluation/
+│       ├── questions.jsonl            # 초기 10문항 Ground Truth
+│       └── questions_pooled.jsonl     # TREC pooling + LLM judge 36문항
 ├── infra/
 │   ├── elasticsearch/Dockerfile       # Elasticsearch + Nori
 │   └── postgres/schema.sql            # document_chunks + HNSW
@@ -460,7 +500,8 @@ personal-data-agent/
 │   │   └── hybrid/
 │   │       └── search.py
 │   ├── evaluation/
-│   │   └── recall_at_k.py
+│   │   ├── recall_at_k.py
+│   │   └── build_ground_truth.py
 │   └── rag/
 │       └── chat.py
 └── tests/
@@ -468,7 +509,8 @@ personal-data-agent/
     ├── test_keyword_retrieval.py
     ├── test_vector_retrieval.py
     ├── test_hybrid_retrieval.py
-    └── test_recall_evaluation.py
+    ├── test_recall_evaluation.py
+    └── test_build_ground_truth.py
 ```
 
 ## 현재 결과
@@ -478,8 +520,8 @@ personal-data-agent/
 - Elasticsearch `personal-documents`: 111개
 - PostgreSQL `document_chunks`: 111개
 - BM25·벡터 RRF 하이브리드 검색 확인
-- 자동 테스트: 14개 통과
-- Recall@K 비교 결과는 위 "6. recall@k" 참고
+- 자동 테스트: 29개 통과
+- Recall@K·nDCG@K 비교 결과는 위 "6. recall@k" 참고 (10문항 초기 버전 + TREC pooling·LLM judge로 재구축한 36문항)
 
 ## 다음 할 일
 

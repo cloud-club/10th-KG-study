@@ -35,11 +35,12 @@ kakao-talk.txt
 
 ## 데이터와 개인정보
 
-카카오톡에서 내보낸 TXT는 `data/do-dop/`에 저장한다. 원본과 가공 결과는 개인정보를 포함할 수 있어 Git에 커밋하지 않는다.
+카카오톡에서 내보낸 TXT와 검색 결과는 `data/do-dop/kakaotalk-search/`에 모아 둔다. 원본과 가공 결과는 개인정보를 포함할 수 있어 Git에 커밋하지 않는다.
 
 ```text
-data/do-dop/
-├── kakao-talk.txt
+data/do-dop/kakaotalk-search/
+├── raw/
+│   └── kakao-talk.txt
 ├── processed/
 │   └── messages.jsonl
 └── results/
@@ -88,8 +89,8 @@ bash infra/check.sh
 
 ```bash
 python3 members/do-dop/labs/02-kakaotalk-search/src/parse_kakao.py \
-  --input data/do-dop/kakao-talk.txt \
-  --output data/do-dop/processed/messages.jsonl
+  --input data/do-dop/kakaotalk-search/raw/kakao-talk.txt \
+  --output data/do-dop/kakaotalk-search/processed/messages.jsonl
 ```
 
 ### 3. grep 검색
@@ -98,23 +99,23 @@ python3 members/do-dop/labs/02-kakaotalk-search/src/parse_kakao.py \
 
 ```bash
 bash members/do-dop/labs/02-kakaotalk-search/src/search_grep.sh \
-  data/do-dop/kakao-talk.txt '합주'
+  data/do-dop/kakaotalk-search/raw/kakao-talk.txt '합주'
 ```
 
 원문이 필요할 때만 `--show`를 붙인다.
 
 ```bash
 bash members/do-dop/labs/02-kakaotalk-search/src/search_grep.sh \
-  --show data/do-dop/kakao-talk.txt '합주'
+  --show data/do-dop/kakaotalk-search/raw/kakao-talk.txt '합주'
 ```
 
 `queries.tsv`의 모든 질의를 실행한다.
 
 ```bash
 bash members/do-dop/labs/02-kakaotalk-search/src/run_grep_queries.sh \
-  data/do-dop/kakao-talk.txt \
+  data/do-dop/kakaotalk-search/raw/kakao-talk.txt \
   members/do-dop/labs/02-kakaotalk-search/config/queries.tsv \
-  data/do-dop/results/grep-counts.tsv
+  data/do-dop/kakaotalk-search/results/grep-counts.tsv
 ```
 
 ### 4. Elasticsearch BM25 검색
@@ -125,7 +126,7 @@ bash members/do-dop/labs/02-kakaotalk-search/src/run_grep_queries.sh \
 cd members/do-dop/labs/02-kakaotalk-search/src
 
 python3 index_es.py \
-  --input ../../../../../data/do-dop/processed/messages.jsonl \
+  --input ../../../../../data/do-dop/kakaotalk-search/processed/messages.jsonl \
   --recreate
 ```
 
@@ -153,7 +154,7 @@ python3 analyze_tokens.py '다음 합주곡 정하자'
 ```bash
 python3 run_es_queries.py \
   --queries ../config/queries.tsv \
-  --output ../../../../../data/do-dop/results/bm25-counts.tsv
+  --output ../../../../../data/do-dop/kakaotalk-search/results/bm25-counts.tsv
 
 cd -
 ```
@@ -175,7 +176,7 @@ pip install -r requirements.txt
 
 ```bash
 python3 src/index_pgvector.py \
-  --input ../../../../data/do-dop/processed/messages.jsonl \
+  --input ../../../../data/do-dop/kakaotalk-search/processed/messages.jsonl \
   --recreate
 ```
 
@@ -198,7 +199,7 @@ python3 src/search_pgvector.py '우리 팀명 뭐였지?' --size 5 --show
 ```bash
 python3 src/run_pgvector_queries.py \
   --queries config/queries.tsv \
-  --output ../../../../data/do-dop/results/pgvector-scores.tsv
+  --output ../../../../data/do-dop/kakaotalk-search/results/pgvector-scores.tsv
 
 cd -
 ```

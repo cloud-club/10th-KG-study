@@ -1,0 +1,92 @@
+[
+  {
+    "id": "newsroom_001",
+    "title": "삼성전자, 2026년 2분기 실적 발표",
+    "date": "2026-07-30",
+    "source": "newsroom",
+    "company": ["삼성전자"],
+    "summary": "삼성전자는 AI 수요 강세에 대응해 HBM4 공급을 확대하고 HBM4E 샘플을 출하했다. 메모리와 파운드리 실적이 개선됐으며 연구개발 투자를 이어갔다.",
+    "url": "https://news.samsung.com/kr/%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90-2026%EB%85%84-2%EB%B6%84%EA%B8%B0-%EC%8B%A4%EC%A0%81-%EB%B0%9C%ED%91%9C"
+  },
+  {
+    "id": "newsroom_002",
+    "title": "삼성전자, GTC서 HBM4E 최초 공개…‘토털 솔루션’으로 엔비디아와 AI 동맹 고도화",
+    "date": "2026-03-17",
+    "source": "newsroom",
+    "company": ["삼성전자", "엔비디아"],
+    "summary": "삼성전자는 GTC에서 HBM4E 실물 칩과 코어 다이 웨이퍼를 공개했다. 메모리, 로직 설계, 파운드리, 첨단 패키징을 묶은 AI 메모리 공급 역량을 강조했다.",
+    "url": "https://news.samsung.com/kr/%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90-gtc%EC%84%9C-hbm4e-%EC%B5%9C%EC%B4%88-%EA%B3%B5%EA%B0%9C%ED%86%A0%ED%84%B8-%EC%86%94%EB%A3%A8%EC%85%98%EC%9C%BC%EB%A1%9C-%EC%97%94%EB%B9%84"
+  },
+  {
+    "id": "newsroom_003",
+    "title": "삼성전자·AMD, 차세대 AI 메모리 솔루션 협력 확대",
+    "date": "2026-03-18",
+    "source": "newsroom",
+    "company": ["삼성전자", "AMD"],
+    "summary": "삼성전자와 AMD는 차세대 AI 메모리와 컴퓨팅 기술 협력을 확대했다. 삼성전자의 HBM4, 파운드리, 패키징 기술로 AMD의 AI 가속기와 플랫폼을 지원할 계획이다.",
+    "url": "https://news.samsung.com/kr/%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90%C2%B7amd-%EC%B0%A8%EC%84%B8%EB%8C%80-ai-%EB%A9%94%EB%AA%A8%EB%A6%AC-%EC%86%94%EB%A3%A8%EC%85%98-%ED%98%91%EB%A0%A5-%ED%99%95%EB%8C%80"
+  },
+  {
+    "id": "newsroom_004",
+    "title": "삼성전자, 세계 최초 HBM4E 12단 샘플 출하",
+    "date": "2026-05-29",
+    "source": "newsroom",
+    "company": ["삼성전자"],
+    "summary": "삼성전자는 차세대 AI 가속기용 HBM4E 12단 샘플을 고객사에 공급했다. 제품 속도를 높이고 선제적인 생산 인프라 투자로 AI 메모리 시장 대응을 강화했다.",
+    "url": "https://news.samsung.com/kr/%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90-%EC%84%B8%EA%B3%84-%EC%B5%9C%EC%B4%88-hbm4e-12%EB%8B%A8-%EC%83%98%ED%94%8C-%EC%B6%9C%ED%95%98"
+  },
+  {
+    "id": "newsroom_005",
+    "title": "삼성전자, 엔비디아와 함께 ‘업계 최고 수준 반도체 AI 팩토리’ 구축",
+    "date": "2025-10-31",
+    "source": "newsroom",
+    "company": ["삼성전자", "엔비디아"],
+    "summary": "삼성전자는 엔비디아 GPU를 도입해 반도체 제조 데이터를 학습하고 판단하는 AI 팩토리를 구축한다. 디지털 트윈 제조 환경과 AI 기반 공정 혁신을 확대할 계획이다.",
+    "url": "https://news.samsung.com/kr/%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90-%EC%97%94%EB%B9%84%EB%94%94%EC%95%84%EC%99%80-%ED%95%A8%EA%BB%98-%EC%97%85%EA%B3%84-%EC%B5%9C%EA%B3%A0-%EC%88%98%EC%A4%80-%EB%B0%98%EB%8F%84%EC%B2%B4"
+  },
+  {
+    "id": "newsroom_006",
+    "title": "SK하이닉스, 2025년 2분기 경영실적 발표",
+    "date": "2025-07-24",
+    "source": "newsroom",
+    "company": ["SK하이닉스"],
+    "summary": "SK하이닉스는 AI 메모리 수요 증가와 HBM 판매 확대로 분기 최대 실적을 기록했다. HBM4 공급 준비와 고성능 서버 메모리 확대를 위한 선제 투자를 추진했다.",
+    "url": "https://news.skhynix.co.kr/2q-2025-business-results/"
+  },
+  {
+    "id": "newsroom_007",
+    "title": "SK하이닉스, 2025년 경영실적 발표…역대 최대 실적 달성",
+    "date": "2026-01-28",
+    "source": "newsroom",
+    "company": ["SK하이닉스"],
+    "summary": "SK하이닉스는 HBM과 서버 메모리 수요 증가로 연간 최대 실적을 기록했다. HBM3E와 HBM4 공급 능력, 커스텀 HBM 대응력을 강화할 계획이다.",
+    "url": "https://news.skhynix.co.kr/2025-business-results/"
+  },
+  {
+    "id": "newsroom_008",
+    "title": "SK하이닉스, 세계 최초 ‘HBM4’ 개발 완료하고 양산 체제 구축",
+    "date": "2025-09-12",
+    "source": "newsroom",
+    "company": ["SK하이닉스"],
+    "summary": "SK하이닉스는 AI용 메모리 HBM4 개발을 마치고 양산 체제를 구축했다. HBM3E보다 대역폭을 두 배로 높이고 전력 효율을 개선해 AI 인프라 수요에 대응한다.",
+    "url": "https://news.skhynix.co.kr/mass-production-hbm-4/"
+  },
+  {
+    "id": "newsroom_009",
+    "title": "SK하이닉스, AI 산업 중심지 미국에 AI 설루션 회사 설립 추진",
+    "date": "2026-01-28",
+    "source": "newsroom",
+    "company": ["SK하이닉스"],
+    "summary": "SK하이닉스는 미국에 AI 설루션 회사를 세워 AI 데이터센터 생태계 투자를 확대한다. HBM 경쟁력을 바탕으로 AI 기업과 전략적 투자 및 협업을 추진한다.",
+    "url": "https://news.skhynix.co.kr/launch-of-ai-company/"
+  },
+  {
+    "id": "newsroom_010",
+    "title": "SK하이닉스, 충청권 투자 계획 발표",
+    "date": "2026-07-02",
+    "source": "newsroom",
+    "company": ["SK하이닉스"],
+    "summary": "SK하이닉스는 청주에 낸드 생산 시설과 첨단 패키징 시설을 구축하는 투자 계획을 발표했다. 충청권을 AI 반도체 생산과 패키징의 핵심 거점으로 육성한다.",
+    "url": "https://news.skhynix.co.kr/fact-07/"
+  }
+]

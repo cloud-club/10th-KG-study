@@ -33,6 +33,8 @@ build/
 *.log
 
 # Data / artifacts
+/data/*
+!/data/README.md
 data/raw/
 *.parquet
 *.db

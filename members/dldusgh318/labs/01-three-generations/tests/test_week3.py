@@ -1,11 +1,12 @@
 import sys
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from agent import NOT_FOUND, answer_from_chunks, assemble_context, verify_citations
-from evaluate import _recall
+from evaluate import _evaluation_queries, _recall, build_pool, render_pool, make_pool
 from hybrid_search import reciprocal_rank_fusion
 
 
@@ -67,6 +68,52 @@ class CitationTest(unittest.TestCase):
 class EvaluationTest(unittest.TestCase):
     def test_recall_uses_all_gold_chunks_as_denominator(self):
         self.assertEqual(_recall(["a", "x", "b"], {"a", "b", "c", "d"}, 3), 0.5)
+
+    def test_shared_complete_group_becomes_each_query_gold(self):
+        qrels = {
+            "version": 2,
+            "queries": [
+                {"id": "R07", "query": "canonical", "judgment_group": "pair"},
+                {"id": "R08", "query": "variant", "judgment_group": "pair"},
+                {"id": "R99", "query": "pending", "judgment_group": "pending"},
+            ],
+            "judgment_groups": {
+                "pair": {"status": "complete", "judgments": [
+                    {"id": "a", "label": "relevant"}, {"id": "b", "label": "irrelevant"},
+                ]},
+                "pending": {"status": "unlabeled", "judgments": []},
+            },
+        }
+        complete, skipped = _evaluation_queries(qrels, {"a", "b"})
+        self.assertEqual([q["id"] for q in complete], ["R07", "R08"])
+        self.assertEqual([q["gold"] for q in complete], [{"a"}, {"a"}])
+        self.assertEqual(skipped, ["R99"])
+
+    def test_pair_pool_unites_candidates_and_preserves_per_query_ranks(self):
+        questions = [dict(id=q, query=q, gold_group="pair", labeling_rule="same") for q in ("R07", "R08")]
+        corpus = {key: hit(key, 1) for key in "abc"}
+        with patch('evaluate.search_bm25', side_effect=[[hit('a', 1)], [hit('c', 1)]]), patch('evaluate.search_vector', side_effect=[[hit('b', 1)], [hit('b', 1)]]):
+            pools, groups = build_pool(questions, corpus)
+        self.assertEqual([len(p['candidates']) for p in pools], [2, 2])
+        self.assertEqual([r['id'] for r in groups['pair']['candidates']], ['a', 'b', 'c'])
+        a = groups['pair']['candidates'][0]
+        self.assertEqual(a['ranks']['R07']['bm25'], 1)
+        self.assertNotIn('R08', a['ranks'])
+        self.assertIn('미판정', render_pool(questions, groups))
+
+    def test_pool_refuses_stale_database_text(self):
+        q = dict(id='R01', query='q', labeling_rule='rule')
+        with patch('evaluate.search_bm25', return_value=[hit('a', 1, 'stale')]), patch('evaluate.search_vector', return_value=[]):
+            with self.assertRaises(ValueError):
+                build_pool([q], {'a': hit('a', 1, 'current')})
+
+    def test_existing_labels_are_not_overwritten(self):
+        q = dict(id='R01', query='q', status='ready')
+        with patch('evaluate.load_questions', return_value=[q]), patch('evaluate.POOL_FILE') as path, patch('evaluate.search_bm25') as search:
+            path.exists.return_value = True
+            with self.assertRaises(SystemExit):
+                make_pool()
+            search.assert_not_called()
 
 
 if __name__ == "__main__":

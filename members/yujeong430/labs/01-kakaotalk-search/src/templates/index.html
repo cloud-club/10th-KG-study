@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>카카오톡 공지 에이전트</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='web_app.css') }}">
+</head>
+<body>
+  <main class="page">
+    <header>
+      <p class="eyebrow">HYBRID RAG · BM25 + VECTOR + RRF</p>
+      <h1>카카오톡 공지 에이전트</h1>
+      <p class="intro">질문을 입력하면 하이브리드 검색으로 근거를 찾고, 그 근거 안에서만 답변합니다.</p>
+    </header>
+
+    <section class="question-panel" aria-label="질문 입력">
+      <form method="post">
+        <label for="question">질문</label>
+        <div class="input-row">
+          <input id="question" name="question" value="{{ question }}" placeholder="예: 학기 재수강 신청 기간과 방법을 알려줘" autofocus>
+          <button type="submit">질문하기</button>
+        </div>
+      </form>
+      <div class="examples" aria-label="예시 질문">
+        <button type="button" data-question="학기 재수강 신청 기간과 방법을 알려줘">학기 재수강 신청 기간과 방법</button>
+        <button type="button" data-question="2학기부터 공결은 종이 대신 어디에서 신청해?">2학기 공결 신청</button>
+        <button type="button" data-question="졸업생 학위복은 어디에서 빌려?">학위복 대여 장소</button>
+      </div>
+    </section>
+
+    {% if error %}
+      <section class="notice error" role="alert">{{ error }}</section>
+    {% endif %}
+
+    {% if answer %}
+      <section class="answer-panel" aria-label="답변">
+        <div class="section-title"><span>답변</span><span class="badge">근거 기반</span></div>
+        <div class="answer-text">{{ answer_html | safe }}</div>
+      </section>
+
+      <section class="sources" aria-label="검색 근거">
+        <div class="section-title">
+          <span>검색 근거</span>
+          <span class="count">상위 {{ results|length }}개</span>
+        </div>
+        <p class="source-help">답변의 <span class="citation">[kakao-xxxxx]</span>를 누르면 해당 원문으로 이동합니다.</p>
+        {% for item in results %}
+          <article class="source-card" id="source-{{ item.id }}">
+            <div class="source-meta">
+              <span class="rank">{{ loop.index }}</span>
+              <code>{{ item.id }}</code>
+              <time>{{ item.date }}</time>
+              {% if item.origins %}<span class="origin">{{ item.origins | join(', ') }}</span>{% endif %}
+            </div>
+            <p>{{ item.content }}</p>
+          </article>
+        {% endfor %}
+      </section>
+    {% endif %}
+  </main>
+  <script>
+    document.querySelectorAll('[data-question]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.getElementById('question').value = button.dataset.question;
+        document.getElementById('question').focus();
+      });
+    });
+  </script>
+</body>
+</html>

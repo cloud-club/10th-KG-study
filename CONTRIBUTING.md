@@ -57,7 +57,7 @@ status: in-progress           # in-progress | done
 
 ### notes
 
-- 파일 하나가 주제 하나입니다.
+- 파일 하나가 주제 하나입니다. 폴더 이름은 `notes/` 입니다 (`note/` 로 만들어도 읽히지만 표준은 복수형).
 - `NN-kebab-case-topic.md` 형식으로 번호를 붙여 순서를 유지합니다.
   - 예: `01-data-model.md`, `02-storage-and-search.md`
 - `templates/note-template.md`를 복사해서 시작합니다.

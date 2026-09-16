@@ -411,7 +411,8 @@
   }
 
   async function load() {
-    const res = await fetch('./data.json', { cache: 'no-store' });
+    // GitHub Pages CDN 이 10분 캐시하므로 매번 다른 URL 로 요청해 항상 최신 빌드를 받는다
+    const res = await fetch(`./data.json?t=${Date.now()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`data.json 을 불러오지 못했어요 (${res.status})`);
     return res.json();
   }

@@ -153,9 +153,9 @@ def study_files(files: list[str]) -> list[str]:
 def classify_commit(files: list[str]) -> str:
     kinds = set()
     for f in files:
-        if re.match(r"^members/[^/]+/labs/", f):
+        if re.match(r"^members/[^/]+/labs?/", f):
             kinds.add("lab")
-        elif re.match(r"^members/[^/]+/notes/", f):
+        elif re.match(r"^members/[^/]+/notes?/", f):
             kinds.add("note")
         elif re.match(rf"^members/[^/]+/{re.escape(READINGS_FILE)}$", f):
             kinds.add("reading")
@@ -463,11 +463,23 @@ def member_dirs() -> list[Path]:
             if d.is_dir() and not d.name.startswith(".") and d.name not in SKIP_DIRS]
 
 
+def content_dir(member_dir: Path, candidates: tuple[str, ...]) -> Path:
+    """notes/ 가 표준이지만 note/ 처럼 단수로 만든 폴더도 읽는다. 있는 첫 후보, 없으면 첫 후보 경로."""
+    for name in candidates:
+        if (member_dir / name).is_dir():
+            return member_dir / name
+    return member_dir / candidates[0]
+
+
+NOTES_DIR_NAMES = ("notes", "note")
+LABS_DIR_NAMES = ("labs", "lab")
+
+
 def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict], names: dict[str, str] | None = None) -> dict:
     member_id = member_dir.name
     readme = member_dir / "README.md"
     meta, body = parse_frontmatter(read_text(readme)) if readme.exists() else ({}, "")
-    notes_dir, labs_dir = member_dir / "notes", member_dir / "labs"
+    notes_dir, labs_dir = content_dir(member_dir, NOTES_DIR_NAMES), content_dir(member_dir, LABS_DIR_NAMES)
 
     notes = sorted((parse_note(p, member_id, repo) for p in notes_dir.glob("*.md")) if notes_dir.exists() else [],
                    key=lambda n: n["file"])

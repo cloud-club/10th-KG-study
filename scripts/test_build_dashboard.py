@@ -482,3 +482,19 @@ class NameTests(unittest.TestCase):
         with mock.patch.object(bd, "sum_numstat", return_value=None), mock.patch.object(bd, "group_diff_excerpt", return_value=""):
             event = bd.commit_event([{**commit, "member": "ghost"}], {"kim": member}, {"url": "https://github.com/x/y"})
         self.assertEqual(event["name"], "ghost")  # 폴더 없는 작성자는 아이디 그대로
+
+
+class FolderNameTests(unittest.TestCase):
+    def test_classify_commit_accepts_singular_folders(self):
+        self.assertEqual(bd.classify_commit(["members/kim/note/01.md"]), "note")
+        self.assertEqual(bd.classify_commit(["members/kim/lab/01-x/README.md"]), "lab")
+
+    def test_content_dir_prefers_plural_then_singular(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.assertEqual(bd.content_dir(root, bd.NOTES_DIR_NAMES), root / "notes")  # 없으면 표준 경로
+            (root / "note").mkdir()
+            self.assertEqual(bd.content_dir(root, bd.NOTES_DIR_NAMES), root / "note")
+            (root / "notes").mkdir()
+            self.assertEqual(bd.content_dir(root, bd.NOTES_DIR_NAMES), root / "notes")

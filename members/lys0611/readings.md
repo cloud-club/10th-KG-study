@@ -31,7 +31,13 @@
 - [Postgres 18 Docker Silently Ignores Your Named Volume (RD Blog)](https://rdiachenko.com/posts/databases/postgresql/postgres-18-docker-silently-ignores-your-named-volume/) — 실습 트러블슈팅. PG18 이미지부터 PGDATA가 `/var/lib/postgresql/18/docker`로 바뀌어 볼륨을 `/var/lib/postgresql`에 마운트해야 함
 - [Elasticsearch — Bootstrap checks](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/bootstrap-checks) — 실습 트러블슈팅. `discovery.type=single-node`면 부트스트랩 체크를 피하므로 Colima 기본 VM에서도 기동됨
 
-## 3주차 · 하이브리드 검색 (미리 볼 것)
+## 3주차 · 하이브리드 검색 + 개인 데이터 에이전트
 
-- [Cormack, Clarke & Buettcher, Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods (SIGIR 2009)](https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf) — RRF 원 논문. 점수 대신 순위를 합치는 이유(1/(k+rank), k=60). 실습 "BM25 ∩ 벡터 = 1개"의 다음 단계
-- [Elasticsearch — RRF retriever](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/retrievers/rrf-retriever) — ES 안에서 BM25와 kNN을 RRF로 합치는 내장 기능. 직접 구현과 비교용
+- [Cormack, Clarke & Büttcher, Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods (SIGIR 2009)](http://cormack.uwaterloo.ca/cormacksigir09-rrf.pdf) — RRF 원 논문. `Σ 1/(k+r)`, k=60은 pilot에서 고정한 값이고 "outlier 시스템의 높은 순위 영향을 완화"하는 상수. TREC 데이터에서 Condorcet Fuse·CombMNZ와 같거나 나았다. 노트 04
+- [Elasticsearch — Reciprocal rank fusion](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion) — `rank_constant` 기본 60, `rank_window_size`는 `size`가 기본이며 키우면 관련성↑ 성능↓. 임베딩이 pgvector에만 있어 실습에서는 쓰지 못했고, 애플리케이션 RRF의 대조군
+- [Elasticsearch — Ranking evaluation API](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/search-rank-eval) — P@k, R@k, MRR, DCG, ERR 정의. "R@10 = 0.5는 관련 8개 중 4개가 top-10에" — 실습 Recall@k 정의의 출처
+- [pgvector README — Iterative index scans](https://github.com/pgvector/pgvector#iterative-index-scans) — 0.8.0부터. 필터가 인덱스 스캔 뒤에 적용돼 `ef_search=40`·10% 조건이면 평균 4행만 남는 문제와 `strict_order`/`relaxed_order`, `hnsw.max_scan_tuples`(기본 20,000). 방 필터 벡터 검색에 적용
+- [Lewis et al., Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (NeurIPS 2020)](https://arxiv.org/abs/2005.11401) — RAG 원 논문. 파라메트릭(가중치) + 비파라메트릭(위키 밀집 인덱스) 기억, RAG-Sequence vs RAG-Token. 노트 05
+- [Gao et al., Enabling Large Language Models to Generate Text with Citations — ALCE (EMNLP 2023)](https://aclanthology.org/2023.emnlp-main.398/) — 유창성·정확성·인용 품질(recall/precision)을 분리해 평가. ELI5에서 최고 모델도 절반은 완전한 인용 지지가 없음 → 인용 검증을 코드와 사람 판정으로 나눈 이유
+- [Tang & Yang, MultiHop-RAG (2024)](https://arxiv.org/abs/2401.15391) — 다중 홉 질의 벤치마크. 여러 임베딩·GPT-4·PaLM·Llama2-70B 모두 "검색과 답변에서 만족스럽지 않음". W3 "못 답하는 질문 목록"의 근거이자 W4로 넘기는 동기
+- [OWASP — RAG Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/RAG_Security_Cheat_Sheet.html) — 검색 문서를 통한 간접 프롬프트 인젝션. "검색된 내용은 데이터이지 명령이 아니다", 구분자·지시 재강조·3~5청크 제한·출력 검증. 시스템 프롬프트 규칙 1과 읽기 전용 설계의 근거

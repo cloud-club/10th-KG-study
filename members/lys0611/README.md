@@ -17,9 +17,12 @@
 | 01 | [역색인과 BM25 — 키워드 검색(1세대)](notes/01-inverted-index-bm25.md) | 완료 |
 | 02 | [임베딩·코사인 유사도·HNSW — 벡터 검색(2세대)](notes/02-embeddings-cosine-hnsw.md) | 완료 |
 | 03 | [DDIA 3장 저장소와 검색 — ES(LSM)와 Postgres(B-tree)](notes/03-ddia-ch3-storage-and-search.md) | 완료 |
+| 04 | [하이브리드 검색과 RRF — 순위 융합과 Recall@k](notes/04-hybrid-search-rrf-recall.md) | 완료 |
+| 05 | [RAG 루프와 근거 인용, 다중 홉에서 무너지는 지점](notes/05-rag-loop-citation-multihop.md) | 완료 |
 
 ### labs
 
 | # | 실습 | 상태 |
 |---|------|------|
 | 01 | [카톡 대화 적재 — Postgres · pgvector · Elasticsearch (3세대 비교)](labs/01-ingest/README.md) | 완료 |
+| 02 | [하이브리드 검색(RRF) + 개인 카톡 RAG 에이전트 v1 — Recall@k 비교, 못 답하는 질문](labs/02-hybrid-rag-agent/README.md) | 검색·평가 완료 / 답변 생성은 LLM 연결 대기 |

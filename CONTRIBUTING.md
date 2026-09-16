@@ -5,6 +5,8 @@
 - 개인 작업은 반드시 `members/<github-id>/` 아래에만 둡니다.
 - 다른 사람 폴더는 수정하지 않습니다. 피드백은 PR 코멘트나 이슈로 남깁니다.
 - 여러 사람이 같이 쓰는 코드는 `shared/` 아래에 둡니다.
+- `wiki/`는 LLM 에이전트가 `members/`를 읽어 유지하는 스터디 위키입니다. **직접 편집하지 않습니다.**
+  틀린 내용은 자기 노트를 고쳐 PR 로 올리면 다음 ingest 때 반영됩니다. 규칙은 루트 [CLAUDE.md](CLAUDE.md).
 
 ## 멤버 폴더 만들기
 
@@ -88,6 +90,13 @@ status: in-progress           # in-progress | done
 
 - 받아온 데이터는 루트 `data/<github-id>/` 아래에 둡니다. `data/` 는 git 이 무시하고, 도커 컨테이너(postgres `/data`, neo4j import 폴더)에 마운트되어 바로 읽을 수 있습니다. → [data/README.md](data/README.md)
 - 실습에 DB 가 필요하면 `docker compose up -d` 로 공용 인프라를 씁니다. → [infra/README.md](infra/README.md)
+
+## 위키 ingest
+
+- 노트·실습 PR 이 머지되면 스터디장이 Claude Code 로 `wiki/`에 반영합니다("PR #n ingest 해줘").
+  위키 변경도 `main` 직접 푸시가 아니라 PR 로 올립니다.
+- 노트 맨 위 프론트매터(`title`·`date`·`tags`·`status`)가 있으면 위키가 출처·주차·태그를 정확히 잡습니다.
+- 개인 대화 원문(카카오톡·노션 내용)은 노트에도 위키에도 싣지 않습니다. 통계(건수·기간)만 적습니다.
 
 ## 커밋하면 안 되는 것
 

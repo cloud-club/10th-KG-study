@@ -46,8 +46,8 @@ READINGS_FILE = "readings.md"      # members/<id>/readings.md — 주차별 읽�
 SKIP_DIRS = {"<github-id>", "_template"}
 NAMES_PATH = MEMBERS_DIR / "names.json"       # {"github-id": "이름"} — 현황판에 아이디 대신 이름을 보여준다
 COHORTS_PATH = MEMBERS_DIR / "cohorts.json"   # 반별 명단 {"A": [id, ...]}. 명단에 없는 멤버는 마지막 반 다음 반(열린 반)으로
-INFRA_PREFIXES = ("dashboard/", "scripts/", ".github/", "templates/", ".cache/")
-INFRA_FILES = {"README.md", "CONTRIBUTING.md", ".gitignore", "members/cohorts.json", "members/names.json"}
+INFRA_PREFIXES = ("dashboard/", "scripts/", ".github/", "templates/", ".cache/", "wiki/", ".claude/")
+INFRA_FILES = {"README.md", "CONTRIBUTING.md", "CLAUDE.md", ".gitignore", "members/cohorts.json", "members/names.json"}
 BINARY_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".pdf", ".zip", ".lock", ".ipynb", ".parquet", ".db"}
 PLACEHOLDERS = {
     "NN. 주제",

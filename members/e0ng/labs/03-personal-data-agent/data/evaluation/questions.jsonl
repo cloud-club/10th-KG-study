@@ -1,0 +1,10 @@
+{"id":"q01","question":"공간 스캔 업로드를 시작할 때 어떤 API를 호출하고 무엇을 발급받아?","reference_chunk_ids":["f31c35648a818869c858"],"context_chunk_ids":[]}
+{"id":"q02","question":"로그인하지 않고 공간 스캔 업로드를 시작하면 공간은 어떻게 저장돼?","reference_chunk_ids":["cf9ad9d77779dd30afdd"],"context_chunk_ids":[]}
+{"id":"q03","question":"공간 파일 업로드를 완료한 뒤 처리 파이프라인은 어떻게 시작해?","reference_chunk_ids":["575dc54016d0a81742fa","f0cf7aebae72ac7458c7"],"context_chunk_ids":["7a92b0d20262421a9328"]}
+{"id":"q04","question":"메모에 기록된 업로드 완료 후 파이프라인 흐름에서는 클라이언트가 공간 최적화 API를 별도로 호출해야 해?","reference_chunk_ids":["50e3b89e09983b42cf06"],"context_chunk_ids":[],"note":"과거 구조의 미사용 API를 설명한 메모 기준이다. 현재 서비스 상태를 검증한 답으로 취급하지 않는다."}
+{"id":"q05","question":"업로드한 내 가구 USDC 파일은 어떻게 GLB가 되고 언제 사용할 수 있어?","reference_chunk_ids":["cac5395bb85a0defac3c","cb16217acd727fc08f7b","7d75e1e517e2c594848a","0542e7e82d49924f90cf"],"context_chunk_ids":[]}
+{"id":"q06","question":"가구 GLB를 iOS용 USDZ로 바꿀 때 서버는 무엇을 해?","reference_chunk_ids":["5bbc7ff55860a9947339"],"context_chunk_ids":[]}
+{"id":"q07","question":"버전 관리가 켜진 S3에서 단순 삭제와 완전 삭제는 뭐가 달라?","reference_chunk_ids":["9fa241e920038b49baa1","8e7263ad9d922b2df791"],"context_chunk_ids":["f9fdcebe9f71b8b63242"]}
+{"id":"q08","question":"refresh token으로 access token을 재발급받으려면 어떤 API를 써?","reference_chunk_ids":["5d5fd322b124999d70e4"],"context_chunk_ids":["dac3469a4579e00baa6e"]}
+{"id":"q09","question":"원본 스캔 에셋과 최적화된 에셋은 각각 어느 API에서 조회해?","reference_chunk_ids":["3a4331a00b17ff86c8c7","e1726f80cd2b336fb9ff"],"context_chunk_ids":[]}
+{"id":"q10","question":"RDS 배포용 IAM 정책에 RDS와 Secrets Manager 권한이 왜 필요해?","reference_chunk_ids":["ec3303c578f8472c8cff"],"context_chunk_ids":["55caac47e950cf353f4e"]}

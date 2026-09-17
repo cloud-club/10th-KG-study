@@ -88,5 +88,41 @@
     "company": ["SK하이닉스"],
     "summary": "SK하이닉스는 청주에 낸드 생산 시설과 첨단 패키징 시설을 구축하는 투자 계획을 발표했다. 충청권을 AI 반도체 생산과 패키징의 핵심 거점으로 육성한다.",
     "url": "https://news.skhynix.co.kr/fact-07/"
+  },
+  {
+    "id": "newsroom_011",
+    "title": "삼성전자, 가전 테크세미나 개최…지역 맞춤형 AI 가전 선봬",
+    "date": "2026-09-17",
+    "source": "newsroom",
+    "company": ["삼성전자"],
+    "summary": "삼성전자는 인도 구루그람에서 가전 테크세미나를 열고 현지 기후·문화에 맞춘 에어컨, 냉장고 등 AI 가전과 스마트싱스 기반 서비스를 소개했다. HBM·반도체와 무관한 소비자 가전 사업 소식이다.",
+    "url": "https://news.samsung.com/kr/%ec%82%bc%ec%84%b1%ec%a0%84%ec%9e%90-%ea%b0%80%ec%a0%84-%ed%85%8c%ed%81%ac%ec%84%b8%eb%af%b8%eb%82%98-%ea%b0%9c%ec%b5%9c%ec%a7%80%ec%97%ad-%eb%a7%9e%ec%b6%a4%ed%98%95-ai-%ea%b0%80%ec%a0%84"
+  },
+  {
+    "id": "newsroom_012",
+    "title": "삼성전자, 필리핀 복합단지 개발사업에 통합 운영 솔루션 공급 협력",
+    "date": "2026-09-17",
+    "source": "newsroom",
+    "company": ["삼성전자", "DH플러스"],
+    "summary": "삼성전자는 필리핀 부동산 개발사 DH플러스와 협약을 맺고 '그란츠 포레스트 파크' 복합단지에 AI 가전과 B2B 통합 운영 솔루션(스마트싱스 프로, b.IoT)을 공급한다. 반도체가 아닌 B2B 빌딩 솔루션 사업 소식이다.",
+    "url": "https://news.samsung.com/kr/%ec%82%bc%ec%84%b1%ec%a0%84%ec%9e%90-%ed%95%84%eb%a6%ac%ed%95%80-%eb%b3%b5%ed%95%a9%eb%8b%a8%ec%a7%80-%ea%b0%9c%eb%b0%9c%ec%82%ac%ec%97%85%ec%97%90-%ed%86%b5%ed%95%a9-%ec%9a%b4%ec%98%81-%ec%86%94"
+  },
+  {
+    "id": "newsroom_013",
+    "title": "SK하이닉스, 지난해 하루 용수 사용 17만 톤 절감…\"2030년까지 6억 톤 아낀다\"",
+    "date": "2026-09-10",
+    "source": "newsroom",
+    "company": ["SK하이닉스"],
+    "summary": "SK하이닉스는 국제물주간 행사에서 지난해 하루 평균 17만 톤의 용수를 절감했고 2030년까지 누적 6억 톤을 절감할 계획이라고 밝혔다. 이천·청주 사업장의 폐수 재이용 확대 등 ESG·수자원 관리 소식이다.",
+    "url": "https://news.skhynix.co.kr/korea-international-water-week-2026/"
+  },
+  {
+    "id": "newsroom_014",
+    "title": "SK하이닉스, 협력사 구성원·가족 3만 명 초청 'ThanksFULL Day' 연다",
+    "date": "2026-09-17",
+    "source": "newsroom",
+    "company": ["SK하이닉스"],
+    "summary": "SK하이닉스는 10월 15일 협력사 구성원과 가족 약 3만 명을 초청하는 상생 행사 'ThanksFULL Day'를 연다. 5년간 1.4조 원 상생 자금 지원, 추석 전 납품 대금 조기 지급 등 협력사 동반성장 관련 소식이다.",
+    "url": "https://news.skhynix.co.kr/2026-thanksfull-day/"
   }
 ]

@@ -102,7 +102,7 @@ pip3 install requests pandas elasticsearch anthropic --break-system-packages
         └── chunks.csv               # 청크 2,443개
 ```
 
-## 남은 과제 (다음 단계)
+## 아직 해야 할 부분
 
 - **pgvector (2세대 벡터 검색):** 임베딩 모델(`jhgan/ko-sroberta-multitask`, 768차원)로 청크를 벡터화해 의미 기반 검색 구현. (현재 `psycopg` 드라이버 이슈로 보류)
 - **하이브리드 검색:** BM25 + 벡터 결과를 RRF로 융합

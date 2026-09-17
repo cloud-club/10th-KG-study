@@ -7,7 +7,7 @@
 |---|---|---|
 | `session-rules.sh` | `SessionStart` | 핵심 규칙을 세션 시작 시 컨텍스트에 주입 |
 | `protect-raw.py` | `PreToolUse` (Edit·Write·MultiEdit·NotebookEdit) | `members/<다른 멤버>/` 편집 차단. 본인 폴더(`gh api user` 로그인, `.cache/gh-login`에 캐시)는 허용. 로그인을 알 수 없으면 경고만 하고 통과(fail-open) |
-| `check-bookkeeping.py` | `Stop` | 위키 페이지가 바뀌었는데 `wiki/log.md`가 안 바뀌었거나, 새 페이지가 생겼는데 `wiki/index.md`가 안 바뀌었으면 한 번 멈춤. `0-pending/`·`_templates/`·`_attachments/`는 면제 |
+| `check-bookkeeping.py` | `Stop` | 위키 페이지가 바뀌었는데 `wiki/log.md`가 안 바뀌었거나, 새 페이지가 생겼는데 `wiki/index.md`가 안 바뀌었으면 한 번 멈춤. `inbox/`·`_templates/`·`_attachments/`는 면제 |
 
 `protect-raw.py`는 dev-docs 개인 위키에는 없던 훅이다. 그 볼트에는 불변 `raw/` 층이 없었지만, 이
 저장소는 `members/`가 그 층이라 들여왔다. 본인 폴더 판별은 `KG_MEMBER_ID` 환경변수로도 고정할 수 있다.

@@ -34,7 +34,7 @@
 ├── wiki/                  # 스터디 위키 (LLM 이 members/ 를 읽어 주제별로 합성). 옵시디언 볼트
 │   ├── index.md           # 카탈로그 — 여기서부터 읽는다
 │   ├── log.md             # 활동 로그
-│   ├── 1-projects/ 2-areas/ 3-resources/ 4-archives/
+│   ├── concepts/ entities/ comparisons/ sources/ inbox/
 │   └── _templates/
 ├── dashboard/             # 현황판 정적 사이트 (GitHub Pages)
 ├── scripts/               # 현황판 데이터 빌드 스크립트
@@ -79,11 +79,11 @@ bash infra/check.sh       # 정상 기동 확인
 `members/`에 흩어진 노트·실습을 **주제별로 합성한** 위키입니다. LLM 에이전트(Claude Code 등)가 규칙
 [CLAUDE.md](CLAUDE.md)에 따라 쓰고 유지합니다. 사람은 읽고, 질문하고, 자기 노트를 고칩니다.
 
-- 시작점은 [wiki/index.md](wiki/index.md). 개념 페이지(`3-resources/`)마다 "멤버들이 확인한 것"에 누가
+- 시작점은 [wiki/index.md](wiki/index.md). 개념 페이지(`concepts/`)마다 "멤버들이 확인한 것"에 누가
   어떤 조건에서 무엇을 측정했는지 모여 있고, 노트끼리 다르게 말하는 지점은 `⚠️ Contradiction`으로 표시됩니다.
-- 내 노트가 어느 페이지에 반영됐는지는 [wiki/3-resources/스터디-노트-지도.md](wiki/3-resources/스터디-노트-지도.md).
+- 내 노트가 어느 페이지에 반영됐는지는 [wiki/sources/스터디-노트-지도.md](wiki/sources/스터디-노트-지도.md).
 - **`wiki/` 아래를 직접 고치지 마세요.** 틀린 게 있으면 자기 노트를 고치고 PR 을 올리면 다음 ingest 때 반영됩니다.
-  급하면 이슈나 `wiki/0-pending/`에 메모를 남기세요.
+  급하면 이슈나 `wiki/inbox/`에 메모를 남기세요.
 - 옵시디언으로 보려면 `wiki/` 폴더를 볼트로 엽니다. 그래프 뷰가 주제 사이의 연결을 보여줍니다.
 - 갱신(ingest)은 이 저장소에서 Claude Code 를 열고 "PR #n 머지됐어, ingest 해줘" 또는 "위키 린트"라고 요청하면
   됩니다. 규칙과 절차는 [CLAUDE.md](CLAUDE.md)에 있고, `.claude/hooks/`의 훅이 규칙을 강제합니다.

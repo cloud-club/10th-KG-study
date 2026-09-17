@@ -4,7 +4,7 @@
 - log.md   — 위키 내용 페이지가 하나라도 바뀌면(생성·수정·이동) 날짜 항목이 필요하다.
 - index.md — 카탈로그는 페이지 목록이므로 **새 페이지**가 생겼을 때만 항목이 필요하다.
 
-면제: index/log/CLAUDE.md, wiki/_templates/, wiki/0-pending/(소재), _attachments/, 동기화 원본 폴더(SYNC_DIRS).
+면제: index/log/CLAUDE.md, wiki/_templates/, wiki/inbox/(소재), _attachments/, 동기화 원본 폴더(SYNC_DIRS).
 members/ 는 위키가 아니라 소재 층이라 애초에 대상이 아니다.
 stop_hook_active 가드로 무한 루프를 막는다 — 정지당 최대 한 번만 요구한다.
 """
@@ -14,7 +14,7 @@ import subprocess
 import sys
 
 REPO = os.environ.get("CLAUDE_PROJECT_DIR", os.getcwd())
-CONTENT_ROOTS = ("wiki/1-projects/", "wiki/2-areas/", "wiki/3-resources/", "wiki/4-archives/")
+CONTENT_ROOTS = ("wiki/concepts/", "wiki/entities/", "wiki/comparisons/", "wiki/sources/")
 SYNC_DIRS: tuple[str, ...] = ()  # 스크립트가 관리하는 동기화 원본 폴더가 생기면 여기 추가
 INDEX = "wiki/index.md"
 LOG = "wiki/log.md"

@@ -116,15 +116,29 @@ EF_SEARCH = 100
 
 
 def search(query: str, limit: int = 5):
+    """기존 W2 CLI가 기대하는 ``(text, score)`` 형식을 유지한다."""
+    return [(row["text"], row["score"]) for row in search_vector(query, limit)]
+
+
+def search_vector(query: str, limit: int = 50) -> list[dict]:
+    """HNSW 검색 결과를 W3 공통 형식으로 반환한다."""
     vec = embedder().encode([query], normalize_embeddings=True)[0]
     with connect() as conn, conn.cursor() as cur:
         cur.execute(f"SET hnsw.ef_search = {EF_SEARCH}")
         cur.execute(
-            f"SELECT text, 1 - (embedding <=> %s) AS score FROM {PG_TABLE}"
+            f"SELECT id, source, title, heading, text,"
+            f" 1 - (embedding <=> %s) AS score FROM {PG_TABLE}"
             " ORDER BY embedding <=> %s LIMIT %s",
             (vec, vec, limit),
         )
-        return cur.fetchall()
+        return [
+            {
+                "id": row[0], "rank": rank, "source": row[1],
+                "title": row[2], "heading": row[3] or "", "text": row[4],
+                "score": float(row[5]),
+            }
+            for rank, row in enumerate(cur.fetchall(), start=1)
+        ]
 
 
 def main() -> None:

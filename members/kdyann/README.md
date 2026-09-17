@@ -15,9 +15,11 @@
 |---|------|------|
 | 01 | [RAG 기술 변천사](notes/01-rag-history.md) | 완료 |
 | 02 | [검색의 세 세대](notes/02-search-generations.md) | 완료 |
+| 03 | [하이브리드 검색과 RAG](notes/03-hybrid-search.md) | 완료 |
 
 ### labs
 
 | # | 실습 | 상태 |
 |---|------|------|
 | 01 | [Instagram 게시물 검색](labs/01-instagram-search/README.md) | 완료 |
+| 03 | [하이브리드 검색과 RAG](labs/03-hybrid-search/README.md) | 완료 |

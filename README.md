@@ -11,6 +11,7 @@
 10th-KG-study/
 ├── README.md
 ├── CONTRIBUTING.md        # 참여 방법, 네이밍 규칙
+├── CLAUDE.md              # 스터디 위키 스키마 — LLM 에이전트가 wiki/ 를 어떻게 쓰는지
 ├── .gitignore
 ├── docker-compose.yml     # 로컬 인프라: Postgres(pgvector) + Elasticsearch(nori) + Neo4j(APOC)
 ├── .env.example           # 인프라 비밀번호·포트 (cp .env.example .env)
@@ -18,6 +19,7 @@
 ├── data/                  # 각자 받아온 데이터셋 (git 무시, 컨테이너에 마운트됨)
 ├── members/               # 멤버별 개인 작업 공간
 │   ├── cohorts.json       # 반(A반/B반…) 명단 — 현황판 지식그래프를 반별로 나눠 그림
+│   ├── names.json         # GitHub 아이디 → 이름. 현황판에 아이디 대신 이름을 보여줌
 │   └── <github-id>/
 │       ├── README.md      # 자기소개, 목표
 │       ├── readings.md    # 주차별 읽을거리·참고자료 (현황판에 모아서 표시)
@@ -29,6 +31,11 @@
 │   └── readings-template.md
 ├── shared/                # 공용 작업 공간
 │   └── cloudclub-agent/
+├── wiki/                  # 스터디 위키 (LLM 이 members/ 를 읽어 주제별로 합성). 옵시디언 볼트
+│   ├── index.md           # 카탈로그 — 여기서부터 읽는다
+│   ├── log.md             # 활동 로그
+│   ├── 1-projects/ 2-areas/ 3-resources/ 4-archives/
+│   └── _templates/
 ├── dashboard/             # 현황판 정적 사이트 (GitHub Pages)
 ├── scripts/               # 현황판 데이터 빌드 스크립트
 └── .github/workflows/     # Pages 배포
@@ -67,12 +74,27 @@ bash infra/check.sh       # 정상 기동 확인
 
 받아온 데이터셋은 `data/<github-id>/` 아래에 두면 컨테이너에서 바로 읽을 수 있고 git 에는 올라가지 않습니다.
 
+## 스터디 위키 (wiki/)
+
+`members/`에 흩어진 노트·실습을 **주제별로 합성한** 위키입니다. LLM 에이전트(Claude Code 등)가 규칙
+[CLAUDE.md](CLAUDE.md)에 따라 쓰고 유지합니다. 사람은 읽고, 질문하고, 자기 노트를 고칩니다.
+
+- 시작점은 [wiki/index.md](wiki/index.md). 개념 페이지(`3-resources/`)마다 "멤버들이 확인한 것"에 누가
+  어떤 조건에서 무엇을 측정했는지 모여 있고, 노트끼리 다르게 말하는 지점은 `⚠️ Contradiction`으로 표시됩니다.
+- 내 노트가 어느 페이지에 반영됐는지는 [wiki/3-resources/스터디-노트-지도.md](wiki/3-resources/스터디-노트-지도.md).
+- **`wiki/` 아래를 직접 고치지 마세요.** 틀린 게 있으면 자기 노트를 고치고 PR 을 올리면 다음 ingest 때 반영됩니다.
+  급하면 이슈나 `wiki/0-pending/`에 메모를 남기세요.
+- 옵시디언으로 보려면 `wiki/` 폴더를 볼트로 엽니다. 그래프 뷰가 주제 사이의 연결을 보여줍니다.
+- 갱신(ingest)은 이 저장소에서 Claude Code 를 열고 "PR #n 머지됐어, ingest 해줘" 또는 "위키 린트"라고 요청하면
+  됩니다. 규칙과 절차는 [CLAUDE.md](CLAUDE.md)에 있고, `.claude/hooks/`의 훅이 규칙을 강제합니다.
+
 ## 현황판 (dashboard)
 
 `main`에 푸시하면 GitHub Actions가 `members/`를 스캔해 노트·실습·커밋·활동 히트맵을 뽑고,
 GPT가 멤버별 칭호·요약·태그와 스터디 소식을 붙여 GitHub Pages로 배포합니다.
 
 - 노트/실습 맨 위 프론트매터의 `tags`가 지식그래프의 주제 노드가 됩니다. 비워두면 GPT가 채워줍니다.
+- 현황판에는 GitHub 아이디 대신 **이름**이 뜹니다. `members/names.json`에 `{"github-id": "이름"}`으로 적어 두면 카드·그래프·중계석·읽을거리·최근 활동과 GPT 문구까지 이름으로 부릅니다. 본인 `README.md` 맨 위 프론트매터에 `name: 이름`을 적으면 그게 우선입니다.
 - 지식그래프는 **반(cohort) 단위**로 따로 그립니다. `members/cohorts.json`에 `{"A": ["id", ...]}`처럼 반별 명단을 적고, 명단에 없는 새 멤버는 자동으로 마지막 반 다음 반(지금은 B반)에 들어갑니다. 반마다 색 계열이 달라(A반 하늘, B반 노을, C반 풀밭) 멤버 카드·피드·읽을거리에서도 어느 반인지 보입니다. B반이 다 찼으면 `"B": [...]`를 추가해 닫고, 그다음 합류자는 C반으로 갑니다.
 - "주차별 읽을거리"는 각자 `members/<id>/readings.md`의 `## N주차` 아래 불릿을 모아 주차별로 보여줍니다. `[제목](링크) — 메모` 형식이면 링크·도메인·메모까지 뽑히고, 링크 없는 책 제목도 됩니다.
 - "중계석"은 최근 커밋의 diff를 GPT가 읽고 무슨 작업인지 캐스터 톤으로 중계합니다. 같은 멤버가 같은 날 올린 커밋은 한 사건으로 묶이고, 한 멤버는 피드에서 커밋 사건을 최대 3개까지만 차지합니다 (한 명이 도배하지 않도록). `members/`, `shared/` 어디든 스터디 작업 커밋이면 잡히고, 3일 이상 연속 출석과 레벨 업도 사건으로 올라갑니다. 현황판 코드나 템플릿만 바꾼 커밋은 제외합니다.
@@ -96,5 +118,7 @@ python3 -m http.server -d dashboard 8000                  # http://localhost:800
 | heebindev | [members/heebindev](members/heebindev) |
 | lys0611 | [members/lys0611](members/lys0611) |
 | e0ng | [members/e0ng](members/e0ng) |
+| do-dop | [members/do-dop](members/do-dop) |
 | kdyann | [members/kdyann](members/kdyann) |
 | kungbi | [members/kungbi](members/kungbi) |
+| sdunge | [members/sdunge](members/sdunge) |

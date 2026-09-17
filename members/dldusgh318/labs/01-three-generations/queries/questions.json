@@ -1,0 +1,100 @@
+{
+  "version": 2,
+  "review_rule": "원문에서 질문 대상 기록의 존재를 확인한 라벨링 후보다. ready는 후보 풀 생성 가능 상태이며 relevance 판정이나 정답 확정을 의미하지 않는다.",
+  "questions": [
+    {
+      "id": "R01",
+      "original_query": "Write-Behind",
+      "query": "Write-Behind의 동작 방식과 데이터 유실 위험은?",
+      "kind": "exact-term",
+      "status": "ready",
+      "reason": "질문 대상 기록이 원문에 존재함을 확인했다. 후보 청크의 relevance는 사용자가 판단한다.",
+      "labeling_rule": "동작 또는 유실 조건을 직접 설명하면 포함한다. 용어 열거와 다른 전략만 설명하는 청크는 제외한다."
+    },
+    {
+      "id": "R02",
+      "original_query": "@Transactional",
+      "query": "@Transactional에서 같은 클래스 내부 호출이 문제가 되는 이유는?",
+      "kind": "code-symbol",
+      "status": "ready",
+      "reason": "질문 대상 기록이 원문에 존재함을 확인했다. 후보 청크의 relevance는 사용자가 판단한다.",
+      "labeling_rule": "내부 호출과 트랜잭션 적용 문제의 원인·동작을 설명하면 포함한다. 단순 사용 예시는 제외한다."
+    },
+    {
+      "id": "R03",
+      "original_query": "SeCause",
+      "query": "SeCause에서 분석 요청을 저장한 뒤 이벤트를 처리하는 방식은?",
+      "kind": "exact-name",
+      "status": "ready",
+      "reason": "질문 대상 기록이 원문에 존재함을 확인했다. 후보 청크의 relevance는 사용자가 판단한다.",
+      "labeling_rule": "해당 프로젝트의 분석 요청 저장과 후속 이벤트 처리 순서·구현을 설명하면 포함한다. 단순 소개와 다른 프로젝트 사례는 제외한다."
+    },
+    {
+      "id": "R04",
+      "original_query": "성능을 개선한 경험",
+      "query": "지원자 수를 세는 작업이 느려서 개선했던 경험은?",
+      "kind": "semantic",
+      "status": "ready",
+      "reason": "질문 대상 기록이 원문에 존재함을 확인했다. 후보 청크의 relevance는 사용자가 판단한다.",
+      "labeling_rule": "지원자 수 집계 개선 사례의 문제·조치·결과를 설명하면 포함한다. 일반 최적화 지식과 다른 사례는 제외한다."
+    },
+    {
+      "id": "R05",
+      "original_query": "트러블 슈팅",
+      "query": "배포 후 데이터베이스 인증이 실패했을 때 어떻게 해결했나?",
+      "kind": "semantic",
+      "status": "ready",
+      "reason": "질문 대상 기록이 원문에 존재함을 확인했다. 후보 청크의 relevance는 사용자가 판단한다.",
+      "labeling_rule": "운영 배포 시 RDS 인증 실패 사건의 원인·진단·해결을 설명하면 포함한다. 다른 장애와 일반 인증 설명은 제외한다."
+    },
+    {
+      "id": "R06",
+      "original_query": "성능을 개선한 경험",
+      "query": "문제가 발생했음을 더 빨리 알아차리고 복구하도록 개선한 경험은?",
+      "kind": "semantic",
+      "status": "ready",
+      "reason": "질문 대상 기록이 원문에 존재함을 확인했다. 후보 청크의 relevance는 사용자가 판단한다.",
+      "labeling_rule": "실제 경험의 장애 인지·복구 개선 조치 또는 결과를 설명하면 포함한다. 일반적인 모니터링 필요성만 설명하면 제외한다."
+    },
+    {
+      "id": "R07",
+      "original_query": "엘라스틱 서치",
+      "query": "Elasticsearch의 검색 방식은?",
+      "kind": "canonical-spelling",
+      "status": "ready",
+      "reason": "대응하는 설명이 원문에 존재함을 확인했다. 표기 비교 쌍은 동일한 판정 묶음을 공유하며 relevance는 사용자가 판단한다.",
+      "labeling_rule": "Elasticsearch 검색 구조·동작을 직접 설명하면 포함한다. 제품명만 언급하면 제외한다.",
+      "gold_group": "elasticsearch-search"
+    },
+    {
+      "id": "R08",
+      "original_query": "엘라스틱 서치",
+      "query": "엘라스틱 서치의 검색 방식은?",
+      "kind": "spacing-mixed-language",
+      "status": "ready",
+      "reason": "대응하는 설명이 원문에 존재함을 확인했다. 표기 비교 쌍은 동일한 판정 묶음을 공유하며 relevance는 사용자가 판단한다.",
+      "labeling_rule": "Elasticsearch 검색 구조·동작을 직접 설명하면 포함한다. 제품명만 언급하면 제외한다.",
+      "gold_group": "elasticsearch-search"
+    },
+    {
+      "id": "R09",
+      "original_query": "쿠버네티즈",
+      "query": "쿠버네티스와 Docker의 차이는?",
+      "kind": "canonical-spelling",
+      "status": "ready",
+      "reason": "대응하는 설명이 원문에 존재함을 확인했다. 표기 비교 쌍은 동일한 판정 묶음을 공유하며 relevance는 사용자가 판단한다.",
+      "labeling_rule": "Kubernetes와 Docker의 역할·범위·동작 차이를 설명하면 포함한다. 비교와 무관한 사용법이나 단순 언급은 제외한다.",
+      "gold_group": "kubernetes-docker"
+    },
+    {
+      "id": "R10",
+      "original_query": "쿠버네티즈",
+      "query": "쿠버네티즈와 Docker의 차이는?",
+      "kind": "typo",
+      "status": "ready",
+      "reason": "대응하는 설명이 원문에 존재함을 확인했다. 표기 비교 쌍은 동일한 판정 묶음을 공유하며 relevance는 사용자가 판단한다.",
+      "labeling_rule": "Kubernetes와 Docker의 역할·범위·동작 차이를 설명하면 포함한다. 비교와 무관한 사용법이나 단순 언급은 제외한다.",
+      "gold_group": "kubernetes-docker"
+    }
+  ]
+}

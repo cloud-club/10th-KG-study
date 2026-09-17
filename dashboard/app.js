@@ -9,6 +9,8 @@
     { name: '풀밭', accent: '#35c39a', palette: ['#35c39a', '#7dc242', '#1fa78a', '#9bc53d', '#2fb885', '#5fae3b', '#43cba9', '#7ab648'] },
   ];
   const NEUTRAL_COLOR = '#8aa0b8'; // 반 정보가 없는 멤버
+  let names = new Map(); // github id → 표시 이름 (data.members 에서 채움)
+  const nameOf = (id) => names.get(id) || id;
   const MAX_ITEMS_PER_LIST = 2;
   const DAY_MS = 86400000;
 
@@ -147,7 +149,7 @@
       el('header', { class: 'post__head' }, [
         avatarFor(f.member),
         el('div', { class: 'post__who' }, [
-          el('a', { class: 'post__name', href: `https://github.com/${f.member}`, target: '_blank', rel: 'noopener', text: f.member }),
+          el('a', { class: 'post__name', href: `https://github.com/${f.member}`, target: '_blank', rel: 'noopener', text: f.name || nameOf(f.member), title: `@${f.member}` }),
           el('span', { class: 'post__meta' }, meta),
         ]),
       ]),
@@ -182,7 +184,7 @@
       : el('span', { class: 'reading__title', text: item.title });
     const meta = [hostOf(item.url), item.note].filter(Boolean);
     return el('li', { class: 'reading', style: `--c:${colorOf(item.member)}` }, [
-      el('a', { class: 'chip reading__who', href: `https://github.com/${item.member}`, target: '_blank', rel: 'noopener', text: item.member }),
+      el('a', { class: 'chip reading__who', href: `https://github.com/${item.member}`, target: '_blank', rel: 'noopener', text: nameOf(item.member), title: `@${item.member}` }),
       el('div', { class: 'reading__body' }, [
         title,
         meta.length ? el('span', { class: 'reading__meta', text: meta.join(' · ') }) : null,
@@ -190,26 +192,53 @@
     ]);
   }
 
-  function renderReadingWeek(group, isLatest, colorOf) {
+  // 주차 상태: 이번 주 / 아직 안 온 주차(라벨 실수일 가능성) / 지난 주차
+  function weekState(week, currentWeek) {
+    if (week === null || !currentWeek) return '';
+    if (week === currentWeek) return 'current';
+    return week > currentWeek ? 'future' : 'past';
+  }
+
+  function renderReadingWeek(group, isOpen, currentWeek, colorOf) {
     const name = group.week === null ? '기타' : `${group.week}주차`;
+    const state = weekState(group.week, currentWeek);
+    const range = group.starts ? `${shortDate(group.starts)} – ${shortDate(group.ends)}` : '';
     const summary = el('summary', { class: 'readings__week' }, [
       el('span', { class: 'readings__name', text: name }),
+      range ? el('span', { class: 'readings__range', text: range }) : null,
+      state === 'current' ? el('span', { class: 'readings__badge readings__badge--now', text: '이번 주' }) : null,
+      state === 'future' ? el('span', { class: 'readings__badge readings__badge--future', text: '아직 안 온 주차', title: '오늘 기준으로 아직 오지 않은 주차예요. readings.md 의 주차 번호를 확인해 보세요.' }) : null,
       group.label ? el('span', { class: 'readings__label', text: group.label }) : null,
-      el('span', { class: 'readings__count', text: `${group.items.length}개 · ${group.members.join(', ')}` }),
+      el('span', { class: 'readings__count', text: `${group.items.length}개 · ${group.members.map(nameOf).join(', ')}` }),
     ]);
-    return el('details', { class: 'readings__group', open: isLatest ? '' : undefined }, [
+    return el('details', { class: `readings__group${state ? ` is-${state}` : ''}`, open: isOpen ? '' : undefined }, [
       summary,
       el('ul', { class: 'readings__items' }, group.items.map((item) => renderReadingItem(item, colorOf))),
     ]);
   }
 
-  function renderReadings(weeks, colorOf) {
+  function renderReadings(weeks, study, colorOf) {
     const box = $('#readings-list');
+    const currentWeek = study.current_week || 0;
+    const hint = $('#readings-week-hint');
+    if (hint && currentWeek) {
+      const [s, e] = [study.week1_start, null];
+      const monday = parseDate(s);
+      if (monday) {
+        const start = new Date(monday.getTime() + (currentWeek - 1) * 7 * DAY_MS);
+        const end = new Date(start.getTime() + 6 * DAY_MS);
+        const fmt = (d) => `${d.getMonth() + 1}.${String(d.getDate()).padStart(2, '0')}`;
+        hint.textContent = `이번 주는 ${currentWeek}주차 (${fmt(start)} – ${fmt(end)}). 1주차는 ${fmt(monday)} 주부터.`;
+        hint.hidden = false;
+      }
+    }
     if (!weeks.length) {
       box.append(el('p', { class: 'readings__empty', text: '아직 올라온 읽을거리가 없어요. members/<id>/readings.md 에 "## 1주차" 아래로 링크를 적어 보세요.' }));
       return;
     }
-    weeks.forEach((group, i) => box.append(renderReadingWeek(group, i === 0, colorOf)));
+    // 이번 주가 있으면 이번 주를 펼치고, 없으면 맨 위(최신) 주차를 펼친다
+    const openWeek = weeks.some((w) => w.week === currentWeek) ? currentWeek : weeks[0].week;
+    weeks.forEach((group) => box.append(renderReadingWeek(group, group.week === openWeek, currentWeek, colorOf)));
   }
 
   /* ---------------------------------------------------------- members */
@@ -265,6 +294,9 @@
     const nameLink = $('.card__name a', tpl);
     nameLink.textContent = member.name;
     nameLink.href = member.url;
+    const handle = $('.card__handle', tpl);
+    if (member.name !== member.id) handle.textContent = `@${member.id}`;
+    else handle.remove();
     $('.sticker--level', tpl).textContent = `Lv.${member.progress.level}`;
     $('.card__summary', tpl).textContent = member.summary;
     const highlights = $('.card__highlights', tpl);
@@ -384,7 +416,7 @@
     activity.forEach((c) => {
       list.append(el('li', {}, [
         el('span', { class: 'activity__date', text: shortDate(c.date) }),
-        el('span', { class: 'activity__who', style: `--c:${colorOf(c.member)}`, text: c.member }),
+        el('span', { class: 'activity__who', style: `--c:${colorOf(c.member)}`, text: nameOf(c.member), title: `@${c.member}` }),
         el('a', { class: 'activity__msg', href: c.url, target: '_blank', rel: 'noopener', text: c.message }),
       ]));
     });
@@ -406,7 +438,8 @@
   }
 
   async function load() {
-    const res = await fetch('./data.json', { cache: 'no-store' });
+    // GitHub Pages CDN 이 10분 캐시하므로 매번 다른 URL 로 요청해 항상 최신 빌드를 받는다
+    const res = await fetch(`./data.json?t=${Date.now()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`data.json 을 불러오지 못했어요 (${res.status})`);
     return res.json();
   }
@@ -415,11 +448,12 @@
     try {
       const data = await load();
       const cohorts = data.cohorts || [];
+      names = new Map(data.members.map((m) => [m.id, m.name]));
       const colorOf = memberColorMap(data.members, cohorts);
       renderHero(data);
       renderStats(data);
       renderFeed(data.feed || [], data.feed_source, colorOf);
-      renderReadings(data.readings || [], colorOf);
+      renderReadings(data.readings || [], data.study || {}, colorOf);
       renderMembers(data.members, cohorts, colorOf);
       renderActivity(data.activity, colorOf);
       renderFooter(data);

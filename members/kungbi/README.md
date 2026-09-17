@@ -11,8 +11,11 @@
 
 ### notes
 
-아직 등록된 노트가 없습니다.
+- [01. OpenViking: 무엇을 기억하고 무엇을 다시 확인할까?][openviking-note] — 완료
 
 ### labs
 
-아직 등록된 실습이 없습니다.
+- [01. Knowledge Graph 데이터 수집 실습][collection-lab] — 진행 중
+
+[openviking-note]: notes/01-openviking-context-database.md
+[collection-lab]: labs/01-data-collection-practice/

@@ -47,3 +47,10 @@ dashboard/data.json
 .cache/
 
 members/sdunge/labs/02-law-search/data/
+# Obsidian per-user state (볼트 = wiki/)
+wiki/.obsidian/workspace*.json
+wiki/.obsidian/cache
+wiki/.trash/
+
+# Claude Code per-user overrides
+.claude/settings.local.json

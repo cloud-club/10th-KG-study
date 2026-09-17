@@ -10,10 +10,15 @@ search_grep.sh와 같은 원칙으로, 기본 출력에는 원문을 포함하�
 from __future__ import annotations
 
 import argparse
-import json
 import sys
-import urllib.error
-import urllib.request
+from pathlib import Path
+
+
+DO_DOP_ROOT = Path(__file__).resolve().parents[3]
+if str(DO_DOP_ROOT) not in sys.path:
+    sys.path.insert(0, str(DO_DOP_ROOT))
+
+from search_common.elasticsearch import search as common_search  # noqa: E402
 
 DEFAULT_INDEX = "do-dop-kakao-messages"
 DEFAULT_ES_URL = "http://localhost:9200"
@@ -33,20 +38,8 @@ def build_search_body(
 
 
 def http_search(es_url: str, index_name: str, body: dict) -> dict:
-    # 파이썬 전용 클라이언트 없이 표준 라이브러리로 _search API를 호출한다.
-    payload = json.dumps(body).encode("utf-8")
-    request = urllib.request.Request(
-        f"{es_url}/{index_name}/_search", data=payload, method="POST"
-    )
-    request.add_header("Content-Type", "application/json")
-    try:
-        with urllib.request.urlopen(request) as response:
-            return json.loads(response.read().decode("utf-8"))
-    except urllib.error.HTTPError as error:
-        detail = error.read().decode("utf-8", errors="replace")
-        raise RuntimeError(
-            f"POST {es_url}/{index_name}/_search -> HTTP {error.code}: {detail}"
-        ) from error
+    # 공통 Elasticsearch HTTP 모듈로 _search API를 호출한다.
+    return common_search(es_url, index_name, body)
 
 
 def parse_hits(response: dict) -> list[dict]:

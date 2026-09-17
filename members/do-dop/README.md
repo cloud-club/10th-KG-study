@@ -17,9 +17,15 @@
 | # | 주제 | 상태 |
 |---|---|---|
 | 02 | [grep에서 벡터 검색까지](notes/02-search-generations.md) | 진행 중 |
+| 03 | [BEIR: BM25는 정말 한물갔을까?](notes/03-beir-benchmark.md) | 완료 |
+| 03 | [하이브리드 검색 결과 합치기: RRF와 Score-based Fusion](notes/03-reciprocal-rank-fusion.md) | 완료 |
+| 03 | [Citation과 Provenance: 근거를 어떻게 남겨야 하는가](notes/03-citation-and-provenance.md) | 완료 |
+| 03 | [RAG 루프와 Retrieval Evaluation](notes/03-rag-loop.md) | 완료 |
+| 03 | [Single-hop에서 Multi-hop으로, 그리고 지식그래프로](notes/03-multihop-to-kg.md) | 완료 |
 
 ### labs
 
 | # | 실습 | 상태 |
 |---|---|---|
 | 02 | [카카오톡 검색 비교](labs/02-kakaotalk-search/README.md) | 진행 중 |
+| 03 | [기업분석 지식 그래프](labs/03-company-analysis-kg/README.md) | 진행 중 |

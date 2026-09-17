@@ -2,3 +2,6 @@
 # pgvector 단계에서 PostgreSQL에 연결할 때 필요하다.
 psycopg[binary]>=3.2,<4
 
+# 챗봇 UI(app.py)에서 사용한다.
+streamlit>=1.38,<2
+

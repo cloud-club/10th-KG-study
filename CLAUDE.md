@@ -2,8 +2,8 @@
 
 이 저장소는 클라우드클럽 10기 KG(Knowledge Graph) 스터디의 작업 공간이자, **LLM이 유지·관리하는 스터디
 지식베이스**다. 멤버는 `members/<github-id>/`에 노트와 실습을 쌓고, 에이전트는 그것을 읽어 `wiki/`에
-증류한다. `wiki/`는 옵시디언 볼트이며 PARA(실행 가능성 기준)로 나눈다. 사람은 소재를 던지고 질문하고
-검토한다. **`wiki/`의 모든 페이지는 에이전트가 쓰고 고치고 연결한다.** 이 파일이 스키마다. 관례가
+증류한다. `wiki/`는 옵시디언 볼트이며 페이지 종류(개념 · 고유명사 · 비교 · 소재)별 폴더로 나눈다. 사람은
+소재를 던지고 질문하고 검토한다. **`wiki/`의 모든 페이지는 에이전트가 쓰고 고치고 연결한다.** 이 파일이 스키마다. 관례가
 바뀌면 대화가 아니라 이 파일을 고친다.
 
 패턴의 원문(철학)은 [[LLM-위키-패턴]]에 있다. 한 번 읽고, 규칙은 이 파일을 따른다.
@@ -17,10 +17,10 @@
 ## 세 층
 
 1. **소재** — `members/<id>/`의 노트(`notes/*.md`)·실습 README(`labs/*/README.md` 등 실습 문서)·
-   `readings.md`, 머지 대기 PR, `wiki/0-pending/`(스터디장이 막 쓰는 메모). **`members/`는 불변이다.**
+   `readings.md`, 머지 대기 PR, `wiki/inbox/`(스터디장이 막 쓰는 메모). **`members/`는 불변이다.**
    에이전트는 읽기만 하고 절대 고치지 않는다(자기 노트는 각자 스터디 작업으로 쓴다). `protect-raw.py`
    훅이 다른 멤버 폴더 편집을 막는다.
-2. **위키** — `wiki/1-projects/`, `wiki/2-areas/`, `wiki/3-resources/`, `wiki/4-archives/`의 페이지.
+2. **위키** — `wiki/concepts/`, `wiki/entities/`, `wiki/comparisons/`, `wiki/sources/`의 페이지.
    에이전트가 소유한다. 사람은 읽고, 고칠 게 있으면 자기 노트를 고친 뒤 재-ingest를 요청한다.
 3. **스키마** — 이 `CLAUDE.md`. 사람과 함께 진화한다.
 
@@ -33,19 +33,20 @@ members/names.json         # id → 이름, members/cohorts.json — 반 명단 
 wiki/                      # 옵시디언 볼트 = 이 폴더
   index.md                 # 전체 카탈로그 — 질문에 답할 때 가장 먼저 읽는다
   log.md                   # append-only 활동 로그
-  _templates/              # 새 페이지의 출발점 (project · area · resource · note)
-  0-pending/               # 분류 전 메모. 스터디장이 자유롭게 쓴다. 정리 요청 시 아래로 분류
-  1-projects/              # 끝이 있는 일. 기수 운영, 공용 골든셋 같은 것. <슬러그>/<슬러그>.md(허브) + 하위 페이지
-  2-areas/                 # 끝이 없는 책임. 로컬 인프라, 현황판, 위키 운영
-  3-resources/             # 개념·비교·함정 페이지. 위키의 본체. 스터디 노트 지도, 패턴 원문도 여기
-  4-archives/              # 비활성. 끝난 기수(완료일 접두), 낡은 페이지
+  _templates/              # 새 페이지의 출발점 (concept · entity · comparison · note)
+  inbox/                   # 분류 전 메모. 스터디장이 자유롭게 쓴다. 정리 요청 시 아래로 분류
+  concepts/                # 개념·방법·규칙 페이지. 위키의 본체 (BM25, 리랭커, 청킹, RAG 평가, 가명화 …)
+  entities/                # 고유명사 페이지. 도구·인프라·데이터·기수 (pgvector 함정, ES 함정, 로컬 인프라, 현황판, 10기 허브)
+  comparisons/             # 비교표·연표 (검색의 세 세대, 실습 비교표, 임베딩 모델 선택 …)
+  sources/                 # 소재 쪽 페이지. 스터디 노트 지도(소재 → 페이지 대응), 패턴 원문
   .obsidian/               # 볼트 설정 (workspace 등 개인 상태는 git 무시)
 dashboard/ scripts/ infra/ # 현황판·인프라 코드. 위키 아님. 규칙은 README.md · CONTRIBUTING.md
 ```
 
-**PARA 판별**: 완료 시점이 있으면 project(기수, 골든셋 구축), 매일·매주 반복되면 area(인프라, 현황판),
-나중에 찾아보려 두면 resource(개념, 비교, 함정), 한 달 안 열지 않았으면 archive. 스터디 지식은 대부분
-resource다. 헷갈리면 "이 페이지를 언제 다시 꺼내 보는가"로 정한다.
+**종류 판별**: 페이지 제목이 일반명사(방법·원리·규칙)면 concept, 고유명사(특정 도구·인프라·데이터·기수·
+프로젝트)면 entity, 둘 이상을 축으로 놓고 견주는 표·연표가 본체면 comparison, 소재 자체를 가리키는 지도·
+원문이면 source. 스터디 지식은 대부분 concept다. 도구의 함정 페이지는 그 도구의 entity 페이지다. 헷갈리면
+"이 페이지를 무엇으로 검색해서 열까"로 정한다. 폴더 = `type`이며, 종류가 바뀌면 파일도 옮긴다.
 
 **소재 범위**: `members/<id>/notes/**/*.md`, `members/<id>/labs/**/*.md`(README·WEEK·RESULT 등 실습 문서),
 `members/<id>/readings.md`, `members/<id>/README.md`(소개·목표만). 실습 데이터(txt·jsonl·csv), 발표용
@@ -69,8 +70,8 @@ html, 코드는 소재가 아니다 — 실습 문서가 코드를 설명한 만
 ```yaml
 ---
 title: 사람이 읽는 제목
-type: project | area | resource | note
-tags: [concept]                  # 하위 구분. concept | comparison | pitfall | runbook | rule | methodology | glossary | map …
+type: concept | entity | comparison | source | note   # = 폴더명
+tags: [concept]                  # 하위 구분. concept | pitfall | runbook | rule | methodology | glossary | map | tool | hub …
 status: stub | draft | maintained | done | archived
 created: 2026-09-16
 updated: 2026-09-16
@@ -86,9 +87,9 @@ source: https://…                # 외부 원문이 있으면 (패턴 원문 �
 
 **본문 형태**:
 - 맨 위 한 줄 정의(`>` 인용).
-- 본문. 개념 페이지: 정의 → 동작 원리 → 강점·약점 → 멤버들이 확인한 것(실험 수치는 조건과 함께,
-  누가 어떤 데이터로) → 함정 → 열린 질문. 프로젝트 페이지: 배경·목표 → 타임라인(`날짜·구분·이벤트/
-  목표·목표일·상태` 표) → 스코프 → 의사결정·이슈 → 남은 일.
+- 본문. concept: 정의 → 동작 원리 → 강점·약점 → 멤버들이 확인한 것(실험 수치는 조건과 함께,
+  누가 어떤 데이터로) → 함정 → 열린 질문. entity: 개요 → (끝이 있는 대상이면) 타임라인(`날짜·구분·이벤트/
+  목표·목표일·상태` 표) → 겪은 문제·함정 → 의사결정·남은 일. comparison: 비교표 → 갈리는 지점 → 열린 질문.
 - `## 관련` — 이웃 페이지 위키링크.
 - `## 출처` — 소재 목록. 한 줄에 `멤버 · 문서 제목 — [저장소 경로](../../members/…)` 형식. 미머지 PR이면
   `(PR #n 미머지)`. 외부 논문·문서는 제목과 URL. **있는 것만**, 불확실한 링크는 적지 않는다.
@@ -111,10 +112,10 @@ source: https://…                # 외부 원문이 있으면 (패턴 원문 �
 
 ### Ingest (소재를 위키로)
 
-PR이 머지되었거나, 스터디장이 `wiki/0-pending/`에 메모를 두거나, 특정 노트·PR을 가리키며 정리를 요청하면:
+PR이 머지되었거나, 스터디장이 `wiki/inbox/`에 메모를 두거나, 특정 노트·PR을 가리키며 정리를 요청하면:
 
 1. **읽는다.** 소재 전체를 읽는다. 크면 읽기 전용 서브에이전트로 나눠 읽고 쓰기는 직접 한다.
-2. **분류한다.** project · area · resource 중 어디인지 정한다. 해당 템플릿에서 페이지를 만들거나
+2. **분류한다.** concept · entity · comparison 중 어디인지 정한다. 해당 템플릿에서 페이지를 만들거나
    기존 페이지를 갱신한다. **비슷한 페이지가 있으면 새로 만들지 말고 갱신한다** — 먼저 `index.md`와
    [[스터디-노트-지도]]를 검색한다.
 3. **통합한다.** 영향받는 모든 페이지를 갱신하고 **양방향** 위키링크를 건다. 개념 페이지의 "멤버들이
@@ -124,7 +125,7 @@ PR이 머지되었거나, 스터디장이 `wiki/0-pending/`에 메모를 두거�
 6. **`log.md`에 append한다.**
 7. **요약한다.** 무엇을 만들고 바꿨는지, 열린 질문, 아직 증류 안 된 소재.
 
-`wiki/0-pending/`의 메모는 위키에 반영한 뒤 삭제한다. `members/`의 소재는 절대 삭제·수정하지 않는다.
+`wiki/inbox/`의 메모는 위키에 반영한 뒤 삭제한다. `members/`의 소재는 절대 삭제·수정하지 않는다.
 
 ### Query (질문에 답하기)
 
@@ -145,13 +146,14 @@ PR이 머지되었거나, 스터디장이 `wiki/0-pending/`에 메모를 두거�
 
 ### Archive (기수 닫기)
 
-기수가 끝나면: 다시 쓸 지식은 `3-resources/`에 남기고, 기수 운영 프로젝트 폴더를 통째로
-`4-archives/<완료일>-<슬러그>/`로 옮긴다. frontmatter `status: archived`. `index.md`의 항목을 보관 절로
-옮기고 로그에 남긴다.
+기수가 끝나면: 다시 쓸 지식은 `concepts/`·`comparisons/`에 남기고, 기수 허브(`entities/<기수>.md`)와 낡은
+페이지는 폴더를 옮기지 않은 채 frontmatter `status: archived`로 바꾼다(위키링크가 basename만 쓰므로 옮길
+이유가 없다). `index.md`의 항목을 Archived 절로 옮기고 로그에 남긴다.
 
 ## index.md 형식
 
-폴더(Pending · Projects · Areas · Resources · Archives)별 카탈로그. 한 줄에 `- [[basename]] — 한 줄 요약`.
+폴더(Inbox · Concepts · Entities · Comparisons · Sources)별 카탈로그 + Archived 절. 한 줄에 `- [[basename]] — 한 줄 요약`.
+Concepts 안은 주제(주차)별 소제목으로 묶는다.
 질문에 답할 때 파일 검색보다 먼저 읽는 탐색 표면이므로 모든 ingest에서 갱신한다. `members/`의 소재는
 개별로 싣지 않고 [[스터디-노트-지도]] 한 줄만 둔다. 아직 안 쓴 페이지는 링크 없이 평문으로 적는다.
 
@@ -161,8 +163,8 @@ Append-only, 최신이 아래. `grep "^## \[" wiki/log.md | tail -5`로 최근 �
 
 ```
 ## [2026-09-16] ingest | <소재 제목 또는 PR #n>
-- created: 3-resources/<페이지>
-- updated: 3-resources/<페이지> (무엇을 추가), index
+- created: concepts/<페이지>
+- updated: concepts/<페이지> (무엇을 추가), index
 - flagged: A와 B의 모순
 ```
 
@@ -187,7 +189,7 @@ Append-only, 최신이 아래. `grep "^## \[" wiki/log.md | tail -5`로 최근 �
 - **`protect-raw.py`** (`PreToolUse: Edit|Write|MultiEdit|NotebookEdit`) — `members/<다른 멤버>/` 아래
   파일 편집을 막는다. 본인 폴더(`gh api user`의 로그인, `.cache/gh-login`에 캐시)는 허용한다.
 - **`check-bookkeeping.py`** (`Stop`) — 위키 페이지를 바꾸고 `wiki/log.md`를 안 건드렸거나, 새 페이지를
-  만들고 `wiki/index.md`를 안 건드렸으면 한 번 멈춰 세운다. `0-pending/`·템플릿은 면제.
+  만들고 `wiki/index.md`를 안 건드렸으면 한 번 멈춰 세운다. `inbox/`·템플릿은 면제.
 
 훅을 고친 뒤에는 `/hooks`를 한 번 열거나 재시작해야 반영된다.
 

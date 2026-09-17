@@ -40,3 +40,10 @@ Append-only, 최신이 아래. 항목은 `## [YYYY-MM-DD] verb | title` 로 시�
 - flagged: frontmatter 없음 — dldusgh318 노트 6편·실습 문서, jjinthung, yujeong430 실습 README(status 없음). heebindev 02는 개요 문장이 본문에 남아 있고 n-gram 절이 비어 있음
 - flagged: 소재 태그 표기 불일치 — `vector-search`/`embedding`/`hnsw`, `search`/`information-retrieval`, `bm25`/`keyword-search-bm25`, `rag`는 거의 모든 노트에. 위키 개념 페이지 파일명을 정본 슬러그로 삼는 것을 제안(현황판 태그와 맞추는 건 별도 결정)
 - flagged: 문서 내부 불일치 — sese2204 02 README의 청킹 기본값(30분/166자 vs 예시 60분/300자), dldusgh318 WEEK2 청크 스키마 vs data_sample README, lys0611 노트 05의 생성 실패 유형 10건 vs failures.md 12건, 채점 주체 표기("내가" vs "Claude가 1차")
+
+## [2026-09-17] refactor | 폴더 구조 PARA → 페이지 종류별 (concepts · entities · comparisons · sources · inbox)
+- moved: 3-resources/ 27편 → concepts/ 18편 · comparisons/ 4편(검색의-세-세대, 임베딩-모델-선택, RAG-변천사, 실습-비교표) · entities/ 3편(PostgreSQL과-pgvector-함정, Elasticsearch-운영-함정, OpenViking-컨텍스트-데이터베이스) · sources/ 2편(스터디-노트-지도, LLM-위키-패턴). 2-areas/ 로컬-인프라·현황판 → entities/. 1-projects/10기-KG-스터디/10기-KG-스터디.md → entities/10기-KG-스터디.md. 0-pending/ → inbox/. 4-archives/ 삭제(보관은 `status: archived` + index Archived 절로)
+- updated: 전 페이지 frontmatter `type` = 폴더명(concept · entity · comparison · source). 10기-KG-스터디 정의문의 `3-resources/` 언급, LLM-위키-패턴 푸터 링크(`../../CLAUDE.md`), index(폴더별 재편), CLAUDE.md(디렉터리 구조·종류 판별·frontmatter·본문 형태·Ingest·Archive·index 형식·log 예시·훅 절), README.md, .claude/hooks/check-bookkeeping.py(CONTENT_ROOTS)·session-rules.sh·README.md
+- templates: resource.md → concept.md, project.md+area.md → entity.md(타임라인 절은 선택), comparison.md 신설, note.md는 inbox/ 용
+- verified: 위키링크 32페이지 전부 해결(basename 유일), 깨진 상대 링크는 미머지 PR #6·#11 소재뿐(이전과 동일)
+- note: members/sese2204/notes/08-llm-wiki.md 가 PARA 구조를 설명하고 있음 — 소재라 위키 작업에서 안 고침, 작성자가 갱신할 것

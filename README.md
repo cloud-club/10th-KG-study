@@ -122,3 +122,4 @@ python3 -m http.server -d dashboard 8000                  # http://localhost:800
 | kdyann | [members/kdyann](members/kdyann) |
 | kungbi | [members/kungbi](members/kungbi) |
 | sdunge | [members/sdunge](members/sdunge) |
+| Yeongeunn | [members/Yeongeunn](members/Yeongeunn) |

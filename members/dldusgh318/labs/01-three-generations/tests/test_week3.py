@@ -194,6 +194,19 @@ class EvaluationTest(unittest.TestCase):
 
 
 class FailureExperimentTest(unittest.TestCase):
+    def test_load_cases_selects_requested_cases_in_cli_order(self):
+        payload = {"cases": [
+            {"id": "X01", "kind": "bridge-2-hop", "question": "질문 1", "expected": "답 1", "gold_chunks": ["a"]},
+            {"id": "X02", "kind": "bridge-2-hop", "question": "질문 2", "expected": "답 2", "gold_chunks": ["b"]},
+        ]}
+        with patch("failure_experiment.CASES") as cases_path, \
+             patch("failure_experiment.load_chunks_by_id", return_value={"a": {}, "b": {}}):
+            cases_path.exists.return_value = True
+            cases_path.read_text.return_value = json.dumps(payload)
+            selected = load_cases(["X02", "X01"])
+
+        self.assertEqual([case["id"] for case in selected], ["X02", "X01"])
+
     def test_load_cases_rejects_unknown_gold_chunk(self):
         payload = {"cases": [{
             "id": "S01", "kind": "single-hop", "question": "질문",

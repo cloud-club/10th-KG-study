@@ -13,7 +13,7 @@ from hybrid_search import hybrid_search
 CASES = WEEK3_DATA / "cases.json"
 RETRIEVAL_CHECK = WEEK3_DATA / "retrieval_check.json"
 RUNS = WEEK3_DATA / "failure_runs.jsonl"
-KINDS = {"single-hop", "2-hop", "aggregation", "3-hop"}
+KINDS = {"single-hop", "2-hop", "aggregation", "3-hop", "bridge-2-hop"}
 FAILURE_TYPES = ["retrieval", "assembly", "composition", "citation", "no_data"]
 
 
@@ -27,7 +27,7 @@ def make_template() -> None:
         "instructions": "실제 데이터에서 답과 gold_chunks를 확인한 질문만 추가한다.",
         "cases": [],
         "case_schema": {
-            "id": "고유 ID", "kind": "single-hop|2-hop|aggregation|3-hop",
+            "id": "고유 ID", "kind": "single-hop|2-hop|aggregation|3-hop|bridge-2-hop",
             "question": "질문", "expected": "사람이 확인한 기대 답",
             "gold_chunks": ["실제 chunk ID"], "note": "선택 사항"
         },
@@ -36,7 +36,7 @@ def make_template() -> None:
     print(f"실패 실험 템플릿 생성: {CASES}")
 
 
-def load_cases() -> list[dict]:
+def load_cases(case_ids: list[str] | None = None) -> list[dict]:
     if not CASES.exists():
         raise SystemExit("cases.json이 없습니다. template 명령으로 먼저 생성하세요.")
 
@@ -60,12 +60,18 @@ def load_cases() -> list[dict]:
         if unknown:
             raise SystemExit(f"{case['id']}: 존재하지 않는 gold chunk: {', '.join(unknown)}")
         seen.add(case["id"])
+    if case_ids:
+        by_id = {case["id"]: case for case in cases}
+        unknown = [case_id for case_id in case_ids if case_id not in by_id]
+        if unknown:
+            raise SystemExit(f"존재하지 않는 case id: {', '.join(unknown)}")
+        return [by_id[case_id] for case_id in case_ids]
     return cases
 
 
-def check_retrieval() -> list[dict]:
+def check_retrieval(case_ids: list[str] | None = None) -> list[dict]:
     records = []
-    for case in load_cases():
+    for case in load_cases(case_ids):
         retrieved = hybrid_search(case["question"], 5)
         retrieved_ids = [row["id"] for row in retrieved]
         missing = [chunk_id for chunk_id in case["gold_chunks"] if chunk_id not in retrieved_ids]
@@ -93,8 +99,8 @@ def check_retrieval() -> list[dict]:
     return records
 
 
-def run(model: str | None) -> None:
-    cases = load_cases()
+def run(model: str | None, case_ids: list[str] | None = None) -> None:
+    cases = load_cases(case_ids)
     WEEK3_DATA.mkdir(parents=True, exist_ok=True)
     with RUNS.open("a", encoding="utf-8") as output:
         for case in cases:
@@ -126,13 +132,14 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("command", nargs="?", choices=("template", "check", "run"), default="template")
     parser.add_argument("--model")
+    parser.add_argument("--case", action="append", dest="case_ids", help="실행할 case ID. 여러 번 지정할 수 있습니다.")
     args = parser.parse_args()
     if args.command == "template":
         make_template()
     elif args.command == "check":
-        check_retrieval()
+        check_retrieval(args.case_ids)
     else:
-        run(args.model)
+        run(args.model, args.case_ids)
 
 
 if __name__ == "__main__":

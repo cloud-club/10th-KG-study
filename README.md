@@ -120,6 +120,7 @@ python3 -m http.server -d dashboard 8000                  # http://localhost:800
 | e0ng | [members/e0ng](members/e0ng) |
 | do-dop | [members/do-dop](members/do-dop) |
 | kdyann | [members/kdyann](members/kdyann) |
+| ur2e | [members/ur2e](members/ur2e) |
 | kungbi | [members/kungbi](members/kungbi) |
 | sdunge | [members/sdunge](members/sdunge) |
 | Yeongeunn | [members/Yeongeunn](members/Yeongeunn) |

@@ -1,0 +1,127 @@
+{
+  "nodes": [
+    {
+      "id": "incident:inc-003",
+      "type": "Incident",
+      "label": "INC-003 API Server 인증서 만료",
+      "description": "etcd 클라이언트 인증서 만료로 API Server가 정상 동작하지 않은 장애",
+      "source_path": "troubleshooting/INC-003-apiserver-etcd-tls-expiry.md"
+    },
+    {
+      "id": "system:api-server",
+      "type": "System",
+      "label": "Kubernetes API Server",
+      "description": "Kubernetes control plane API 구성요소"
+    },
+    {
+      "id": "symptom:x509-expired",
+      "type": "Symptom",
+      "label": "x509 certificate has expired",
+      "description": "인증서 유효기간 만료 오류"
+    },
+    {
+      "id": "cause:certificate-expired",
+      "type": "Cause",
+      "label": "인증서 만료",
+      "description": "control-plane 노드의 인증서가 갱신되지 않음"
+    },
+    {
+      "id": "action:renew-certificate",
+      "type": "Action",
+      "label": "kubeadm 인증서 갱신",
+      "description": "control-plane 노드 전체에서 인증서 유효기간을 확인하고 갱신",
+      "action_type": "procedure",
+      "source_path": "howto/kubeadm-인증서-갱신-절차.md"
+    },
+    {
+      "id": "action:restart-static-pod",
+      "type": "Action",
+      "label": "static Pod 재시작",
+      "description": "manifest를 잠시 옮겨 갱신된 인증서를 다시 읽도록 재시작",
+      "action_type": "command",
+      "source_path": "howto/kubeadm-인증서-갱신-절차.md"
+    },
+    {
+      "id": "action:check-readyz",
+      "type": "Action",
+      "label": "노드별 /readyz 확인",
+      "description": "로드밸런서 뒤의 통합 상태가 아니라 노드별 준비 상태를 검증",
+      "action_type": "verification",
+      "source_path": "howto/kubeadm-인증서-갱신-절차.md"
+    },
+    {
+      "id": "todo:certificate-alert",
+      "type": "Todo",
+      "label": "인증서 만료 알람 설정",
+      "description": "다음 만료 전에 알림을 받도록 자동화하는 후속 작업",
+      "status": "open",
+      "source_path": "daily/2026-02-03.md"
+    },
+    {
+      "id": "decision:split-registries",
+      "type": "Decision",
+      "label": "Harbor와 Nexus 분리 운영",
+      "description": "운영 부담보다 각 저장소에서 잃는 기능이 크다고 판단해 통합하지 않음",
+      "status": "accepted",
+      "source_path": "decisions/이미지-레지스트리-harbor-vs-nexus.md"
+    },
+    {
+      "id": "system:harbor",
+      "type": "System",
+      "label": "Harbor",
+      "description": "컨테이너 이미지 스캔과 robot account를 제공하는 레지스트리"
+    },
+    {
+      "id": "system:nexus",
+      "type": "System",
+      "label": "Nexus",
+      "description": "여러 artifact 포맷을 지원하는 저장소"
+    },
+    {
+      "id": "incident:inc-009",
+      "type": "Incident",
+      "label": "INC-009 Harbor ImagePullBackOff",
+      "description": "Harbor 인증 문제로 이미지를 가져오지 못한 장애",
+      "source_path": "troubleshooting/INC-009-harbor-imagepullbackoff.md"
+    },
+    {
+      "id": "incident:inc-011",
+      "type": "Incident",
+      "label": "INC-011 Nexus 업로드 401",
+      "description": "Nexus 인증 문제로 artifact 업로드가 실패한 장애",
+      "source_path": "troubleshooting/INC-011-nexus-upload-401.md"
+    },
+    {
+      "id": "document:inc-003",
+      "type": "Document",
+      "label": "INC-003 장애 기록",
+      "description": "인증서 만료 장애의 증상·원인·조치 기록",
+      "source_path": "troubleshooting/INC-003-apiserver-etcd-tls-expiry.md"
+    },
+    {
+      "id": "document:certificate-howto",
+      "type": "Document",
+      "label": "kubeadm 인증서 갱신 절차",
+      "description": "갱신, 재시작, 검증 순서를 담은 절차 문서",
+      "source_path": "howto/kubeadm-인증서-갱신-절차.md"
+    }
+  ],
+  "edges": [
+    {"source": "incident:inc-003", "target": "system:api-server", "type": "AFFECTS", "evidence": "INC-003#증상"},
+    {"source": "incident:inc-003", "target": "symptom:x509-expired", "type": "HAS_SYMPTOM", "evidence": "INC-003#확인 내용"},
+    {"source": "incident:inc-003", "target": "cause:certificate-expired", "type": "CAUSED_BY", "evidence": "INC-003#원인"},
+    {"source": "incident:inc-003", "target": "action:renew-certificate", "type": "RESOLVED_BY", "evidence": "INC-003#조치"},
+    {"source": "action:renew-certificate", "target": "action:restart-static-pod", "type": "REQUIRES", "evidence": "인증서 갱신 절차#갱신"},
+    {"source": "action:restart-static-pod", "target": "action:check-readyz", "type": "NEXT", "evidence": "인증서 갱신 절차#확인"},
+    {"source": "action:renew-certificate", "target": "action:check-readyz", "type": "VERIFIED_BY", "evidence": "인증서 갱신 절차#확인"},
+    {"source": "todo:certificate-alert", "target": "incident:inc-003", "type": "FOLLOW_UP", "evidence": "daily/2026-02-03"},
+    {"source": "incident:inc-003", "target": "document:inc-003", "type": "MENTIONED_IN", "evidence": "INC-003"},
+    {"source": "action:renew-certificate", "target": "document:certificate-howto", "type": "MENTIONED_IN", "evidence": "인증서 갱신 절차"},
+    {"source": "decision:split-registries", "target": "system:harbor", "type": "CONCERNS", "evidence": "이미지 레지스트리 결정#결정"},
+    {"source": "decision:split-registries", "target": "system:nexus", "type": "CONCERNS", "evidence": "이미지 레지스트리 결정#결정"},
+    {"source": "decision:split-registries", "target": "incident:inc-009", "type": "MOTIVATED_BY", "evidence": "이미지 레지스트리 결정#운영 조건"},
+    {"source": "decision:split-registries", "target": "incident:inc-011", "type": "MOTIVATED_BY", "evidence": "이미지 레지스트리 결정#운영 조건"},
+    {"source": "incident:inc-009", "target": "system:harbor", "type": "AFFECTS", "evidence": "INC-009"},
+    {"source": "incident:inc-011", "target": "system:nexus", "type": "AFFECTS", "evidence": "INC-011"}
+  ]
+}

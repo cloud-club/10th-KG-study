@@ -1,0 +1,13 @@
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
+SELECT ?country ?countryLabel ?capital ?capitalLabel ?coord WHERE {
+  VALUES ?country { wd:Q884 wd:Q17 wd:Q142 }
+  ?country wdt:P36 ?capital .
+  ?capital wdt:P625 ?coord .
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "ko,en" .
+  }
+}

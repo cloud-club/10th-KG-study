@@ -1,0 +1,35 @@
+node.Project {
+  color: #4C78A8;
+  size: 55px;
+  caption: '{label}';
+}
+
+node.Technology {
+  color: #F58518;
+  size: 70px;
+  caption: '{label}';
+}
+
+node.TechnologyUse {
+  color: #54A24B;
+  size: 38px;
+  caption: '{purpose}';
+}
+
+relationship.PART_OF {
+  color: #9EA3A8;
+  width: 2px;
+  caption: 'PART_OF';
+}
+
+relationship.USES_TECHNOLOGY {
+  color: #E45756;
+  width: 3px;
+  caption: 'USES';
+}
+
+relationship.REPLACES {
+  color: #B279A2;
+  width: 4px;
+  caption: 'REPLACES';
+}

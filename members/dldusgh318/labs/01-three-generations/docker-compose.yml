@@ -39,6 +39,24 @@ services:
       timeout: 5s
       retries: 10
 
+  # 5주차: 프로퍼티 그래프 + Cypher
+  neo4j:
+    image: neo4j:5.26-community
+    container_name: kg-neo4j
+    environment:
+      - NEO4J_AUTH=neo4j/study-password
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4jdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p study-password 'RETURN 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
 volumes:
   esdata:
   pgdata:
+  neo4jdata:

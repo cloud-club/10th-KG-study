@@ -2,7 +2,7 @@
 title: 온톨로지 모델링 — RDF·OWL로 사실과 관계 표현하기
 date: 2026-09-28
 tags: [ontology, rdf, rdfs, owl, sparql, wikidata, property-graph]
-status: in-progress
+status: done
 ---
 
 # 04-2. 온톨로지 모델링 — RDF·OWL로 사실과 관계 표현하기

@@ -2,7 +2,7 @@
 title: SPARQL 질의와 계약 비교 그래프 모델링
 date: 2026-09-29
 tags: [sparql, wikidata, rdf, knowledge-graph]
-status: in-progress
+status: done
 ---
 
 # 04. SPARQL 질의와 계약 비교 그래프 모델링
@@ -114,17 +114,7 @@ SELECT ?country ?countryLabel ?capital ?capitalLabel WHERE {
 
 회사에 곧바로 `지급기한=30일`을 붙이면 같은 회사의 다른 계약이나 개정 계약을 구분하기 어렵다. 계약을 별도 대상으로 두고 회사·조건·근거 문서를 연결한다.
 
-```mermaid
-flowchart LR
-    A["A사"] -->|계약| CA["계약 A"]
-    B["B사"] -->|계약| CB["계약 B"]
-    CA -->|paymentDays| DA["30일"]
-    CB -->|paymentDays| DB["45일"]
-    CA -->|paymentStart| I["청구일 invoiceDate"]
-    CB -->|paymentStart| I
-    CA -->|sourceDoc| SA["문서 A · 버전 1 · 문서 날짜"]
-    CB -->|sourceDoc| SB["문서 B · 버전 1 · 문서 날짜"]
-```
+![A사와 B사의 계약별 지급 기한, 청구일 기준, 근거 문서를 연결한 그래프](images/05-contract-model.png)
 
 위 문서 버전도 모델링을 설명하기 위해 붙인 가상 값이며, 문서 날짜는 실제 원문에서 확인해 저장할 항목이다. `청구일`은 기준의 종류를 뜻한다. 실제 지급 예정일을 계산하려면 개별 청구서의 `invoiceDate` 날짜 값과 어떤 계약에 따른 청구인지도 추가해야 한다.
 

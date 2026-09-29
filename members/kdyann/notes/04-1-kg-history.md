@@ -2,7 +2,7 @@
 title: 온톨로지 변천사 — 존재론에서 지식 그래프까지
 date: 2026-09-28
 tags: [ontology, semantic-web, RDFS, OWL, knowledge-graph, linked-data, graphrag]
-status: in-progress
+status: done
 ---
 
 # 04-1. 온톨로지 변천사 — 존재론에서 지식 그래프까지

@@ -18,6 +18,7 @@
 | 03 | [하이브리드 검색과 RAG](notes/03-hybrid-search.md) | 완료 |
 | 04-1 | [온톨로지 변천사 — 존재론에서 지식 그래프까지](notes/04-1-kg-history.md) | 완료 |
 | 04-2 | [온톨로지 모델링 — RDF·OWL로 사실과 관계 표현하기](notes/04-2-ontology-modeling.md) | 완료 |
+| 04-3 | [팔란티어 온톨로지의 Object·Link·Action과 RDF 비교](notes/04-3-palantir-ontology.md) | 완료 |
 
 ### labs
 

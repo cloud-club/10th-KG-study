@@ -1,0 +1,18 @@
+name: rag-pgvector-lab
+services:
+  db:
+    image: pgvector/pgvector:0.8.6-pg17-trixie
+    environment:
+      POSTGRES_DB: rag
+      POSTGRES_USER: rag
+      POSTGRES_HOST_AUTH_METHOD: trust
+    # DB is accessed only through docker compose exec (no host port).
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag -d rag"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+volumes:
+  pgdata:

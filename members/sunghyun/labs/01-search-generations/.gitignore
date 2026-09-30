@@ -1,0 +1,4 @@
+src/outputs/
+src/local-data/
+**/__pycache__/
+**/last_comparison.json

@@ -11,3 +11,6 @@ PostgreSQL, Elasticsearch, Docker를 직접 사용해 데이터 저장과 검색
 ## 진행 현황
 
 - 1주차: RAG와 지식 그래프 기초 정리
+
+- 2주차: [청킹·BM25·벡터 검색·HNSW 정리](notes/02-search-methods.md)
+- 실습: [검색의 세 세대 비교](labs/01-search-generations/README.md) — 전체 2,685개 청크 검색, JSON/DB 결과 비교, HNSW 실행 계획 확인

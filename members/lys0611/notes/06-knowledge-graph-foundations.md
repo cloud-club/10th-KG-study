@@ -75,7 +75,7 @@ status: done
    - **한계**: 구조화 관계와 LLM을 함께 활용 → **기존 RAG가 어려워하는 다중 관계·전체 데이터 질문을 개선**
 
 9. **GraphRAG:** 문서에서 entity·relationship을 추출해 graph를 만들고, **그래프 구조까지 검색 컨텍스트에 활용**
-   - **한계**: **텍스트 검색 + 그래프 관계 탐색을 결합**
+   - **텍스트 검색 + 그래프 관계 탐색을 결합**
 
 ## **2. RDF 기본: Triple, IRI, Literal, Namespace**
 

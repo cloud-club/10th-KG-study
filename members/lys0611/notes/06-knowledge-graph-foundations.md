@@ -79,7 +79,7 @@ status: done
 
 ## **2. RDF 기본: Triple, IRI, Literal, Namespace**
 
-### 트리플
+### Triple
 
 - RDF의 기본 단위: **Subject – Predicate – Object**
 - 사실 하나 = 트리플 하나, 그래프 = 트리플의 집합

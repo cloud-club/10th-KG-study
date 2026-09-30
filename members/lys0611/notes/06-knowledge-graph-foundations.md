@@ -139,9 +139,7 @@ status: done
 
 - 장점: 계층 탐색, 역관계 생성, 서로 다른 데이터셋 연결
 - 주의: 잘못된 `sameAs` 같은 규칙은 오류를 그래프 전체에 전파할 수 있음
-- `(Developer subClassOf Person) + (예승 type Developer)` ⇒ `(예승 type Person)`
-- `(worksAt domain Person) + (예승 worksAt 회사)` ⇒ `(예승 type Person)`
-- `(parentOf inverseOf childOf) + (A parentOf B)` ⇒ `(B childOf A)`
+- `(worksAt domain Person) + (A worksAt 회사)` ⇒ `(A type Person)`
 
 ## 4. SPARQL
 
@@ -182,7 +180,8 @@ status: done
 
 **Q: 부산 같이 간 사람들 중 같은 회사 다니는 사람?**
 
-!busan_trip_same_company_graph_generic_labels.png
+<img width="2048" height="1446" alt="image" src="https://github.com/user-attachments/assets/65e016cb-6d93-42ce-b75b-57c882f44ef4" />
+
 
 **방법**: 질문 선택 → 필요한 사실 분해 → 명사=Node, 동사=Relationship → 경로 연결 → Hop 수 확인
 

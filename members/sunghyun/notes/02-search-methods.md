@@ -141,6 +141,37 @@ HNSW는 벡터들을 여러 층의 그래프로 연결해 둔다. 위층에는 �
 
 인덱스를 만든 뒤 실행 계획에서 `chunks_embedding_hnsw` 사용을 확인했다. 이번 질문에서는 정확 검색과 HNSW의 Top-3가 같았고, DB 시간은 65.023ms와 6.371ms였다. 이번 실행에서는 약 10배 차이가 났다. 질문 임베딩 시간은 제외한 수치이며 다른 질문도 같은 차이가 나는지는 더 비교해 봐야 한다.
 
+## 직접 수행한 실습과 화면
+
+| 실습 | 실행한 내용 | 확인한 결과 |
+|---|---|---|
+| `01_chunk_documents.py` | 문서를 본문·소제목 단위로 청킹 | 문서 364개에서 청크 2,685개 생성 |
+| 문자열 검색·Nori 분석 | 문자열 일치 검색과 형태소 분석 비교 | 문자열 그대로 찾는 방식과 단어로 나누는 방식 구분 |
+| `bm25_lab/search_lab.py` | Elasticsearch + Nori로 BM25 OR/AND 비교 | 같은 URM 질문에서 OR 709개, AND 1개 |
+| `02_embed_sample.py` · `03_vector_search.py` | 소규모 임베딩 실습 후 50개 청크 검색, 전체 범위로 확장 | qwen3-embedding:0.6b의 1,024차원 벡터와 코사인 검색 확인 |
+| `pgvector_lab/04_pgvector_search.py` | 전체 2,685개 벡터를 PostgreSQL + pgvector에서 검색 | Python과 DB의 정확 검색 순위 비교 |
+| HNSW 인덱스 생성·검색 | 인덱스 생성 후 실행 계획과 정확 검색 결과 비교 | HNSW 실제 사용 확인, 같은 질문의 Top-3 일치 |
+
+### 50개 청크로 벡터 검색해 보기
+
+![50개 청크 임베딩과 코사인 검색 실행 화면](../assets/week2-vector-sample-50.png)
+
+50개 청크를 임베딩하고 질문과 가까운 본문을 출력한 초기 실습이다. 이 화면의 검색 범위는 50개이며, 이후 전체 2,685개로 확장했다. 검색 범위 밖 문서는 찾아낼 수 없다는 점을 확인했다.
+
+### BM25 AND에서 후보가 없는 경우
+
+![BM25 AND 조건에서 검색 결과가 0개인 화면](../assets/week2-bm25-and-no-hit.png)
+
+‘오늘 내가 퇴근 빨리하는 방법’ 질문은 이 AND 조건에서 0개가 나왔다. 검색 조건이 엄격하면 후보가 사라질 수 있다. 이 결과만으로 전체 문서에 답이 없다고 판단할 수는 없다.
+
+### pgvector에 HNSW 인덱스 만들기
+
+![HNSW 인덱스 생성과 pg_indexes 조회 화면](../assets/week2-hnsw-index.png)
+
+`CREATE INDEX` 실행 후 `pg_indexes`에서 코사인 검색용 `chunks_embedding_hnsw`가 생성된 것을 확인했다. 인덱스의 존재와 검색에서의 실제 사용은 별개이며, 실제 사용 여부는 이후 검색 실행 계획에서 확인했다.
+
+화면 출처: [Notion 2주차 학습 기록](https://www.notion.so/3dddbb08775280f8aab7fbb3072820aa). 로그인 정보나 내부 링크가 보이는 화면은 제외했다.
+
 ## 예시 / 코드
 
 코사인 검색용 HNSW 인덱스를 만들 때 사용한 SQL이다.
@@ -156,8 +187,8 @@ ON chunks USING hnsw (embedding vector_cosine_ops);
 
 - [ ] Nori와 n-gram으로 나눴을 때 검색 결과 비교하기
 - [ ] 같은 질문으로 다른 임베딩 모델도 비교하기
-- [ ] 정답 청크가 상위 결과에 얼마나 들어오는지 평가하기
-- [ ] BM25와 벡터 검색 결과를 합치는 RRF 공부하기
+- [x] 정답 청크가 상위 결과에 얼마나 들어오는지 평가하기 — [3주차 Recall 실습](03-hybrid-rag-and-evaluation.md)에서 진행
+- [x] BM25와 벡터 검색 결과를 합치는 RRF 공부하기 — [3주차 하이브리드 실습](03-hybrid-rag-and-evaluation.md)에서 진행
 
 ## 스터디에서 나눌 이야기
 

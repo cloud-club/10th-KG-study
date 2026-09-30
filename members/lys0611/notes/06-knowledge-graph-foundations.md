@@ -79,8 +79,6 @@ status: done
 
 ## **2. RDF 기본: Triple, IRI, Literal, Namespace**
 
-## 2. RDF 기본
-
 ### 트리플
 
 - RDF의 기본 단위: **Subject – Predicate – Object**

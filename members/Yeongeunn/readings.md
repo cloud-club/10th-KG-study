@@ -28,3 +28,26 @@
 - [Stanford NER 소개와 실행 예제](https://nlp.stanford.edu/software/CRF-NER.html) — CRF 기반 추출기가 어떤 입력과 출력을 사용하는지 확인할 수 있다.
 
 모델별 발전 과정, 평가셋의 발표 시점과 원 논문은 [개체추출](notes/06-entity-extraction-models.md)·[임베딩](notes/07-embedding-models.md)·[생성 모델](notes/08-generative-models.md)에 정리했다.
+
+
+## 4주차 · 지식 그래프와 온톨로지
+
+- [RDF Primer — W3C](https://www.w3.org/TR/rdf11-primer/) — 트리플·식별자·리터럴을 예제로 읽기.
+- [OWL 2 Primer — W3C](https://www.w3.org/TR/owl2-primer/) — 클래스와 관계의 의미, 열린 세계 가정 이해.
+- [구글 지식 그래프 소개](https://blog.google/products/search/introducing-knowledge-graph-things-not/) — 문자열 검색에서 대상 중심 검색으로 관심이 확장된 배경.
+- [Wikidata 진술](https://www.wikidata.org/wiki/Help:Statements) — 값에 한정어·출처·순위를 붙이는 구조.
+- [Wikidata SPARQL 튜토리얼](https://www.wikidata.org/wiki/Wikidata:SPARQL_tutorial) — 직접 관계와 진술 노드를 조회하는 차이.
+
+- [Apple — Growing and Serving Large Open-domain Knowledge Graphs](https://machinelearning.apple.com/research/open-domain-knowledgegraphs) — 대상과 웹 콘텐츠의 연결.
+- [LinkedIn — Building the LinkedIn Knowledge Graph](https://www.linkedin.com/blog/engineering/knowledge/building-the-linkedin-knowledge-graph) — 사람·직무·스킬의 표준화와 검증.
+- [Amazon — COSMO](https://www.amazon.science/blog/building-commonsense-knowledge-graphs-to-aid-product-recommendation) — 사용 목적 관계 생성과 품질 관리.
+- [Siemens — The AI context layer](https://blogs.sw.siemens.com/rapidminer/ai-context-layer-knowledge-graph/) — 산업 데이터의 의미 연결.
+- [Elsevier — AstraZeneca 사례](https://www-prod.elsevier.com/resources/astrazeneca-epimap-case-study) — 연구 근거를 연결한 표적 탐색.
+
+## 5주차 · 트리플 추출과 저장
+
+- [RDFS — W3C](https://www.w3.org/TR/rdf-schema/) — 클래스·속성·domain/range의 의미.
+- [JSON-LD 1.1 — W3C](https://www.w3.org/TR/json-ld11/) — JSON 키와 ID를 RDF의 의미에 연결하기.
+- [Neo4j MERGE](https://neo4j.com/docs/cypher-manual/current/clauses/merge/) — 식별자를 기준으로 반복 적재하는 방법과 유일성 주의점.
+- [Cypher 가변 길이 경로](https://neo4j.com/docs/cypher-manual/current/patterns/variable-length-patterns/) — 관계를 여러 번 따라가는 질의.
+- DDIA 2장 「데이터 모델과 질의 언어」, 4장 「부호화와 발전」 발췌 — 그래프 표현과 직렬화·스키마 변경 연결.

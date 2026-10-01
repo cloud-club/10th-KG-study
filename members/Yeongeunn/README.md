@@ -25,10 +25,17 @@
 | 추가 학습 | 06 | [개체추출 모델과 평가셋](notes/06-entity-extraction-models.md) | 완료 |
 | 추가 학습 | 07 | [임베딩 모델과 평가셋](notes/07-embedding-models.md) | 완료 |
 | 추가 학습 | 08 | [생성 모델과 평가 기준](notes/08-generative-models.md) | 완료 |
+| 4주차 | 09 | [지식 그래프와 온톨로지](notes/09-week4-ontology-background.md) | 학습 중 |
+| 5주차 | 10 | [이룸페이 문서 기반 미니 온톨로지와 트리플 추출](notes/10-week5-triple-pipeline.md) | 학습 중 |
+| 4주차 추가 학습 | 11 | [Wikidata의 식별자·진술·근거](notes/11-week4-wikidata-statements.md) | 학습 중 |
+| 4주차 추가 학습 | 12 | [기업의 지식 그래프 활용 사례](notes/12-enterprise-knowledge-graph-cases.md) | 학습 중 |
 
 ### labs
+
+[실행 방법·검색 평가·그래프 결과](labs/README.md)
 
 | 주차 | # | 실습 | 상태 |
 |---|---|---|---|
 | 3주차 | 03 | [프로젝트 Notion 검색 — BM25 + Gemini RAG](labs/03-notion-ingest/README.md) | 완료 |
-| 3주차 | — | 벡터 검색·RRF·Recall@5 비교 | 예정 |
+| 3주차 | 04 | [BM25·벡터·RRF 검색 평가](labs/04-hybrid-evaluation/README.md) | 실행 완료 · 평가셋 검토 중 |
+| 5주차 | 05 | [Notion 문서에서 트리플 추출](labs/05-triple-extraction/README.md) | 추출·적재·조회 완료 · 의미 검토 중 |

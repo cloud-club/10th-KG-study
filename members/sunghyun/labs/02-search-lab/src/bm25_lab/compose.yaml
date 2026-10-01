@@ -1,0 +1,16 @@
+name: rag-bm25-lab
+services:
+  elasticsearch:
+    build: .
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      xpack.ml.enabled: "false"
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    ports:
+      - "127.0.0.1:19200:9200"
+    mem_limit: 2g
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+volumes:
+  esdata:

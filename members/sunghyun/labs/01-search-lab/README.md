@@ -26,12 +26,20 @@ status: done
 
 ## 실행 방법
 
+### 입력 형식
+
+입력은 한 줄에 문서 하나를 둔 JSONL이다. `document_id`와 `sections[].blocks`가 필요하며, 제목·문서 경로·섹션 경로는 검색 문맥에 쓰인다. 원본 없이 흐름을 확인하려면 직접 만든 아래 문서를 포함해 최소 3개 청크가 생성되도록 준비한다. 실제 평가 Q1~Q6은 원래 데이터에만 해당한다.
+
+```json
+{"document_id":"demo-1","title":"서버 등록","document_path":["가이드","서버"],"sections":[{"heading":"등록 방법","section_path":["등록 방법"],"blocks":[{"type":"paragraph","text":"서버 관리 화면에서 등록 버튼을 누르고 서버 정보를 입력한다."}]}]}
+```
+
 ### 1. 문서 → 청크
 
 저장소 루트에서 실습 폴더로 이동한다.
 
 ```bash
-cd members/sunghyun/labs/01-search-generations
+cd members/sunghyun/labs/01-search-lab
 python3 src/01_chunk_documents.py \
   --input ../../../../data/sunghyun/normalized_documents_with_path.jsonl \
   --output src/outputs/chunked_documents_v1.jsonl
@@ -104,50 +112,7 @@ python3 src/pgvector_lab/04_pgvector_search.py \
 
 `HNSW 실제 사용: True`와 인덱스 이름, 정확 검색 결과와 겹치는 개수를 확인한다. exact는 해당 트랜잭션에서 인덱스 탐색을 꺼 기준을 만들고, hnsw는 순차 탐색을 억제한 뒤 실행 계획으로 사용 여부를 검사한다. 설정은 트랜잭션 안에서만 적용한다. `last_comparison.json`은 로컬 결과이며 Git에서 제외한다.
 
-## 구조
-
-```text
-src/
-├── 01_chunk_documents.py          # 문서 구조 → 청크
-├── 02_embed_sample.py             # 3개 샘플, 저장 없음
-├── 03_vector_search.py            # 벡터 캐시 + Python 코사인 검색
-├── bm25_lab/
-│   ├── search_lab.py              # load/grep/analyze/bm25/explain
-│   ├── Dockerfile                # Nori 설치
-│   └── compose.yaml
-└── pgvector_lab/
-    ├── 04_pgvector_search.py      # 벡터 적재, exact/hnsw, 계획 확인
-    ├── create_hnsw.sql
-    └── compose.yaml
-```
-
-## 결과
-
-이번 데이터로 실행한 결과다.
-
-- 청킹: 문서 364개 → 본문 있는 302개 → 청크 2,685개. 빈 본문·중복 ID·본문 최대 길이 검사 통과.
-- 샘플: 3개 벡터 모두 1,024차원, 유효한 숫자 확인.
-- BM25: URM 질문 OR 709개 / AND 1개. 1위는 두 경우 동일하고 점수 19.422447.
-- 전체 벡터: 1위 URM 초기 설정(0.6678), 2위 배포 체크리스트(0.6642), 3위 Admin 사용자 가이드(0.6583).
-- JSON/DB 정확 검색: 같은 질문 벡터로 Top-k 순서 일치, 최대 점수 차이 약 `1.3e-7`.
-- HNSW: 실제 인덱스 사용 확인, 이번 질문 Top-3는 정확 검색과 3/3 겹침.
-- DB 측정: exact 65.023ms / HNSW 6.371ms, 약 10.2배. 별도 단일 실행 기록이며 질문 임베딩 시간 제외. 다른 질문이나 데이터에서도 같은 차이가 나는지는 더 비교해야 한다.
-
-## 배운 점
-
-처음에는 BM25도 임베딩이 필요하다고 생각했다. 실습해 보니 Nori로 단어를 나누고 BM25로 점수를 매기는 검색과, 임베딩한 벡터끼리 비교하는 검색이 따로 있었다.
-
-AND로 바꾸니 709개였던 결과가 1개로 줄었다. 조건을 좁히면 관련 문서도 빠질 수 있다는 점을 알게 됐다. 벡터 검색에서는 본문이 거의 없는 청크가 2위로 나와서 문서 경로와 소제목도 같이 살펴봤다. HNSW는 전체를 비교하지 않아 빨랐고, 이번 질문의 상위 3개는 정확 검색과 같았다.
-
-## 다음 단계
-
-- [x] 같은 질문 세트로 검색 방식별 Recall@k 평가
-- [x] BM25와 벡터 순위를 RRF로 결합
-- [x] 검색 본문과 출처로 LLM 답변 생성
-- [ ] 관계 질문을 남겨 4주차 지식 그래프 학습으로 연결
-
-
-## 3주차: RRF → 답변 생성 → Recall 평가
+### 6. 3주차: RRF → 답변 생성 → Recall 평가
 
 관련 노트: [3주차 실습과 결과](../../notes/03-hybrid-rag-and-evaluation.md).
 아래 명령은 위 1~5단계의 청크 생성, 전체 임베딩, Elasticsearch·pgvector 적재와 HNSW 인덱스 준비를 마친 뒤 같은 실습 폴더에서 실행한다.
@@ -186,6 +151,54 @@ python3 src/08_evaluate_recall.py --question Q6 --ks 1 3 5 10
 
 07의 기본값은 BM25 OR, HNSW, 후보 각 20개, 최종 Top-5다. 기존 2주차 BM25 단독 실습의 기본 AND와 구분한다. `--preview`는 07에서도 사용할 수 있으며 답변 모델 호출을 생략한다. OpenRouter 모드는 질문과 선택된 본문·출처를 API로 전송하므로 전송 가능한 자료로 실행한다.
 
-05~08은 실습 당시 `src/outputs/vectors_qwen3_2685.json`을 사용한다. 다른 데이터셋으로 청크 수가 달라지면 `src/pgvector_lab/04_pgvector_search.py`의 `CACHE` 경로도 실제 캐시 파일에 맞춘다. 08의 `CASES`에는 이번 비공개 데이터의 정답 청크 ID만 들어 있다. 다른 데이터로 실행하려면 원문을 읽고 질문과 정답 ID를 바꿔야 하며, 임의의 데이터에서는 그대로 재현되지 않는다.
+05·07·08의 기본 캐시는 실습 당시 `src/outputs/vectors_qwen3_2685.json`이다. 다른 캐시는 세 명령에 `--cache src/outputs/vectors_qwen3_<실제 청크 수>.json`을 지정한다. 08의 청크 파일도 다르면 `--input <청크 파일>`을 지정한다. 코드의 `CACHE` 상수를 수정할 필요는 없다. 08의 `CASES`에는 이번 비공개 데이터의 정답 청크 ID만 들어 있다. 다른 데이터로 실행하려면 원문을 읽고 질문과 정답 ID를 바꿔야 하며, 임의의 데이터에서는 그대로 재현되지 않는다.
 
 인용 번호 검사는 번호 범위만 검사한다. 문장과 근거가 일치하는지는 직접 확인한다. 결과 JSON/CSV, 원문·임베딩 캐시, API 키는 업로드하지 않는다.
+
+## 구조
+
+```text
+src/
+├── 01_chunk_documents.py          # 문서 구조 → 청크
+├── 02_embed_sample.py             # 3개 샘플, 저장 없음
+├── 03_vector_search.py            # 벡터 캐시 + Python 코사인 검색
+├── 05_hybrid_rrf.py               # BM25·벡터 RRF 결합
+├── 06_rag_answer.py               # 선택한 청크로 답변 생성
+├── 07_hybrid_rag.py               # 검색부터 답변까지 연결
+├── 08_evaluate_recall.py          # Q1~Q6 Recall 평가
+├── bm25_lab/
+│   ├── search_lab.py              # load/grep/analyze/bm25/explain
+│   ├── Dockerfile                # Nori 설치
+│   └── compose.yaml
+└── pgvector_lab/
+    ├── 04_pgvector_search.py      # 벡터 적재, exact/hnsw, 계획 확인
+    ├── create_hnsw.sql
+    └── compose.yaml
+```
+
+## 결과
+
+아래는 기존 로컬 데이터로 실행해 기록한 결과다. 2026-10-01 정비에서는 Python 문법·CLI 옵션·캐시 전달을 점검했으며, 비공개 데이터와 DB·모델이 없어 검색 성능 실험을 다시 실행하지 않았다.
+
+- 청킹: 문서 364개 → 본문 있는 302개 → 청크 2,685개. 빈 본문·중복 ID·본문 최대 길이 검사 통과.
+- 샘플: 3개 벡터 모두 1,024차원, 유효한 숫자 확인.
+- BM25: URM 질문 OR 709개 / AND 1개. 1위는 두 경우 동일하고 점수 19.422447.
+- 전체 벡터: 1위 URM 초기 설정(0.6678), 2위 배포 체크리스트(0.6642), 3위 Admin 사용자 가이드(0.6583).
+- JSON/DB 정확 검색: 같은 질문 벡터로 Top-k 순서 일치, 최대 점수 차이 약 `1.3e-7`.
+- HNSW: 실제 인덱스 사용 확인, 이번 질문 Top-3는 정확 검색과 3/3 겹침.
+- DB 측정: exact 65.023ms / HNSW 6.371ms, 약 10.2배. 별도 단일 실행 기록이며 질문 임베딩 시간 제외. 다른 질문이나 데이터에서도 같은 차이가 나는지는 더 비교해야 한다.
+
+## 배운 점
+
+처음에는 BM25도 임베딩이 필요하다고 생각했다. 실습해 보니 Nori로 단어를 나누고 BM25로 점수를 매기는 검색과, 임베딩한 벡터끼리 비교하는 검색이 따로 있었다.
+
+AND로 바꾸니 709개였던 결과가 1개로 줄었다. 조건을 좁히면 관련 문서도 빠질 수 있다는 점을 알게 됐다. 벡터 검색에서는 본문이 거의 없는 청크가 2위로 나와서 문서 경로와 소제목도 같이 살펴봤다. HNSW는 전체를 비교하지 않아 빨랐고, 이번 질문의 상위 3개는 정확 검색과 같았다.
+
+## 다음 단계
+
+- [x] 같은 질문 세트로 검색 방식별 Recall@k 평가
+- [x] BM25와 벡터 순위를 RRF로 결합
+- [x] 검색 본문과 출처로 LLM 답변 생성
+- [x] 관계 질문을 4주차 지식 그래프 이론 학습으로 연결 — [4주차 노트](../../notes/04-knowledge-graph-background.md)
+- [ ] 실제 W3 질문의 근거를 그래프로 표현하고 검색 누락과 사실 부족 구분
+- [ ] 공개 예제 데이터로 전체 DB·모델 실행 재현

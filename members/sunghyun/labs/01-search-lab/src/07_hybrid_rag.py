@@ -21,6 +21,7 @@ def load(name, filename):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--query', required=True)
+    parser.add_argument('--cache', type=Path, help='04에서 적재한 벡터 캐시 파일')
     parser.add_argument('--candidates', type=int, default=20)
     parser.add_argument('--top-k', type=int, default=5)
     parser.add_argument('--ef-search', type=int, default=40)
@@ -44,7 +45,7 @@ def main():
     print('질문:', args.query, flush=True)
     print('BM25와 벡터 검색 → RRF 결합 중…', flush=True)
     report = hybrid.retrieve(args.query, args.operator, args.candidates, 60,
-                             args.search_mode, args.ef_search, track_total_hits=False)
+                             args.search_mode, args.ef_search, track_total_hits=False, cache=args.cache)
     selected = report['results'][:args.top_k]
     if not selected:
         raise ValueError('검색 근거가 없습니다. LLM 호출을 생략합니다.')
@@ -71,7 +72,7 @@ def main():
     print('생성 종료 이유:', result.get('done_reason', '미제공'))
     elapsed = time.perf_counter() - started
     path = ROOT / 'outputs' / ('rag_run_' + datetime.now().strftime('%Y%m%d_%H%M%S_%f') + '.json')
-    saved = {'query': args.query, 'settings': vars(args), 'retrieval': report,
+    saved = {'query': args.query, 'settings': {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()}, 'retrieval': report,
              'selected': selected, 'context': context, 'llm': result,
              'elapsed_seconds': elapsed, 'citation_numbers': refs,
              'invalid_citations': invalid}

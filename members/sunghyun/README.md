@@ -10,8 +10,8 @@ PostgreSQL, Elasticsearch, Docker를 직접 사용해 데이터 저장과 검색
 
 ## 진행 현황
 
-- 1주차: RAG와 지식 그래프 기초 정리
-
+- 1주차: [RAG와 지식 그래프 기초 정리](notes/01-knowledge-graph-and-ontology.md)
 - 2주차: [청킹·BM25·벡터 검색·HNSW 정리](notes/02-search-methods.md)
-- 실습: [검색의 세 세대 비교](labs/01-search-generations/README.md) — 전체 2,685개 청크 검색, JSON/DB 결과 비교, HNSW 실행 계획 확인
+- 실습: [검색의 세 세대 비교](labs/01-search-lab/README.md) — 전체 2,685개 청크 검색, JSON/DB 결과 비교, HNSW 실행 계획 확인
 - 3주차: [하이브리드 검색, RAG와 Recall 평가](notes/03-hybrid-rag-and-evaluation.md) — RRF 결합, HNSW 검색, 로컬·OpenRouter 답변 생성과 검색 평가 실습. 다중 홉 질문은 후속 과제로 남겼다.
+- 4주차: [지식 그래프의 배경 — 온톨로지 변천사와 방법론](notes/04-knowledge-graph-background.md) — RDF·OWL·링크드 데이터, Wikidata 질의, 그래프 모델 비교, 팔란티어와 GraphRAG 이론 학습. 실제 W3 질문의 그래프 검증은 후속 과제다.

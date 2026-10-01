@@ -105,7 +105,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="청크 3개 로컬 임베딩 테스트")
     parser.add_argument(
         "--input", type=Path,
-        default=Path("outputs/chunked_documents_v1.jsonl"),
+        default=Path(__file__).resolve().parent / "outputs/chunked_documents_v1.jsonl",
     )
     args = parser.parse_args()
     try:

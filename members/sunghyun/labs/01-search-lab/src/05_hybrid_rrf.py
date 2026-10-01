@@ -31,10 +31,11 @@ def fuse(lists, constant):
 
 
 def retrieve(query, operator='or', candidates=20, rrf_k=60, mode='exact',
-             ef_search=40, track_total_hits=True):
+             ef_search=40, track_total_hits=True, cache=None):
     bm = module('bm25', ROOT / 'bm25_lab/search_lab.py')
     pg = module('pg', ROOT / 'pgvector_lab/04_pgvector_search.py')
-    saved = json.loads(pg.CACHE.read_text())
+    cache_path = Path(cache).expanduser() if cache is not None else pg.CACHE
+    saved = json.loads(cache_path.read_text())
     settings = json.loads(pg.sql('SELECT settings FROM cache_settings WHERE id=1;'))
     if settings != saved['settings'] or pg.previous.model_digest() != settings['model_digest']:
         raise ValueError('캐시/DB/모델 설정 불일치')
@@ -93,6 +94,7 @@ def retrieve(query, operator='or', candidates=20, rrf_k=60, mode='exact',
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--query', required=True)
+    parser.add_argument('--cache', type=Path, help='04에서 적재한 벡터 캐시 파일')
     parser.add_argument('--operator', choices=['or', 'and'], default='or')
     parser.add_argument('--candidates', type=int, default=20)
     parser.add_argument('--top-k', type=int, default=5)
@@ -105,7 +107,7 @@ def main():
     if not args.query.strip() or min(args.candidates, args.top_k) < 1 or args.rrf_k < 0:
         parser.error('질문과 양수 후보/출력 수, 0 이상의 rrf-k가 필요합니다.')
     report = retrieve(args.query, args.operator, args.candidates, args.rrf_k,
-                      args.mode, args.ef_search)
+                      args.mode, args.ef_search, cache=args.cache)
     combined, lists = report['results'], report['lists']
     bm_hits, vec_hits = lists['bm25'], lists['vector']
     print(f"검색 범위: {report['count']} / BM25={args.operator.upper()} / vector={args.mode}")

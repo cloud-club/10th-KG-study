@@ -36,6 +36,8 @@ def recall_at_k(ranked_ids, gold, k):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--cache', type=Path, help='04에서 적재한 벡터 캐시 파일')
+    parser.add_argument('--input', type=Path, default=ROOT / 'outputs/chunked_documents_v1.jsonl')
     parser.add_argument('--operator', choices=['or', 'and'], default='or')
     parser.add_argument('--candidates', type=int, default=20)
     parser.add_argument('--ef-search', type=int, default=40)
@@ -45,7 +47,7 @@ def main():
     if min(args.ks) < 1 or args.candidates < max(args.ks) or args.ef_search < args.candidates:
         parser.error('k는 양수, candidates는 최대 k 이상, ef-search는 candidates 이상이어야 합니다.')
     ks = sorted(set(args.ks))
-    chunks = [json.loads(l) for l in (ROOT / 'outputs/chunked_documents_v1.jsonl').read_text().splitlines() if l.strip()]
+    chunks = [json.loads(l) for l in args.input.read_text().splitlines() if l.strip()]
     spec = importlib.util.spec_from_file_location('hybrid', ROOT / '05_hybrid_rrf.py')
     hybrid = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(hybrid)
@@ -61,7 +63,7 @@ def main():
             gold.append(matches[0]['chunk_id'])
         print(f'\n{qid}: {query}\n정답 근거 수: {len(gold)}', flush=True)
         report = hybrid.retrieve(query, args.operator, args.candidates, 60,
-                                 'hnsw', args.ef_search, track_total_hits=False)
+                                 'hnsw', args.ef_search, track_total_hits=False, cache=args.cache)
         rankings = {**report['lists'], 'hybrid': report['results']}
         ranked_details = {}
         for method, hits in rankings.items():
@@ -94,7 +96,7 @@ def main():
         print(method, averages[method])
     stem = ROOT / 'outputs' / ('recall_eval_' + datetime.now().strftime('%Y%m%d_%H%M%S_%f'))
     with stem.with_suffix('.json').open('x', encoding='utf-8') as out:
-        json.dump({'settings': vars(args), 'gold_scope': '원문을 검토해 고정한 초기 정답셋; 전체 관련 근거의 완전성은 미검증',
+        json.dump({'settings': {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()}, 'gold_scope': '원문을 검토해 고정한 초기 정답셋; 전체 관련 근거의 완전성은 미검증',
                    'summary': summary, 'macro_average': averages, 'questions': detail}, out, ensure_ascii=False, indent=2)
     with stem.with_suffix('.csv').open('x', encoding='utf-8-sig', newline='') as out:
         writer = csv.DictWriter(out, fieldnames=['question_id', 'method'] + [f'recall@{k}' for k in ks])

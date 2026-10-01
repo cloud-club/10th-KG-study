@@ -288,10 +288,10 @@ def recall_at_k(ranked_ids, gold_ids, k):
 
 | 파일 | 역할 |
 |---|---|
-| [05_hybrid_rrf.py](../labs/01-search-generations/src/05_hybrid_rrf.py) | BM25·exact/HNSW 검색, RRF 결합 |
-| [06_rag_answer.py](../labs/01-search-generations/src/06_rag_answer.py) | 청크 본문·출처 조립, LLM 답변 생성 |
-| [07_hybrid_rag.py](../labs/01-search-generations/src/07_hybrid_rag.py) | 질문 하나로 검색부터 답변까지 연결 |
-| [08_evaluate_recall.py](../labs/01-search-generations/src/08_evaluate_recall.py) | 고정 정답셋으로 세 방식의 Recall 비교 |
+| [05_hybrid_rrf.py](../labs/01-search-lab/src/05_hybrid_rrf.py) | BM25·exact/HNSW 검색, RRF 결합 |
+| [06_rag_answer.py](../labs/01-search-lab/src/06_rag_answer.py) | 청크 본문·출처 조립, LLM 답변 생성 |
+| [07_hybrid_rag.py](../labs/01-search-lab/src/07_hybrid_rag.py) | 질문 하나로 검색부터 답변까지 연결 |
+| [08_evaluate_recall.py](../labs/01-search-lab/src/08_evaluate_recall.py) | 고정 정답셋으로 세 방식의 Recall 비교 |
 
 ## 궁금한 점 / 더 알아볼 것
 

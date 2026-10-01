@@ -48,6 +48,8 @@ status: done
 **대체재가 아니라 서로 다른 층을 재는 도구.**
 검색 지표를 RAGAS로 대신하려 들면 노이즈만 늘어난다.
 
+> 보정(2026-09-16): "정답 레이블 없이"는 논문 원형 3지표(faithfulness·answer relevance·context relevance)에 대한 말이고, 현재 RAGAS 카탈로그의 절반 이상은 `reference`(정답 문장)나 `reference_context_ids`가 필요하다. 정답셋 유형별로 열리는 지표는 [10. RAGAS](10-ragas.md) 2절 참고.
+
 ### 실습 로드맵
 
 기법을 하나씩 **누적해서** 붙이고, 매번 **같은 골든셋**으로 측정.

@@ -14,7 +14,7 @@ from sentence_transformers import SentenceTransformer
 
 
 DEFAULT_MODEL = "intfloat/multilingual-e5-small"
-DEFAULT_DSN = "postgresql://study:study@127.0.0.1:5432/knowledge_graph"
+DEFAULT_DSN = "postgresql://kg:kg@127.0.0.1:5432/kg"
 
 
 def vector_literal(vector) -> str:

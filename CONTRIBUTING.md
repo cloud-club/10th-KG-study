@@ -5,6 +5,8 @@
 - 개인 작업은 반드시 `members/<github-id>/` 아래에만 둡니다.
 - 다른 사람 폴더는 수정하지 않습니다. 피드백은 PR 코멘트나 이슈로 남깁니다.
 - 여러 사람이 같이 쓰는 코드는 `shared/` 아래에 둡니다.
+- `wiki/`는 LLM 에이전트가 `members/`를 읽어 유지하는 스터디 위키입니다. **직접 편집하지 않습니다.**
+  틀린 내용은 자기 노트를 고쳐 PR 로 올리면 다음 ingest 때 반영됩니다. 규칙은 루트 [CLAUDE.md](CLAUDE.md).
 
 ## 멤버 폴더 만들기
 
@@ -23,6 +25,11 @@ touch members/$GH_ID/notes/.gitkeep members/$GH_ID/labs/.gitkeep
 ```
 
 폴더를 만든 뒤 루트 `README.md`의 멤버 표에 자기 행을 추가합니다.
+
+### 이름 표시
+
+- 현황판은 GitHub 아이디 대신 이름을 보여줍니다. 운영자가 `members/names.json`에 `"github-id": "이름"`을 추가합니다.
+- 다르게 불리고 싶으면 본인 `README.md` 맨 위에 프론트매터로 `name: 원하는 이름`을 적으세요. 이게 `names.json`보다 우선합니다.
 
 ### 반 (cohort)
 
@@ -50,7 +57,7 @@ status: in-progress           # in-progress | done
 
 ### notes
 
-- 파일 하나가 주제 하나입니다.
+- 파일 하나가 주제 하나입니다. 폴더 이름은 `notes/` 입니다 (`note/` 로 만들어도 읽히지만 표준은 복수형). `notes/week3/` 처럼 하위 폴더로 나눠도 현황판이 읽습니다.
 - `NN-kebab-case-topic.md` 형식으로 번호를 붙여 순서를 유지합니다.
   - 예: `01-data-model.md`, `02-storage-and-search.md`
 - `templates/note-template.md`를 복사해서 시작합니다.
@@ -66,6 +73,7 @@ status: in-progress           # in-progress | done
 ### readings (주차별 읽을거리)
 
 - `members/<github-id>/readings.md` 파일 하나에 주차별로 모읍니다. `templates/readings-template.md`를 복사해서 시작합니다.
+- 주차 번호는 스터디 첫 주(8/31~9/6, OT)를 **1주차**로 셉니다. 현황판이 주차마다 날짜 범위와 "이번 주"를 표시하니 헷갈리면 그걸 보고 맞추세요.
 - `## N주차` 제목 아래 불릿 하나가 자료 하나입니다. `## 1주차 · RAG 기초`처럼 제목 뒤에 주제를 붙여도 됩니다.
 - 불릿은 `[제목](링크) — 한 줄 메모` 형식을 기본으로 하되, 링크만 적거나 책처럼 링크 없이 제목만 적어도 됩니다.
 - 현황판 "주차별 읽을거리"가 멤버 전체 파일을 합쳐 주차별로 보여줍니다. 주차 제목 밖의 불릿은 "기타"로 묶입니다.
@@ -83,6 +91,13 @@ status: in-progress           # in-progress | done
 
 - 받아온 데이터는 루트 `data/<github-id>/` 아래에 둡니다. `data/` 는 git 이 무시하고, 도커 컨테이너(postgres `/data`, neo4j import 폴더)에 마운트되어 바로 읽을 수 있습니다. → [data/README.md](data/README.md)
 - 실습에 DB 가 필요하면 `docker compose up -d` 로 공용 인프라를 씁니다. → [infra/README.md](infra/README.md)
+
+## 위키 ingest
+
+- 노트·실습 PR 이 머지되면 스터디장이 Claude Code 로 `wiki/`에 반영합니다("PR #n ingest 해줘").
+  위키 변경도 `main` 직접 푸시가 아니라 PR 로 올립니다.
+- 노트 맨 위 프론트매터(`title`·`date`·`tags`·`status`)가 있으면 위키가 출처·주차·태그를 정확히 잡습니다.
+- 개인 대화 원문(카카오톡·노션 내용)은 노트에도 위키에도 싣지 않습니다. 통계(건수·기간)만 적습니다.
 
 ## 커밋하면 안 되는 것
 

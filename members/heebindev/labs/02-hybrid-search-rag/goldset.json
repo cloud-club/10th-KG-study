@@ -1,0 +1,27 @@
+[
+  {
+    "question": "SJF는 어떤 작업을 먼저 실행하는가?",
+    "expected_answer": "예상 CPU 사용 시간이 가장 짧은 작업을 먼저 실행한다.",
+    "relevant_chunk_ids": ["396719b3086e5d9f"]
+  },
+  {
+    "question": "문맥 교환 때 현재 프로세스의 CPU 레지스터 값은 어디에 저장하는가?",
+    "expected_answer": "현재 프로세스의 레지스터 값을 PCB에 저장한다.",
+    "relevant_chunk_ids": ["8117c4272ab827bd", "d8f22ea610b5d210"]
+  },
+  {
+    "question": "Round Robin에서 quantum은 어떤 역할을 하는가?",
+    "expected_answer": "각 작업에 할당되는 실행 시간 단위다. 작업은 quantum 동안 실행되거나 그 전에 블록될 때까지 실행된다.",
+    "relevant_chunk_ids": ["ac6a4d3661fb275f"]
+  },
+  {
+    "question": "프로세스가 교착상태에 빠지는 조건은 무엇인가?",
+    "expected_answer": "상호 배제, 보유 및 대기, 비선점, 순환 대기의 네 조건이 모두 성립해야 한다.",
+    "relevant_chunk_ids": ["a5f332867a87697c"]
+  },
+  {
+    "question": "Running 상태와 Blocked 상태는 어떻게 다른가?",
+    "expected_answer": "Running은 CPU에서 실행 중인 상태이고, Blocked는 입출력 완료 같은 이벤트를 기다리는 상태다.",
+    "relevant_chunk_ids": ["028330e0f5f56c47", "34a369044f7b7a7a"]
+  }
+]

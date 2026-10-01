@@ -1,0 +1,8 @@
+psycopg[binary]>=3.2
+python-dotenv>=1.0
+elasticsearch>=9,<10        # 서버 9.x ↔ 클라이언트 9.x 메이저를 맞춰야 함 (ES 8.x 라면 >=8,<9)
+openai>=1.50
+# 선택: 제미나이 임베딩
+# google-genai>=1.0
+# 선택: 로컬 임베딩 (bge-m3 / KURE)
+# sentence-transformers>=3.0

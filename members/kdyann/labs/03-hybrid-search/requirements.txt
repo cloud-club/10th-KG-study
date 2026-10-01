@@ -1,0 +1,2 @@
+psycopg[binary]==3.2.10
+sentence-transformers==3.4.1

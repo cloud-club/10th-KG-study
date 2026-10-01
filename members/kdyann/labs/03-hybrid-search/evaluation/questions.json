@@ -1,0 +1,95 @@
+{
+  "description": "수집된 내 Instagram 캡션과 참고 캡션을 읽고 수동으로 정답 문서를 지정한 개발용 질문 15개. 순위를 보기 전에 작성했으며 독립 테스트 세트가 아니다. 관련성은 질문의 구체적인 사실을 뒷받침하는 캡션으로 판단한다. 다중 홉 질문의 relevant_ids는 답변에 함께 필요한 근거 문서이며, Recall은 사실 연결이나 답변 정확도를 측정하지 않는다.",
+  "questions": [
+    {
+      "id": "own-design-tools",
+      "query": "내가 디자인 시스템을 만들 때 사용한 도구는 뭐야?",
+      "scope": "own",
+      "relevant_ids": ["17958989982195917"]
+    },
+    {
+      "id": "own-free-side-project",
+      "query": "내가 돈 없이 사이드 프로젝트를 배포하면서 배운 점은 뭐야?",
+      "scope": "own",
+      "relevant_ids": ["18125003041828008"]
+    },
+    {
+      "id": "own-first-contribution",
+      "query": "내가 처음 오픈소스에 기여할 때 어떤 이슈로 시작했어?",
+      "scope": "own",
+      "relevant_ids": ["18022073909902914"]
+    },
+    {
+      "id": "own-intern-story",
+      "query": "개발을 시작한 지 1년 만에 인턴에 합격했다는 내 글 찾아줘",
+      "scope": "own",
+      "relevant_ids": ["17864759229641845"]
+    },
+    {
+      "id": "own-umbrella-app",
+      "query": "우산을 자꾸 잊어버려서 만든 앱은 어떤 기능이 있어?",
+      "scope": "own",
+      "relevant_ids": ["18461156551119746"]
+    },
+    {
+      "id": "own-baseball-typing",
+      "query": "내가 만든 야구 선수 이름을 빠르게 입력해서 이기는 게임 찾아줘",
+      "scope": "own",
+      "relevant_ids": ["18089796404194917"]
+    },
+    {
+      "id": "own-study-app-features",
+      "query": "내 외계인 공부 앱에서 모리와 행성은 어떻게 등장해?",
+      "scope": "own",
+      "relevant_ids": ["18084823565536221", "18029336216850454"]
+    },
+    {
+      "id": "own-study-app-release",
+      "query": "내가 스터디언을 iOS·App Store로 출시했다고 소개한 글들을 찾아줘",
+      "scope": "own",
+      "relevant_ids": ["18084823565536221", "18029336216850454"]
+    },
+    {
+      "id": "own-batting-quiz",
+      "query": "내 타격폼 보고 선수 맞히기 게시물 찾아줘",
+      "scope": "own",
+      "relevant_ids": ["17909277054461458"]
+    },
+    {
+      "id": "reference-claude-feedback",
+      "query": "Claude Code 활용 팁 중 계획을 먼저 세우고 테스트와 스크린샷으로 검증하라는 글 찾아줘",
+      "scope": "reference",
+      "relevant_ids": ["18405632698093592"]
+    },
+    {
+      "id": "reference-graphify",
+      "query": "코드와 문서와 티켓을 하나의 지도로 연결하고 Claude Code와 연동되는 Graphify 설명 찾아줘",
+      "scope": "reference",
+      "relevant_ids": ["17975901117092532"]
+    },
+    {
+      "id": "reference-learning-resources",
+      "query": "Claude Code 학습 자료 5개와 Nick의 4시간 튜토리얼을 소개한 글 찾아줘",
+      "scope": "reference",
+      "relevant_ids": ["18131118205678291"]
+    },
+    {
+      "id": "reference-nine-repositories",
+      "query": "Claude Code 도우미와 Ahrefs나 Semrush 대안을 포함한 GitHub 저장소 9개를 소개한 글 찾아줘",
+      "scope": "reference",
+      "relevant_ids": ["18084939893245578"]
+    },
+    {
+      "id": "all-personal-design",
+      "query": "내가 Pen.dev와 Claude Code로 컬러와 폰트와 컴포넌트를 추출한 디자인 시스템 글 찾아줘",
+      "scope": "all",
+      "relevant_ids": ["17958989982195917"]
+    },
+    {
+      "id": "all-tool-bridge",
+      "query": "내 디자인 시스템에 사용한 도구 중 참고 게시물에도 등장하는 도구를 찾고, 그 도구의 활용 팁과 Graphify 연동 설명을 연결해줘",
+      "scope": "all",
+      "relevant_ids": ["17958989982195917", "18405632698093592", "17975901117092532"]
+    }
+  ]
+}

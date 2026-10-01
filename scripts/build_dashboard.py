@@ -44,9 +44,10 @@ XP_PER_LEVEL = 100
 KIND_ORDER = {"level": 0, "streak": 1, "lab": 2, "note": 3, "reading": 4, "shared": 5, "commit": 6}
 READINGS_FILE = "readings.md"      # members/<id>/readings.md — 주차별 읽을거리
 SKIP_DIRS = {"<github-id>", "_template"}
+NAMES_PATH = MEMBERS_DIR / "names.json"       # {"github-id": "이름"} — 현황판에 아이디 대신 이름을 보여준다
 COHORTS_PATH = MEMBERS_DIR / "cohorts.json"   # 반별 명단 {"A": [id, ...]}. 명단에 없는 멤버는 마지막 반 다음 반(열린 반)으로
-INFRA_PREFIXES = ("dashboard/", "scripts/", ".github/", "templates/", ".cache/")
-INFRA_FILES = {"README.md", "CONTRIBUTING.md", ".gitignore", "members/cohorts.json"}
+INFRA_PREFIXES = ("dashboard/", "scripts/", ".github/", "templates/", ".cache/", "wiki/", ".claude/")
+INFRA_FILES = {"README.md", "CONTRIBUTING.md", "CLAUDE.md", ".gitignore", "members/cohorts.json", "members/names.json"}
 BINARY_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".pdf", ".zip", ".lock", ".ipynb", ".parquet", ".db"}
 PLACEHOLDERS = {
     "NN. 주제",
@@ -152,9 +153,9 @@ def study_files(files: list[str]) -> list[str]:
 def classify_commit(files: list[str]) -> str:
     kinds = set()
     for f in files:
-        if re.match(r"^members/[^/]+/labs/", f):
+        if re.match(r"^members/[^/]+/labs?/", f):
             kinds.add("lab")
-        elif re.match(r"^members/[^/]+/notes/", f):
+        elif re.match(r"^members/[^/]+/notes?/", f):
             kinds.add("note")
         elif re.match(rf"^members/[^/]+/{re.escape(READINGS_FILE)}$", f):
             kinds.add("reading")
@@ -365,8 +366,24 @@ def parse_readings(path: Path, member_id: str, repo: dict) -> list[dict]:
     return items
 
 
-def build_readings(members: list[dict]) -> list[dict]:
-    """전 멤버 읽을거리를 주차별로 묶어 최신 주차부터. 주차 없는 항목은 맨 뒤 '기타'."""
+def week1_monday(started_at: str) -> dt.date:
+    """스터디 첫 커밋이 속한 주의 월요일. 이 날부터 7일씩 1주차, 2주차 … 로 센다."""
+    start = dt.date.fromisoformat(started_at)
+    return start - dt.timedelta(days=start.weekday())
+
+
+def week_of(date: dt.date, monday: dt.date) -> int:
+    return (date - monday).days // 7 + 1
+
+
+def week_range(week: int, monday: dt.date) -> tuple[str, str]:
+    start = monday + dt.timedelta(days=(week - 1) * 7)
+    return start.isoformat(), (start + dt.timedelta(days=6)).isoformat()
+
+
+def build_readings(members: list[dict], monday: dt.date | None = None) -> list[dict]:
+    """전 멤버 읽을거리를 주차별로 묶어 최신 주차부터. 주차 없는 항목은 맨 뒤 '기타'.
+    monday(1주차 월요일)를 주면 주차마다 날짜 범위(starts/ends)를 붙인다."""
     groups: dict = defaultdict(list)
     for m in members:
         for item in m["readings"]:
@@ -375,9 +392,11 @@ def build_readings(members: list[dict]) -> list[dict]:
     for week in sorted((w for w in groups if w is not None), reverse=True) + ([None] if None in groups else []):
         items = groups[week]
         labels = [i["label"] for i in items if i["label"]]
+        starts, ends = week_range(week, monday) if (monday and week is not None) else ("", "")
         weeks.append({
             "week": week,
             "label": Counter(labels).most_common(1)[0][0] if labels else "",
+            "starts": starts, "ends": ends,
             "members": sorted({i["member"] for i in items}),
             "items": [{k: v for k, v in i.items() if k not in ("week", "label")} for i in items],
         })
@@ -389,11 +408,13 @@ def build_readings(members: list[dict]) -> list[dict]:
 def parse_note(path: Path, member_id: str, repo: dict) -> dict:
     meta, body = parse_frontmatter(read_text(path))
     rel = path.relative_to(ROOT).as_posix()
+    # notes/week3/06-x.md 처럼 하위 폴더에 둔 노트도 id 가 겹치지 않게 멤버 폴더 기준 상대 경로를 쓴다
+    inside = Path(rel).relative_to(f"members/{member_id}").as_posix()
     title = clean_title(meta.get("title")) or clean_title(first_heading(body)) or humanize(path.stem)
     return {
         "kind": "note",
-        "id": f"{member_id}/notes/{path.stem}",
-        "file": path.name,
+        "id": f"{member_id}/{inside[:-3] if inside.endswith('.md') else inside}",
+        "file": inside,
         "title": title,
         "date": find_date(meta, body, rel),
         "summary": clean_title(meta.get("summary")) or section_text(body, "한 줄 요약"),
@@ -462,14 +483,26 @@ def member_dirs() -> list[Path]:
             if d.is_dir() and not d.name.startswith(".") and d.name not in SKIP_DIRS]
 
 
-def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict]) -> dict:
+def content_dir(member_dir: Path, candidates: tuple[str, ...]) -> Path:
+    """notes/ 가 표준이지만 note/ 처럼 단수로 만든 폴더도 읽는다. 있는 첫 후보, 없으면 첫 후보 경로."""
+    for name in candidates:
+        if (member_dir / name).is_dir():
+            return member_dir / name
+    return member_dir / candidates[0]
+
+
+NOTES_DIR_NAMES = ("notes", "note")
+LABS_DIR_NAMES = ("labs", "lab")
+
+
+def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict], names: dict[str, str] | None = None) -> dict:
     member_id = member_dir.name
     readme = member_dir / "README.md"
     meta, body = parse_frontmatter(read_text(readme)) if readme.exists() else ({}, "")
-    notes_dir, labs_dir = member_dir / "notes", member_dir / "labs"
+    notes_dir, labs_dir = content_dir(member_dir, NOTES_DIR_NAMES), content_dir(member_dir, LABS_DIR_NAMES)
 
-    notes = sorted((parse_note(p, member_id, repo) for p in notes_dir.glob("*.md")) if notes_dir.exists() else [],
-                   key=lambda n: n["file"])
+    note_files = [p for p in notes_dir.rglob("*.md") if not any(part.startswith((".", "_")) for part in p.relative_to(notes_dir).parts)] if notes_dir.exists() else []
+    notes = sorted((parse_note(p, member_id, repo) for p in note_files), key=lambda n: n["file"])
     labs = sorted((parse_lab(d, member_id, repo) for d in labs_dir.iterdir() if d.is_dir() and not d.name.startswith("."))
                   if labs_dir.exists() else [], key=lambda l: l["file"])
     readings_path = member_dir / READINGS_FILE
@@ -479,7 +512,7 @@ def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict
 
     return {
         "id": member_id,
-        "name": str(meta.get("name") or clean_title(first_heading(body)) or member_id),
+        "name": member_name(member_id, meta, body, names or {}),
         "avatar": f"https://github.com/{member_id}.png?size=160",
         "url": f"https://github.com/{member_id}",
         "folder_url": f"{repo['url']}/tree/{repo['branch']}/members/{member_id}",
@@ -496,6 +529,41 @@ def scan_member(member_dir: Path, repo: dict, today: dt.date, commits: list[dict
         "readings": readings,
         "_commits": commits,
     }
+
+
+# ------------------------------------------------------------------- names
+
+def load_names(path: Path) -> dict[str, str]:
+    """members/names.json → {"id": "이름"}. 없거나 깨졌으면 {}. 문자열이 아닌 값은 건너뛴다."""
+    if not path.exists():
+        return {}
+    try:
+        raw = json.loads(read_text(path))
+    except ValueError as exc:
+        print(f"[dashboard] {path.name} 파싱 실패, 이름 없이 진행: {exc}", file=sys.stderr)
+        return {}
+    if not isinstance(raw, dict):
+        print(f'[dashboard] {path.name} 은 {{"github-id": "이름"}} 형식이어야 합니다', file=sys.stderr)
+        return {}
+    names = {}
+    for mid, name in raw.items():
+        if isinstance(name, str) and name.strip():
+            names[str(mid)] = name.strip()
+        else:
+            print(f"[dashboard] {path.name}: {mid} 의 이름은 비어 있지 않은 문자열이어야 합니다", file=sys.stderr)
+    return names
+
+
+def member_name(member_id: str, meta: dict, body: str, names: dict[str, str]) -> str:
+    """표시 이름 우선순위: README 프론트매터 name → names.json (대소문자 무시) → README 첫 제목 → 아이디."""
+    if meta.get("name"):
+        return str(meta["name"]).strip()
+    by_lower = {k.lower(): v for k, v in names.items()}
+    mapped = names.get(member_id) or by_lower.get(member_id.lower())
+    if mapped:
+        return mapped
+    heading = clean_title(first_heading(body))
+    return heading if heading and heading.lower() != member_id.lower() else member_id
 
 
 # ----------------------------------------------------------------- cohorts
@@ -654,6 +722,7 @@ def commit_event(group: list[dict], members_by_id: dict, repo: dict) -> dict:
     return {
         "id": f"commit:{latest['sha'][:12]}" if single else f"commits:{latest['member']}:{latest['date']}:{latest['sha'][:7]}",
         "date": latest["date"], "member": latest["member"], "kind": latest["kind"] if single else classify_commit(files),
+        "name": (members_by_id.get(latest["member"]) or {}).get("name") or latest["member"],
         "title": latest["message"], "url": f"{repo['url']}/commit/{latest['sha']}",
         "count": len(group),
         "commits": [{"message": c["message"], "url": f"{repo['url']}/commit/{c['sha']}"} for c in group[:MAX_COMMITS_IN_EVENT]],
@@ -673,7 +742,7 @@ def commit_events(commits: list[dict], members_by_id: dict, repo: dict) -> list[
 def milestone_events(members: list[dict]) -> list[dict]:
     events = []
     for m in members:
-        base = {"member": m["id"], "date": m["last_active"], "url": m["folder_url"], "count": 1, "commits": [],
+        base = {"member": m["id"], "name": m["name"], "date": m["last_active"], "url": m["folder_url"], "count": 1, "commits": [],
                 "summary": "", "tags": [], "items": [], "stats": None, "files": [], "_diff": ""}
         if m["streak"] >= STREAK_MILESTONE:
             events.append({**base, "id": f"streak:{m['id']}:{m['streak']}", "kind": "streak",
@@ -735,7 +804,8 @@ def main() -> int:
     by_member: dict[str, list[dict]] = defaultdict(list)
     for c in commits:
         by_member[c["member"]].append(c)
-    members = [scan_member(d, repo, today, by_member.get(d.name, [])) for d in dirs]
+    names = load_names(NAMES_PATH)
+    members = [scan_member(d, repo, today, by_member.get(d.name, []), names) for d in dirs]
     cohorts, cohort_of = assign_cohorts([m["id"] for m in members], load_cohorts(COHORTS_PATH))
     members = [{**m, "cohort": cohort_of[m["id"]]} for m in members]
 
@@ -748,7 +818,9 @@ def main() -> int:
         "cohorts": sum(1 for c in cohorts if c["members"]),
     }
     started = git(["log", "--reverse", "--format=%ad", "--date=short"]).splitlines()
-    study = {"started_at": started[0] if started else today.isoformat()}
+    started_at = started[0] if started else today.isoformat()
+    monday = week1_monday(started_at)
+    study = {"started_at": started_at, "week1_start": monday.isoformat(), "current_week": week_of(today, monday)}
 
     events = build_feed_events(commits, members, repo)
     llm = enrich_with_llm(members, totals, cache, events)
@@ -766,7 +838,7 @@ def main() -> int:
         "members": strip_private(members),
         "cohorts": build_cohort_graphs(cohorts, members),
         "activity": build_activity(commits, repo),
-        "readings": build_readings(members),
+        "readings": build_readings(members, monday),
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")

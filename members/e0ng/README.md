@@ -20,4 +20,4 @@
 
 | # | 실습 | 상태 |
 |---|---|---|
-| 02 | [내 데이터를 세 가지 검색 방식으로 저장하고 검색하기](labs/02-search-generations/README.md) | 완료 |
+| 03 | [개인 데이터 검색 에이전트](labs/03-personal-data-agent/README.md) | 완료 |

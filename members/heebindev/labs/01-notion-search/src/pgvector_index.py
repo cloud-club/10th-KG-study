@@ -103,7 +103,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--dsn",
-        default="postgresql://study:study@127.0.0.1:5432/knowledge_graph",
+        default="postgresql://kg:kg@127.0.0.1:5432/kg",
         help="PostgreSQL 접속 문자열",
     )
     parser.add_argument("--batch-size", type=int, default=32, help="임베딩 묶음 크기")

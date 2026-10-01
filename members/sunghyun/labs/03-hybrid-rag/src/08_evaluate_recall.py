@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
+SEARCH_ROOT = ROOT.parents[1] / '02-search-lab' / 'src'
 CASES = [
     ('Q6', 'CodeCenter에서 서버의 모델을 가져와 선택하는 방법은?', [
         '939045cab738cdbea348369ce1cf8974b649821a24d7aa3e2ddbc92adf8ed9bc',
@@ -37,7 +38,7 @@ def recall_at_k(ranked_ids, gold, k):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--cache', type=Path, help='04에서 적재한 벡터 캐시 파일')
-    parser.add_argument('--input', type=Path, default=ROOT / 'outputs/chunked_documents_v1.jsonl')
+    parser.add_argument('--input', type=Path, default=SEARCH_ROOT / 'outputs/chunked_documents_v1.jsonl')
     parser.add_argument('--operator', choices=['or', 'and'], default='or')
     parser.add_argument('--candidates', type=int, default=20)
     parser.add_argument('--ef-search', type=int, default=40)

@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
+SEARCH_ROOT = ROOT.parents[1] / '02-search-lab' / 'src'
 
 
 def module(name, path):
@@ -32,8 +33,8 @@ def fuse(lists, constant):
 
 def retrieve(query, operator='or', candidates=20, rrf_k=60, mode='exact',
              ef_search=40, track_total_hits=True, cache=None):
-    bm = module('bm25', ROOT / 'bm25_lab/search_lab.py')
-    pg = module('pg', ROOT / 'pgvector_lab/04_pgvector_search.py')
+    bm = module('bm25', SEARCH_ROOT / 'bm25_lab/search_lab.py')
+    pg = module('pg', SEARCH_ROOT / 'pgvector_lab/04_pgvector_search.py')
     cache_path = Path(cache).expanduser() if cache is not None else pg.CACHE
     saved = json.loads(cache_path.read_text())
     settings = json.loads(pg.sql('SELECT settings FROM cache_settings WHERE id=1;'))

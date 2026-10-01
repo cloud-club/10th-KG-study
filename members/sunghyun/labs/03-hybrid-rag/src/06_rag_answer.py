@@ -7,6 +7,7 @@ from pathlib import Path
 from urllib.request import Request, ProxyHandler, HTTPRedirectHandler, build_opener
 
 ROOT = Path(__file__).resolve().parent
+SEARCH_ROOT = ROOT.parents[1] / '02-search-lab' / 'src'
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -89,7 +90,7 @@ def main():
     if not args.query.strip():
         parser.error('질문이 비어 있습니다.')
     rows = [json.loads(line) for line in
-            (ROOT / 'outputs/chunked_documents_v1.jsonl').read_text().splitlines() if line.strip()]
+            (SEARCH_ROOT / 'outputs/chunked_documents_v1.jsonl').read_text().splitlines() if line.strip()]
     selected = []
     for prefix in args.chunk_id:
         matches = [r for r in rows if r['chunk_id'].startswith(prefix)]

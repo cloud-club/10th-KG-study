@@ -180,7 +180,7 @@ CREATE INDEX chunks_embedding_hnsw
 ON chunks USING hnsw (embedding vector_cosine_ops);
 ```
 
-실습 코드와 실행 방법은 [검색 실습 README](../labs/01-search-lab/README.md)에 정리했다.
+실습 코드와 실행 방법은 [검색 실습 README](../labs/02-search-lab/README.md)에 정리했다.
 
 ## 궁금한 점 / 더 알아볼 것
 

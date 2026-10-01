@@ -5,13 +5,13 @@ tags: [rag, bm25, elasticsearch, nori, embedding, pgvector, hnsw]
 status: done
 ---
 
-# 01. 검색의 세 세대 비교
+# 02. 검색의 세 세대 비교
 
 > 관련 노트: [청킹부터 BM25, pgvector, HNSW까지](../../notes/02-search-methods.md)
 
 ## 목표
 
-같은 청크를 문자열·키워드·벡터로 검색하고, 전체 비교와 HNSW 근사 탐색의 차이를 확인한다. 2주차 검색 실습에 이어 3주차에는 RRF 결합, LLM 답변 생성, Recall 평가까지 진행했다.
+같은 청크를 문자열·키워드·벡터로 검색하고, 전체 비교와 HNSW 근사 탐색의 차이를 확인한다. 3주차의 RRF 결합, LLM 답변 생성과 Recall 평가는 별도 폴더에서 이어간다.
 
 ## 환경
 
@@ -39,7 +39,7 @@ status: done
 저장소 루트에서 실습 폴더로 이동한다.
 
 ```bash
-cd members/sunghyun/labs/01-search-lab
+cd members/sunghyun/labs/02-search-lab
 python3 src/01_chunk_documents.py \
   --input ../../../../data/sunghyun/normalized_documents_with_path.jsonl \
   --output src/outputs/chunked_documents_v1.jsonl
@@ -112,48 +112,9 @@ python3 src/pgvector_lab/04_pgvector_search.py \
 
 `HNSW 실제 사용: True`와 인덱스 이름, 정확 검색 결과와 겹치는 개수를 확인한다. exact는 해당 트랜잭션에서 인덱스 탐색을 꺼 기준을 만들고, hnsw는 순차 탐색을 억제한 뒤 실행 계획으로 사용 여부를 검사한다. 설정은 트랜잭션 안에서만 적용한다. `last_comparison.json`은 로컬 결과이며 Git에서 제외한다.
 
-### 6. 3주차: RRF → 답변 생성 → Recall 평가
+## 후속 실습
 
-관련 노트: [3주차 실습과 결과](../../notes/03-hybrid-rag-and-evaluation.md).
-아래 명령은 위 1~5단계의 청크 생성, 전체 임베딩, Elasticsearch·pgvector 적재와 HNSW 인덱스 준비를 마친 뒤 같은 실습 폴더에서 실행한다.
-
-| 코드 | 역할 |
-|---|---|
-| [05_hybrid_rrf.py](src/05_hybrid_rrf.py) | BM25·벡터 후보를 chunk_id 기준 RRF로 결합 |
-| [06_rag_answer.py](src/06_rag_answer.py) | 지정한 청크 ID의 본문·출처로 답변 생성 |
-| [07_hybrid_rag.py](src/07_hybrid_rag.py) | 질문 하나로 검색·RRF·컨텍스트·LLM 답변 연결 |
-| [08_evaluate_recall.py](src/08_evaluate_recall.py) | Q1~Q6의 고정 정답 청크로 세 검색 방식 평가 |
-
-```bash
-# HNSW 후보 검색과 RRF Top-5 확인
-python3 src/05_hybrid_rrf.py \
-  --query 'URM 서버 등록하는 방법' \
-  --operator or --mode hnsw --candidates 20 --top-k 5
-
-# 선택한 청크 본문으로 컨텍스트 조립만 확인
-python3 src/06_rag_answer.py \
-  --query 'URX에서 서로 다른 ALM에 아이템 어떻게 보내?' \
-  --chunk-id '<실제 청크 ID>' --preview
-
-# 로컬 답변 모델 준비 후 통합 흐름 실행
-ollama pull qwen2.5:7b
-python3 src/07_hybrid_rag.py --mode local \
-  --query 'URX에서 서로 다른 ALM에 아이템 어떻게 보내?'
-
-# OPENROUTER_API_KEY 환경변수를 설정한 터미널에서 실행
-python3 src/07_hybrid_rag.py --mode openrouter \
-  --query 'URX에서 서로 다른 ALM에 아이템 어떻게 보내? 그리고 CB가 뭐야?'
-
-# LLM 호출 없이 BM25/HNSW/RRF Recall 비교
-python3 src/08_evaluate_recall.py --ks 1 3 5 10
-python3 src/08_evaluate_recall.py --question Q6 --ks 1 3 5 10
-```
-
-07의 기본값은 BM25 OR, HNSW, 후보 각 20개, 최종 Top-5다. 기존 2주차 BM25 단독 실습의 기본 AND와 구분한다. `--preview`는 07에서도 사용할 수 있으며 답변 모델 호출을 생략한다. OpenRouter 모드는 질문과 선택된 본문·출처를 API로 전송하므로 전송 가능한 자료로 실행한다.
-
-05·07·08의 기본 캐시는 실습 당시 `src/outputs/vectors_qwen3_2685.json`이다. 다른 캐시는 세 명령에 `--cache src/outputs/vectors_qwen3_<실제 청크 수>.json`을 지정한다. 08의 청크 파일도 다르면 `--input <청크 파일>`을 지정한다. 코드의 `CACHE` 상수를 수정할 필요는 없다. 08의 `CASES`에는 이번 비공개 데이터의 정답 청크 ID만 들어 있다. 다른 데이터로 실행하려면 원문을 읽고 질문과 정답 ID를 바꿔야 하며, 임의의 데이터에서는 그대로 재현되지 않는다.
-
-인용 번호 검사는 번호 범위만 검사한다. 문장과 근거가 일치하는지는 직접 확인한다. 결과 JSON/CSV, 원문·임베딩 캐시, API 키는 업로드하지 않는다.
+RRF 결합, 답변 생성과 Recall 평가는 [3주차 실습](../03-hybrid-rag/README.md)으로 분리했다.
 
 ## 구조
 
@@ -162,10 +123,6 @@ src/
 ├── 01_chunk_documents.py          # 문서 구조 → 청크
 ├── 02_embed_sample.py             # 3개 샘플, 저장 없음
 ├── 03_vector_search.py            # 벡터 캐시 + Python 코사인 검색
-├── 05_hybrid_rrf.py               # BM25·벡터 RRF 결합
-├── 06_rag_answer.py               # 선택한 청크로 답변 생성
-├── 07_hybrid_rag.py               # 검색부터 답변까지 연결
-├── 08_evaluate_recall.py          # Q1~Q6 Recall 평가
 ├── bm25_lab/
 │   ├── search_lab.py              # load/grep/analyze/bm25/explain
 │   ├── Dockerfile                # Nori 설치

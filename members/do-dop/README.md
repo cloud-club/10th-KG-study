@@ -22,6 +22,9 @@
 | 03 | [Citation과 Provenance: 근거를 어떻게 남겨야 하는가](notes/03-citation-and-provenance.md) | 완료 |
 | 03 | [RAG 루프와 Retrieval Evaluation](notes/03-rag-loop.md) | 완료 |
 | 03 | [Single-hop에서 Multi-hop으로, 그리고 지식그래프로](notes/03-multihop-to-kg.md) | 완료 |
+| 04 | [시맨틱 웹에서 지식그래프까지](notes/04-semantic-web-to-knowledge-graph.md) | 완료 |
+| 04 | [온톨로지와 추론: 저장된 사실에서 새로운 지식으로](notes/04-ontology-and-inference.md) | 완료 |
+| 04 | [관계형 데이터베이스와 그래프 데이터 모델](notes/04-relational-and-graph-data-models.md) | 완료 |
 
 ### labs
 

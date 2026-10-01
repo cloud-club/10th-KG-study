@@ -51,6 +51,18 @@ OPENAI_MODEL=gpt-4.1-mini
 
 ### 2. 같은 코퍼스로 검색 색인 만들기
 
+최근 참고 게시물은 공식 Instagram 해시태그 API에서 수집한다. 기본 해시태그는 `reels`, `fyp`, `coding`, `AI`, `개발`이다. 게시 후 24시간 이상, 최근 7일 이내, 관측 좋아요 100개 이상인 후보를 좋아요·댓글 순위 RRF로 정렬해 최대 50개 선정한다. 이는 수집한 후보 안에서의 순위이며 Instagram 전체 인기 순위가 아니다.
+
+```bash
+python src/fetch_topic_instagram.py --count 50
+```
+
+이미 저장한 후보에 새 기준만 적용하려면 아래 명령을 사용한다. 이 모드는 Meta API나 액세스 토큰 없이 `instagram_topic_documents.jsonl`을 읽고 현재 시각 기준으로 `instagram_topic_selected.jsonl`만 갱신한다. 새로운 후보를 찾으려면 위 수집 명령을 다시 실행해야 한다.
+
+```bash
+python src/fetch_topic_instagram.py --reselect-existing --count 50
+```
+
 ```bash
 python src/index_search.py
 ```

@@ -64,7 +64,7 @@ class TopicTests(unittest.TestCase):
         self.assertIsNone(selected[0]["selection"]["observed_comments"])
         self.assertEqual(selected[0]["selection"], {"method": "likes_comments_rrf", "score": 1 / 61,
                          "k": 60, "likes_rank": 1, "comments_rank": None, "min_age_hours": 24,
-                         "min_likes": 1000, "max_age_days": 7, "observed_likes": 1000,
+                         "min_likes": 100, "max_age_days": 7, "observed_likes": 1000,
                          "observed_comments": None})
         self.assertEqual(topics.select_documents([], NOW, 3, 7), [])
 
@@ -80,8 +80,8 @@ class TopicTests(unittest.TestCase):
                          [row["id"] for row in topics.select_documents(rows, NOW, 3, 7)])
 
     def test_selection_age_and_like_boundaries_are_inclusive(self):
-        rows = [document("at24h", 1, {"likes": 1000}), document("at7d", 7, {"likes": 1000}),
-                document("under1000", 2, {"likes": 999}), document("under24h", metrics={"likes": 9000}),
+        rows = [document("at24h", 1, {"likes": 100}), document("at7d", 7, {"likes": 100}),
+                document("under100", 2, {"likes": 99}), document("under24h", metrics={"likes": 9000}),
                 document("over7d", metrics={"likes": 9000})]
         rows[3]["published_at"] = (NOW - timedelta(hours=23, minutes=59)).isoformat()
         rows[4]["published_at"] = (NOW - timedelta(days=7, seconds=1)).isoformat()
@@ -117,20 +117,38 @@ class TopicTests(unittest.TestCase):
         self.assertIsNone(selected[1]["selection"]["comments_rank"])
         self.assertAlmostEqual(selected[1]["selection"]["score"], 1 / (60 + selected[1]["selection"]["likes_rank"]))
 
-    def test_default_topics_and_selection_cap_ten(self):
+    def test_default_topics_and_selection_cap_fifty(self):
         args = topics.parse_args([])
         self.assertEqual(args.hashtag, ["reels", "fyp", "coding", "AI", "개발"])
-        self.assertEqual(args.count, 10)
-        rows = [document(f"p{i:02d}", metrics={"likes": 1000 + i, "comments": i}) for i in range(12)]
+        self.assertEqual(args.count, 50)
+        rows = [document(f"p{i:02d}", metrics={"likes": 100 + i, "comments": i}) for i in range(52)]
         selected = topics.select_documents(rows, NOW, args.count, args.max_age_days)
-        self.assertEqual(len(selected), 10)
-        self.assertEqual(selected[0]["id"], "p11")
+        self.assertEqual(len(selected), 50)
+        self.assertEqual(selected[0]["id"], "p51")
         self.assertEqual(selected[-1]["id"], "p02")
-        for invalid in (0, 11):
+        for invalid in (0, 51):
             with self.subTest(count=invalid), contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
                 topics.parse_args(["--count", str(invalid)])
             with self.assertRaises(ValueError):
                 topics.select_documents(rows, NOW, invalid, 7)
+
+    def test_meta_timestamp_without_timezone_colon(self):
+        row = document("meta", metrics={"likes": 100})
+        row["published_at"] = "2026-09-15T12:00:00+0000"
+        self.assertEqual([item["id"] for item in topics.select_documents([row], NOW, 50, 7)], ["meta"])
+
+    def test_reselect_existing_does_not_need_credentials_or_fetch(self):
+        with tempfile.TemporaryDirectory() as temp:
+            documents, selected = Path(temp) / "documents.jsonl", Path(temp) / "selected.jsonl"
+            topics.write_jsonl(documents, [document("eligible", metrics={"likes": 100}),
+                                           document("low", metrics={"likes": 99})])
+            with patch.dict(os.environ, {}, clear=True), patch.object(topics, "DOCUMENTS_PATH", documents), \
+                    patch.object(topics, "SELECTED_PATH", selected), patch.object(topics, "fetch_topics") as fetch, \
+                    patch.object(topics, "datetime", wraps=datetime) as clock, contextlib.redirect_stdout(io.StringIO()):
+                clock.now.return_value = NOW
+                self.assertEqual(topics.main(["--reselect-existing"]), 0)
+            fetch.assert_not_called()
+            self.assertEqual([row["id"] for row in topics.read_jsonl(selected)], ["eligible"])
 
     def test_invalid_likes_excluded_and_invalid_comments_remain_unknown(self):
         for bad in (None, True, False, -1, float("nan"), float("inf"), float("-inf"), "1000"):
@@ -181,11 +199,11 @@ class TopicTests(unittest.TestCase):
 
 
 class ContentTests(unittest.TestCase):
-    def test_prepare_context_accepts_ten_but_rejects_eleven_and_duplicate_ids(self):
-        rows = [document(f"p{i}") for i in range(11)]
-        context = content.prepare_context(rows[:10], [])
-        self.assertEqual(len(context["selected_posts"]), 10)
-        self.assertEqual([row["id"] for row in context["selected_posts"]], [f"p{i}" for i in range(10)])
+    def test_prepare_context_accepts_fifty_but_rejects_fifty_one_and_duplicate_ids(self):
+        rows = [document(f"p{i}") for i in range(51)]
+        context = content.prepare_context(rows[:50], [])
+        self.assertEqual(len(context["selected_posts"]), 50)
+        self.assertEqual([row["id"] for row in context["selected_posts"]], [f"p{i}" for i in range(50)])
         for invalid in (rows, [], [rows[0], rows[0]]):
             with self.assertRaises(content.ContentError):
                 content.prepare_context(invalid, [])

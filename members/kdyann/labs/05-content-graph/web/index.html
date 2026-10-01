@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f4f0" />
+    <title>준영피티 · 로컬 채팅</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand" aria-label="준영피티">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span>준영피티</span>
+        </div>
+        <span class="local-badge"><span aria-hidden="true"></span> 로컬 실습</span>
+      </header>
+
+      <main class="workspace">
+        <section class="chat-panel" aria-label="콘텐츠 그래프 채팅">
+          <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions text">
+            <div class="message assistant welcome-message">
+              <span class="avatar" aria-hidden="true">✳</span>
+              <div class="message-content">
+                <p>안녕하세요! 내 게시물과 최근 참고 게시물 사이의 연결을 찾아볼게요. 아래 질문을 골라 시작해 보세요.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="composer-area">
+            <div class="suggestions" aria-label="추천 질문">
+              <button type="button" class="suggestion" data-prompt="최근 유행한 것 중 내 게시물에 참고할 만한 거 있어?">최근 유행한 것 중 참고할 만한 거 있어? <span aria-hidden="true">↗</span></button>
+              <button type="button" class="suggestion" data-prompt="내 게시물의 주제는 뭐야?">내 게시물의 주제는 뭐야? <span aria-hidden="true">↗</span></button>
+            </div>
+            <form id="chat-form" class="composer">
+              <label for="chat-input" class="sr-only">질문 입력</label>
+              <textarea id="chat-input" rows="1" maxlength="500" placeholder="내 콘텐츠에 대해 물어보세요" required></textarea>
+              <button id="send-button" class="send-button" type="submit" aria-label="질문 보내기">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h15m-6-6 6 6-6 6" /></svg>
+              </button>
+            </form>
+            <p class="composer-note">Enter로 전송 · Shift+Enter로 줄바꿈 · 로컬에 저장된 그래프를 조회합니다</p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

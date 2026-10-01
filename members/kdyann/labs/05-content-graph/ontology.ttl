@@ -1,0 +1,27 @@
+@prefix cg: <https://example.org/kdyann/content-graph/v0/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+cg:Post a rdfs:Class ; rdfs:label "게시물"@ko .
+cg:Concept a rdfs:Class ; rdfs:label "계정 콘셉트"@ko .
+cg:Topic a rdfs:Class ; rdfs:label "콘텐츠 주제"@ko .
+cg:Project a rdfs:Class ; rdfs:label "프로젝트"@ko .
+cg:Feature a rdfs:Class ; rdfs:label "게시물에 명시된 기능"@ko .
+
+cg:expressesConcept a rdf:Property ; rdfs:domain cg:Post ; rdfs:range cg:Concept ; rdfs:label "콘셉트를 명시한다"@ko .
+cg:coversTopic a rdf:Property ; rdfs:domain cg:Post ; rdfs:range cg:Topic ; rdfs:label "주제를 다룬다"@ko .
+cg:describesProject a rdf:Property ; rdfs:domain cg:Post ; rdfs:range cg:Project ; rdfs:label "프로젝트를 설명한다"@ko .
+cg:describesFeature a rdf:Property ; rdfs:domain cg:Post ; rdfs:range cg:Feature ; rdfs:label "기능을 설명한다"@ko .
+cg:hasFeature a rdf:Property ; rdfs:domain cg:Project ; rdfs:range cg:Feature ; rdfs:label "프로젝트의 기능임을 명시한다"@ko .
+cg:statesReleaseStatus a rdf:Property ; rdfs:domain cg:Post ; rdfs:range rdfs:Literal ; rdfs:label "게시물이 당시 밝힌 출시 상태"@ko .
+cg:availableOn a rdf:Property ; rdfs:domain cg:Post ; rdfs:range rdfs:Literal ; rdfs:label "게시물이 밝힌 이용 플랫폼·스토어"@ko .
+
+# 추출 근거와 원문 메타데이터. 위 7개 도메인 관계 수에는 포함하지 않는다.
+cg:sourceId a rdf:Property ; rdfs:domain cg:Post ; rdfs:label "원본 문서 ID"@ko .
+cg:corpus a rdf:Property ; rdfs:domain cg:Post ; rdfs:label "own 또는 reference"@ko .
+cg:permalink a rdf:Property ; rdfs:domain cg:Post ; rdfs:label "원문 URL"@ko .
+cg:publishedAt a rdf:Property ; rdfs:domain cg:Post ; rdfs:range <http://www.w3.org/2001/XMLSchema#dateTime> ; rdfs:label "게시 시각 UTC"@ko .
+cg:sourcePost a rdf:Property ; rdfs:domain rdf:Statement ; rdfs:range cg:Post .
+cg:quote a rdf:Property ; rdfs:domain rdf:Statement ; rdfs:label "정확한 원문 발췌"@ko .
+cg:start a rdf:Property ; rdfs:domain rdf:Statement ; rdfs:label "시작 문자 인덱스"@ko .
+cg:end a rdf:Property ; rdfs:domain rdf:Statement ; rdfs:label "끝 문자 인덱스, 배타적"@ko .

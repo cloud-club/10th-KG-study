@@ -2,7 +2,7 @@
 title: 하이브리드 검색과 RAG
 date: 2026-09-16
 tags: [reciprocal-rank-fusion, hybrid-search, rag-citation-grounding, multi-hop question]
-status: in-progress
+status: done
 ---
 
 # 03. 하이브리드 검색과 RAG

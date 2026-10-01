@@ -1,4 +1,4 @@
-"""공식 해시태그 후보 중 24시간 이상·좋아요 1,000개 이상인 게시물을 추천한다."""
+"""공식 해시태그 후보 중 24시간 이상·좋아요 100개 이상인 게시물을 추천한다."""
 
 from __future__ import annotations
 
@@ -16,10 +16,10 @@ from instagram_common import HASHTAG_PATTERN, REPO_ROOT, required_env, write_jso
 from fetch_reference_instagram import GRAPH_HOST, ReferenceAPIError, _request_json, check_access
 
 DEFAULT_HASHTAGS = ["reels", "fyp", "coding", "AI", "개발"]
-MAX_SELECTION_COUNT = 10
+MAX_SELECTION_COUNT = 50
 RRF_K = 60
 MIN_AGE_HOURS = 24
-MIN_LIKES = 1000
+MIN_LIKES = 100
 MEDIA_FIELDS = "id,caption,media_type,permalink,timestamp,like_count,comments_count"
 RAW_PATH = REPO_ROOT / "data/kdyann/raw/instagram_topic_media.jsonl"
 DOCUMENTS_PATH = REPO_ROOT / "data/kdyann/processed/instagram_topic_documents.jsonl"
@@ -108,7 +108,9 @@ def publication_time(document: dict[str, Any]) -> datetime | None:
     if not isinstance(value, str):
         return None
     try:
-        stamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        # Meta timestamps can end in +0000; Python 3.9 requires +00:00.
+        normalized = re.sub(r"([+-]\d{2})(\d{2})$", r"\1:\2", value.replace("Z", "+00:00"))
+        stamp = datetime.fromisoformat(normalized)
         return stamp.astimezone(timezone.utc) if stamp.tzinfo else None
     except ValueError:
         return None
@@ -170,17 +172,18 @@ def merge_documents(previous: list[dict[str, Any]], current: list[dict[str, Any]
 
 
 def parse_args(argv=None):
-    parser = argparse.ArgumentParser(description="해시태그 후보 수집; 24시간 이상·좋아요 1,000개 이상을 좋아요/댓글 순위 RRF로 최대 10개 추천")
+    parser = argparse.ArgumentParser(description="해시태그 후보 수집; 24시간 이상·좋아요 100개 이상을 좋아요/댓글 순위 RRF로 최대 50개 추천")
     parser.add_argument("--hashtag", action="append", help="탐색 해시태그; 여러 번 지정 가능")
     parser.add_argument("--max-candidates", type=int, default=25, help="해시태그/edge당 1페이지 상한 (1~50)")
-    parser.add_argument("--count", type=int, default=MAX_SELECTION_COUNT, help="추천 상한 (1~10, 기본 10)")
+    parser.add_argument("--count", type=int, default=MAX_SELECTION_COUNT, help="추천 상한 (1~50, 기본 50)")
     parser.add_argument("--max-age-days", type=int, default=7, help="추천 대상 작성 시각의 최대 나이")
     parser.add_argument("--check-access", action="store_true", help="권한·계정만 점검; 수집 접근은 별도 검증")
     parser.add_argument("--list-linked-accounts", action="store_true", help="Facebook 페이지명·연결된 Instagram ID만 확인")
+    parser.add_argument("--reselect-existing", action="store_true", help="저장된 후보에서 최근 게시물만 다시 선정; Meta API 호출 없음")
     args = parser.parse_args(argv)
     args.hashtag = list(dict.fromkeys(tag.strip().removeprefix("#") for tag in (args.hashtag or DEFAULT_HASHTAGS)))
     if not 1 <= args.max_candidates <= 50 or not 1 <= args.count <= MAX_SELECTION_COUNT or args.max_age_days < 1:
-        parser.error("후보 상한 1~50, 추천 상한 1~10, 최대 나이 1일 이상이어야 합니다.")
+        parser.error("후보 상한 1~50, 추천 상한 1~50, 최대 나이 1일 이상이어야 합니다.")
     if len(args.hashtag) > 10 or any(not re.fullmatch(r"[\w가-힣]{1,100}", tag) for tag in args.hashtag):
         parser.error("해시태그는 # 없이 단어로, 최대 10개 지정하세요.")
     return args
@@ -188,6 +191,18 @@ def parse_args(argv=None):
 
 def main(argv=None) -> int:
     args = parse_args(argv)
+    if args.reselect_existing:
+        try:
+            if not DOCUMENTS_PATH.exists():
+                raise ValueError("저장된 후보 파일이 없습니다.")
+            documents = read_jsonl(DOCUMENTS_PATH)
+            selected = select_documents(documents, datetime.now(timezone.utc), args.count, args.max_age_days)
+            write_jsonl(SELECTED_PATH, selected)
+        except (ValueError, OSError) as error:
+            print("오류:", error, file=sys.stderr)
+            return 1
+        print(f"저장된 후보 {len(documents)}건에서 추천 {len(selected)}건: {SELECTED_PATH}")
+        return 0
     try:
         version, token = (required_env(name) for name in ("INSTAGRAM_API_VERSION", "FACEBOOK_ACCESS_TOKEN"))
         if not re.fullmatch(r"v\d+\.\d+", version):
@@ -229,7 +244,7 @@ def main(argv=None) -> int:
         return 1
     print(f"이번 후보 {len(documents)}건, 누적 {len(accumulated)}건, 추천 {len(selected)}건")
     print(f"추천 파일: {SELECTED_PATH}")
-    print("추천은 24시간 이상·좋아요 1,000개 이상인 후보의 좋아요/댓글 순위 RRF입니다. 전체 Instagram 인기 순위가 아닙니다.")
+    print("추천은 24시간 이상·좋아요 100개 이상인 후보의 좋아요/댓글 순위 RRF입니다. 전체 Instagram 인기 순위가 아닙니다.")
     return 0
 
 

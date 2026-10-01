@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="370" viewBox="0 0 1200 370">
+<title>가상 Slack·GitHub 데이터의 RDF 그래프 경로</title>
+<desc>thread17에서 discusses로 pr42, changes로 feeCalculator, definedIn으로 billingFile, inRepository로 billingRepo를 연결한다. 실제 수집 데이터가 아닌 본문 Turtle 예시의 시각화.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/></marker></defs>
+<rect width="1200" height="370" fill="#f8fafc"/>
+<path d="M40 22H1160" stroke="#0e7490" stroke-width="4"/>
+<g font-family="Apple SD Gothic Neo, Noto Sans KR, Arial, sans-serif" fill="#0f172a">
+<text x="40" y="66" font-size="30" font-weight="700">트리플이 모이면 경로가 된다</text>
+<text x="40" y="102" font-size="20" fill="#475569">SPARQL은 아래의 연결 패턴에 맞는 자원을 찾는다.</text>
+<rect x="40.0" y="146" width="180" height="96" fill="white" stroke="#2563eb" stroke-width="2"/>
+<rect x="40.0" y="146" width="180" height="5" fill="#2563eb"/>
+<text x="130.0" y="183" text-anchor="middle" font-size="22" font-weight="700" fill="#2563eb">Slack 스레드</text>
+<text x="130.0" y="216" text-anchor="middle" font-family="Menlo,monospace" font-size="20">thread17</text>
+<path d="M226.0 194H268.0" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="247.0" y="278" text-anchor="middle" font-family="Menlo,monospace" font-size="18" fill="#334155">discusses</text>
+<rect x="275.0" y="146" width="180" height="96" fill="white" stroke="#7c3aed" stroke-width="2"/>
+<rect x="275.0" y="146" width="180" height="5" fill="#7c3aed"/>
+<text x="365.0" y="183" text-anchor="middle" font-size="22" font-weight="700" fill="#7c3aed">GitHub PR</text>
+<text x="365.0" y="216" text-anchor="middle" font-family="Menlo,monospace" font-size="20">pr42</text>
+<path d="M461.0 194H503.0" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="482.0" y="278" text-anchor="middle" font-family="Menlo,monospace" font-size="18" fill="#334155">changes</text>
+<rect x="510.0" y="146" width="180" height="96" fill="white" stroke="#b45309" stroke-width="2"/>
+<rect x="510.0" y="146" width="180" height="5" fill="#b45309"/>
+<text x="600.0" y="183" text-anchor="middle" font-size="22" font-weight="700" fill="#b45309">코드 심볼</text>
+<text x="600.0" y="216" text-anchor="middle" font-family="Menlo,monospace" font-size="20">feeCalculator</text>
+<path d="M696.0 194H738.0" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="717.0" y="278" text-anchor="middle" font-family="Menlo,monospace" font-size="18" fill="#334155">definedIn</text>
+<rect x="745.0" y="146" width="180" height="96" fill="white" stroke="#15803d" stroke-width="2"/>
+<rect x="745.0" y="146" width="180" height="5" fill="#15803d"/>
+<text x="835.0" y="183" text-anchor="middle" font-size="22" font-weight="700" fill="#15803d">파일</text>
+<text x="835.0" y="216" text-anchor="middle" font-family="Menlo,monospace" font-size="20">billingFile</text>
+<path d="M931.0 194H973.0" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="952.0" y="278" text-anchor="middle" font-family="Menlo,monospace" font-size="18" fill="#334155">inRepository</text>
+<rect x="980.0" y="146" width="180" height="96" fill="white" stroke="#0e7490" stroke-width="2"/>
+<rect x="980.0" y="146" width="180" height="5" fill="#0e7490"/>
+<text x="1070.0" y="183" text-anchor="middle" font-size="22" font-weight="700" fill="#0e7490">저장소</text>
+<text x="1070.0" y="216" text-anchor="middle" font-family="Menlo,monospace" font-size="20">billingRepo</text>
+<path d="M40 303H1160" stroke="#cbd5e1"/>
+<text x="40" y="337" font-size="17" fill="#475569">설명용 가상 데이터 · 노드/관계의 ex: prefix 생략 · 실제 수집 결과 아님</text>
+</g></svg>

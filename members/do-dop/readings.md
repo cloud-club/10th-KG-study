@@ -25,3 +25,16 @@
 - [Interleaving Retrieval with Chain-of-Thought Reasoning for Knowledge-Intensive Multi-Step Questions](https://aclanthology.org/2023.acl-long.557/) — 중간 추론에 맞춰 검색을 반복하는 IRCoT 접근
 - [Enabling Large Language Models to Generate Text with Citations (ALCE)](https://arxiv.org/abs/2305.14627) — 생성 답변의 인용과 근거 품질 평가
 - [PROV Model Primer — W3C](https://www.w3.org/TR/prov-primer/) — 출처와 생성 과정을 기록하는 provenance 기본 모델
+
+## 4주차 · 시맨틱 웹, 온톨로지와 지식그래프
+
+- [The Semantic Web — Scientific American](https://www.scientificamerican.com/article/the-semantic-web/) — 시맨틱 웹이 제시한 초기 비전
+- [RDF 1.1 Primer — W3C](https://www.w3.org/TR/rdf11-primer/) — 트리플, IRI, Literal과 RDF 그래프 입문
+- [RDF Schema 1.1 — W3C](https://www.w3.org/TR/rdf-schema/) — 클래스, 속성, domain, range와 계층
+- [OWL 2 Web Ontology Language Primer — W3C](https://www.w3.org/TR/owl2-primer/) — 공리와 OWL 기반 추론 입문
+- [SPARQL 1.1 Overview — W3C](https://www.w3.org/TR/sparql11-overview/) — RDF 그래프 표준 질의 언어
+- [Linked Data — Tim Berners-Lee](https://www.w3.org/DesignIssues/LinkedData.html) — HTTP URI로 데이터를 연결하는 네 가지 원칙
+- [Wikidata Data Model](https://www.wikidata.org/wiki/Help:Data_model) — Item, Property, Statement, Qualifier와 Reference
+- [Introducing the Knowledge Graph — Google](https://blog.google/products-and-platforms/products/search/introducing-knowledge-graph-things-not/) — “things, not strings”와 검색의 엔티티화
+- [From Local to Global: A Graph RAG Approach](https://arxiv.org/abs/2404.16130) — 커뮤니티 탐지와 계층적 요약을 이용한 GraphRAG
+- [PostgreSQL Recursive Queries](https://www.postgresql.org/docs/current/queries-with.html#QUERIES-WITH-RECURSIVE) — RDBMS에서 계층과 그래프 경로를 탐색하는 방법

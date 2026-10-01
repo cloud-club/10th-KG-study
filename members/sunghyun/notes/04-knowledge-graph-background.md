@@ -9,19 +9,19 @@ status: done
 
 
 학습 원본: [노션 — 지식 그래프는 왜 필요한가? — 온톨로지 변천사와 방법론](https://www.notion.so/3ebdbb08775281a1a19ecc9804484067).
-이 파일은 원문의 개념·예시·보충 설명을 학습 기록으로 옮기고, 아래에 분담 발표 내용을 확장한 것이다.
+이 파일은 원문의 개념·예시·보충 설명을 학습 기록으로 옮기고, 관련 사례와 방법론을 함께 정리한 것이다.
 
-## 이 문서에서 발표 내용을 어디서 찾을까?
+## 내용 안내
 
-| 분담 주제 | 발표 절 |
+| 주제 | 상세 내용 |
 |---|---|
-| ① 시맨틱 웹과 KG | [대중화와 운영 범위](#presentation-1) |
-| ② Wikidata 구조 | [식별자·클레임·한정어](#presentation-2) |
-| ③ 구글·애플·아마존 사례 | [기업별 활용 목적](#presentation-3) |
-| ④ 팔란티어 Object/Link/Action | [의미 모델과 업무 실행](#presentation-4) |
-| ⑤ MS GraphRAG 논문 | [커뮤니티 탐지와 글로벌 서치](#presentation-5) |
+| ① 시맨틱 웹과 KG | [대중화와 운영 범위](#topic-1) |
+| ② Wikidata 구조 | [식별자·클레임·한정어](#topic-2) |
+| ③ 구글·애플·아마존 사례 | [기업별 활용 목적](#topic-3) |
+| ④ 팔란티어 Object/Link/Action | [의미 모델과 업무 실행](#topic-4) |
+| ⑤ MS GraphRAG 논문 | [커뮤니티 탐지와 글로벌 서치](#topic-5) |
 
-앞부분은 개념 학습, **분담 발표** 부분은 발표 시 확인할 상세 설명과 원고다.
+기본 개념부터 살펴본 뒤, 기업 사례와 방법론으로 이어진다.
 
 ## 한 줄 요약
 
@@ -251,11 +251,11 @@ SELECT ?team WHERE {
 
 질의 구조를 이해하기 위한 예시다. 이 가상 데이터를 실제 저장소에 적재해 실행하지는 않았다.
 
-## 분담 발표 — 주제별 설명과 발표 원고
+## 사례와 방법론을 더 살펴보면?
 
-각 주제는 **문제 → 원리 → 사례 → 한계** 순서로 설명한다. 아래 사례 중 사내 서비스·장애 모델은 이해를 위한 가정이고, 기업 사례는 연결한 공개 자료 범위다.
+사내 서비스·장애 모델은 이해를 위한 가정이며, 기업 사례는 연결한 공개 자료 범위다.
 
-<a id="presentation-1"></a>
+<a id="topic-1"></a>
 
 ### ① 시맨틱 웹은 왜 대중화에 실패했고 KG는 왜 성공했나?
 
@@ -287,11 +287,9 @@ Google은 검색어가 가리키는 실제 대상을 구별하고 관련 사실�
 
 시맨틱 웹의 목표가 모두 실현되지 않았더라도 관련 표준과 아이디어는 이런 활용으로 이어졌다. KG를 RDF·OWL만으로 구현해야 하는 것은 아니다.
 
-> **발표 원고:** 시맨틱 웹은 웹페이지를 연결하는 것을 넘어 대상과 관계의 의미를 컴퓨터도 처리하게 하려는 비전이었습니다. 하지만 웹 전체에서 식별자·용어·품질·갱신 책임을 맞추기는 어려웠습니다. KG는 검색이나 기업 업무처럼 목적과 범위를 정해 활용할 수 있었습니다. 그래서 실패와 성공을 단정하기보다, 적용 범위와 운영 방식이 달라졌다고 설명하는 것이 적절합니다.
+참고: [2001년 시맨틱 웹 원문](https://www.cs.cmu.edu/~fgandon/lecture/licence_travaux_etude2002/TheSemanticWeb/), [Google의 2012년 소개 글](https://blog.google/products-and-platforms/products/search/introducing-knowledge-graph-things-not/).
 
-참고: [2001년 시맨틱 웹 원문](https://www.cs.cmu.edu/~fgandon/lecture/licence_travaux_etude2002/TheSemanticWeb/), [Google의 2012년 발표](https://blog.google/products-and-platforms/products/search/introducing-knowledge-graph-things-not/).
-
-<a id="presentation-2"></a>
+<a id="topic-2"></a>
 
 ### ② Wikidata 구조 뜯어보기 — Q/P 식별자, 클레임, 한정어
 
@@ -349,11 +347,9 @@ SELECT ?employer ?start ?end WHERE {
 
 `P108`은 근무 기관, `P580`은 시작 시점, `P582`는 종료 시점이다. 날짜가 없다는 사실이 무기한 근무나 현재 재직을 증명하는 것은 아니다.
 
-> **발표 원고:** Wikidata의 Q는 대상, P는 속성을 식별합니다. 베를린 Q64가 국가 P17을 통해 독일 Q183과 연결되는 식입니다. 실제 사실에는 한정어·출처·랭크도 붙습니다. 특히 현재 상태를 묻는 질문은 관계만 읽지 말고 기간과 다른 진술을 확인해야 합니다. 직접 관계를 조회하는 `wdt:`와 진술을 거쳐 한정어를 조회하는 경로도 구분해야 합니다.
-
 참고: [Wikidata 진술 구조](https://www.wikidata.org/wiki/Help:Statements), [한정어](https://www.wikidata.org/wiki/Help:Qualifiers), [SPARQL 튜토리얼](https://www.wikidata.org/wiki/Wikidata:SPARQL_tutorial).
 
-<a id="presentation-3"></a>
+<a id="topic-3"></a>
 
 ### ③ 구글·애플·아마존 KG 사례 — 같은 그래프로 무엇을 다르게 해결하나?
 
@@ -383,11 +379,9 @@ Amazon의 COSMO 연구는 상품과 기능·사용자·사용 장소 등의 맥�
 
 설명용으로 `겨울 코트 — 사용 목적 → 보온`처럼 상품명에 직접 없는 의도를 관계로 표현할 수 있다. 이는 고객 질의와 상품의 관련성을 판단하는 데 도움을 준다. LLM이 생성한 관계를 곧바로 확정된 사실로 취급해서는 안 된다.
 
-> **발표 원고:** 세 회사 모두 대상과 관계를 활용하지만 목적은 다릅니다. 구글은 같은 문자열이 어떤 대상을 뜻하는지 구별합니다. 애플의 공개 연구는 지식 그래프를 지속적으로 만들고 최신 정보를 제공하는 운영 문제를 다룹니다. 아마존은 상품과 사용 목적을 연결해 추천에 활용합니다. 따라서 KG의 가치는 그래프라는 형태뿐 아니라 어떤 문제에 필요한 관계를 담고 유지하는지에 있습니다.
-
 참고: [Google KG](https://blog.google/products-and-platforms/products/search/introducing-knowledge-graph-things-not/), [Apple Saga](https://machinelearning.apple.com/research/continuous-construction), [Amazon COSMO](https://www.amazon.science/blog/building-commonsense-knowledge-graphs-to-aid-product-recommendation).
 
-<a id="presentation-4"></a>
+<a id="topic-4"></a>
 
 ### ④ 팔란티어 온톨로지의 Object/Link/Action — RDF와 무엇이 같고 다른가?
 
@@ -427,11 +421,9 @@ Amazon의 COSMO 연구는 상품과 기능·사용자·사용 장소 등의 맥�
 
 RDF 기반 시스템도 애플리케이션을 붙여 변경 작업을 수행할 수 있다. 반대로 Object Type을 정의했다고 그것이 OWL 클래스와 같은 추론 의미를 자동으로 갖는 것은 아니다.
 
-> **발표 원고:** 팔란티어에서 Object는 서비스나 장애 같은 업무 대상이고 Link는 그 사이 연결입니다. Action은 상태를 변경하는 실행입니다. RDF와 대상·관계를 표현한다는 점은 비슷하지만, 팔란티어는 행동·권한·업무 로직까지 운영 체계에 결합합니다. 담당 팀을 답하는 데는 관계 조회로 충분하고, 장애 상태를 바꾸려면 허용된 작업 실행이 필요합니다.
-
 참고: [Ontology system](https://www.palantir.com/docs/foundry/architecture-center/ontology-system), [Action Types](https://www.palantir.com/docs/foundry/action-types/overview/).
 
-<a id="presentation-5"></a>
+<a id="topic-5"></a>
 
 ### ⑤ GraphRAG 논문(MS, 2024) — 커뮤니티 탐지 기반 글로벌 서치
 
@@ -488,13 +480,11 @@ Map-reduce는 부분 결과를 만들고 통합하는 패턴이다. 질문할 �
 | 장애 I의 정확한 시각은? | 원문 또는 명시적으로 저장한 사실 확인 |
 | 승인된 담당자가 상태를 변경해줘 | 권한과 실행 워크플로 |
 
-> **발표 원고:** MS의 GraphRAG는 전체 자료의 주요 주제처럼 일부 청크만으로 답하기 어려운 질문에 초점을 둡니다. LLM으로 대상과 관계를 추출하고, Leiden 알고리즘으로 커뮤니티를 만든 뒤 보고서를 미리 요약합니다. 질문이 오면 보고서별 부분 답변을 만들고 유용한 내용을 최종 답변으로 종합합니다. 이는 단순한 다중 홉 조회와 다르며, 특정 사실 조회까지 항상 이 방식으로 처리할 필요는 없습니다.
-
 참고: [2024년 논문 v1](https://arxiv.org/abs/2404.16130v1), [공식 Global Search](https://microsoft.github.io/graphrag/query/global_search/).
 
-### 발표 전에 어떤 질문을 점검하면 될까?
+### 핵심 차이를 어떻게 구분하면 될까?
 
-| 주제 | 반드시 설명할 수 있어야 하는 질문 |
+| 주제 | 핵심 구분 |
 |---|---|
 | ① | 같은 RDF 표준을 써도 식별·품질 문제가 남는 이유는? |
 | ② | 직접 관계 조회에서 기간이 사라지는 이유는? |
@@ -509,7 +499,7 @@ Map-reduce는 부분 결과를 만들고 통합하는 패턴이다. 질문할 �
 - [ ] 현재 담당 팀과 과거 담당 팀의 유효 기간을 어떻게 모델링할지 비교하기
 - [ ] GraphRAG 글로벌 검색의 비용과 답변 품질을 실제 자료로 평가하기
 
-## 스터디에서 나눌 이야기
+## 공부하며 정리한 생각
 
 - 시맨틱 웹과 기업 KG는 기술만이 아니라 적용 범위와 데이터 운영 책임도 다르다.
 - “거꾸로 찾기”와 “새 술어의 사실을 도출하기”를 구분하니 OWL 역관계가 이해됐다.

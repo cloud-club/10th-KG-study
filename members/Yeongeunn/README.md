@@ -32,7 +32,10 @@
 
 ### labs
 
+[실행 방법·검색 평가·그래프 결과](labs/README.md)
+
 | 주차 | # | 실습 | 상태 |
 |---|---|---|---|
 | 3주차 | 03 | [프로젝트 Notion 검색 — BM25 + Gemini RAG](labs/03-notion-ingest/README.md) | 완료 |
-| 3주차 | — | 벡터 검색·RRF·Recall@5 비교 | 예정 |
+| 3주차 | 04 | [BM25·벡터·RRF 검색 평가](labs/04-hybrid-evaluation/README.md) | 실행 완료 · 평가셋 검토 중 |
+| 5주차 | 05 | [Notion 문서에서 트리플 추출](labs/05-triple-extraction/README.md) | 추출·적재·조회 완료 · 의미 검토 중 |

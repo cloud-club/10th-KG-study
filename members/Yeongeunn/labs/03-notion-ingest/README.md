@@ -75,10 +75,9 @@ python3 members/Yeongeunn/labs/03-notion-ingest/src/rag.py ask --model gemini-3.
 - PG와 ES 사이에 단일 트랜잭션이 없어 부분 적재가 발생할 수 있다.
 - 기본 마스킹은 일부 숫자·토큰·이메일을 처리하며, 인용 검사는 번호 유효성만 확인한다.
 
-## 예정
+## 후속 실험
 
-- grep 고정 문자열 검색 기준선 비교
-- 임베딩·벡터 검색
-- RRF 하이브리드 검색
-- 정답 근거를 지정한 질문셋과 Recall@5 비교
-- 다중 홉 질문의 검색 결과와 실패 유형 기록
+- [BM25·벡터·RRF 비교와 답변 진단](../04-hybrid-evaluation/README.md): 같은 스냅샷과 질문으로 지정 근거 Recall@5 측정.
+- [관계 추출·그래프 적재](../05-triple-extraction/README.md): 문서의 관계와 근거를 Postgres·Turtle·Neo4j에 저장.
+
+이 문서는 최초 BM25 RAG 실습 기록이며 후속 검색 비교는 별도 코드·인덱스를 사용한다.

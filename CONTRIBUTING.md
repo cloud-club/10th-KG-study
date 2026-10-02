@@ -94,8 +94,10 @@ status: in-progress           # in-progress | done
 
 ## 위키 ingest
 
-- 노트·실습 PR 이 머지되면 스터디장이 Claude Code 로 `wiki/`에 반영합니다("PR #n ingest 해줘").
-  위키 변경도 `main` 직접 푸시가 아니라 PR 로 올립니다.
+- 노트·실습 PR 이 머지되면 **매주 월요일 아침 GitHub Actions 가 자동으로** `wiki/`에 반영해 PR 을 올립니다
+  (`.github/workflows/wiki-ingest.yml`). 그 PR 을 스터디장이 검토해 머지합니다. 급하면 스터디장이 Claude Code 로
+  직접 ingest 합니다("PR #n ingest 해줘"). 위키 변경도 `main` 직접 푸시가 아니라 PR 로 올립니다.
+- 뭐가 밀렸는지는 `python3 scripts/wiki_backlog.py` 로 볼 수 있습니다.
 - 노트 맨 위 프론트매터(`title`·`date`·`tags`·`status`)가 있으면 위키가 출처·주차·태그를 정확히 잡습니다.
 - 개인 대화 원문(카카오톡·노션 내용)은 노트에도 위키에도 싣지 않습니다. 통계(건수·기간)만 적습니다.
 

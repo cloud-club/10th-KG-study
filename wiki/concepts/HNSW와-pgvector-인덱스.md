@@ -4,9 +4,9 @@ type: concept
 tags: [concept, pitfall]
 status: maintained
 created: 2026-09-16
-updated: 2026-09-16
-members: [yujeong430, dldusgh318, do-dop, kdyann, heebindev, sese2204, lys0611]
-weeks: [2]
+updated: 2026-10-02
+members: [yujeong430, dldusgh318, do-dop, kdyann, heebindev, sese2204, lys0611, sunghyun, Yeongeunn, e0ng]
+weeks: [2, 3]
 ---
 
 > 벡터를 노드로, 가까운 벡터 사이를 간선으로 잇는 여러 층의 그래프. 위층의 성긴 그래프에서 멀리 이동하고 아래층의 촘촘한 그래프에서 정밀 탐색해 전수 비교보다 훨씬 적은 후보만 본다. 근사 검색(ANN)이라 **속도를 얻는 대신 recall 일부를 포기**한다. pgvector는 기본이 정확 검색이고 HNSW 인덱스를 만들어야 ANN이 되는데, 만들어도 플래너가 안 탈 수 있다.
@@ -14,7 +14,8 @@ weeks: [2]
 ## 정의
 
 - 정확 검색(exact k-NN)은 질문과 모든 벡터를 비교한다. 정확하지만 데이터가 많으면 느리다. ANN(HNSW, IVFFlat, Annoy 등)은 가까울 가능성이 높은 후보만 탐색한다. 품질은 recall로 잰다 (yujeong430, kdyann, e0ng, heebindev).
-- HNSW는 "지하철 급행"(dldusgh318): 상위 층에서 빠르게 멀리 → 하위 층에서 후보를 좁힘 → 가까운 벡터 탐색. 원 논문은 Malkov & Yashunin (2016).
+- HNSW는 "지하철 급행"(dldusgh318): 상위 층에서 빠르게 멀리 → 하위 층에서 후보를 좁힘 → 가까운 벡터 탐색. 원 논문은 Malkov & Yashunin (2016). 위층의 벡터는 아래층에도 남아 있고 맨 아래층에 모든 벡터가 있다 — **"트리의 자식으로 내려가는 구조는 아니다"** (sunghyun). HNSW의 "그래프"는 의미 관계 그래프가 아니다 (Yeongeunn) → [[지식그래프와-온톨로지]]와 혼동 주의.
+- **recall의 두 뜻을 분리한다** (Yeongeunn): HNSW가 정확 검색의 이웃을 얼마나 보존했는지는 **인덱스 근사 오차**, 그 이웃이 정답 근거인지는 **검색 관련성**. 아래 lys0611·Yeongeunn의 일치율 1.0은 전자다.
 - **pgvector는 기본적으로 정확 최근접 검색을 수행**하고, HNSW 인덱스를 추가하면 속도와 recall을 맞바꾸는 ANN이 된다 (yujeong430, kdyann). `CREATE INDEX … USING hnsw (embedding vector_cosine_ops)`.
 - 파라미터 (yujeong430이 유일하게 정의): `m`(층당 최대 연결 수)과 `ef_construction`(생성 중 후보 목록 크기)을 키우면 recall은 좋아지지만 생성 시간·삽입 속도·메모리가 는다. 검색 시 `hnsw.ef_search`가 recall과 지연의 균형을 조절한다. dldusgh318은 `ef_search` 변경 실험을 TODO로 남겼다.
 - pgvector 기본값 `m=16`, `ef_construction=64`, `hnsw.ef_search=40`. HNSW 색인 가능 차원은 `vector` 2,000, `halfvec` 4,000까지 (lys0611, 공식 문서 기준). 학습 단계가 없어 빈 테이블에도 만들 수 있지만 데이터를 넣고 만드는 편이 빌드가 빠르다.
@@ -25,6 +26,9 @@ weeks: [2]
 - **작은 테이블에서는 플래너가 HNSW를 안 탄다** (sese2204, 11,985청크): 순차 스캔 74ms vs HNSW Index Scan 1.8ms인데도 플래너는 순차 스캔을 골랐다. `EXPLAIN ANALYZE`로 확인하고 **질의 단위로 `SET LOCAL enable_seqscan = off`**를 거는 것이 pgvector 문서가 권하는 방법. yujeong430의 검색 스크립트는 `--explain`으로 실행 계획을 함께 출력한다. kdyann의 문서 13개 실습은 실행 계획 확인 언급이 없어 인덱스를 탔는지 불명.
 - **인덱스가 있으면 대량 적재가 느려진다** (sese2204): HNSW가 이미 있는 상태에서 COPY하니 66초 → 86초. 대량 재적재면 인덱스를 지웠다 만든다.
 - **HNSW가 놓친 걸까, 임베딩이 틀린 걸까** (dldusgh318): `Write-Behind → Write Around` 오답이 ANN의 recall 손실인지 임베딩 자체의 문제인지 구분하려면 `SET enable_indexscan = off`(Exact)와 `on`(HNSW)의 결과를 비교해 `recall@10`을 재면 된다. 아직 수행하지 않아 단정하지 않았다.
+- **정확 검색 대비 10.2배** (sunghyun, 2,685청크, 1,024차원, 단일 실행, 질문 임베딩 시간 제외): DB 시간 exact 65.023ms vs HNSW 6.371ms, 이번 질문 top-3는 정확 검색과 3/3 일치. exact는 트랜잭션 안에서 인덱스 탐색을 끄고, hnsw는 순차 탐색을 억제한 뒤 **실행 계획으로 사용 여부를 검사**해 비교 기준선을 만들었다(설정은 트랜잭션 안에서만). `ef_search`는 탐색 후보를 넓히지만 "실제 방문한 벡터 개수와 같은 것은 아니다".
+- **파라미터를 적고 일치율을 잰 첫 사례** (Yeongeunn, 1,369청크): `m=16`, `ef_construction=64`, `ef_search=100`에서 10질의 평균 정확 검색 top-5 대비 이웃 일치율 **1.0**, 실행 계획으로 인덱스 사용 확인. 평가 자체는 정확 검색으로 했다(HNSW 생성 후에도). yujeong430 40문항도 `ef_search=100`.
+- e0ng(111청크)·kdyann(248문서)은 "HNSW가 있어도 실제 실행 계획은 플래너가 결정한다"고 유보만 적었다.
 - **이 규모에서 HNSW는 성능 장치가 아니다** (lys0611, 1,922청크): 정확 검색도 p50 8ms로 충분히 작다. HNSW는 recall/속도 교환을 확인하려고 넣은 것. `ef_search=100`에서 HNSW top-10과 `enable_indexscan=off` 정확 검색 top-10의 겹침이 27문항 평균 **1.000**. top-5 쿼리는 1.6~1.9ms(1회 측정, 일반 수치 아님).
 - **필터와 ANN의 조합** (lys0611): `WHERE room_id = …` 필터는 보통 인덱스 스캔 뒤에 적용되므로 `ef_search=40` 후보 중 그 방 청크가 적으면 `LIMIT 10`인데 10건을 못 받는다(조건이 10% 행이면 평균 4행). pgvector 0.8.0의 `SET LOCAL hnsw.iterative_scan = strict_order`(또는 `relaxed_order`)로 해결. `hnsw.max_scan_tuples` 기본 20,000. 필터가 잦으면 `ef_search`만 키우기보다 필터 컬럼 인덱스·부분 HNSW·파티셔닝을 검토한다.
 - 저장 비용: 1,024차원 벡터를 모든 청크에 저장해 원본의 23배(22MB)가 됐다 (dldusgh318). 차원 수는 저장·검색 비용에 직결된다 → [[임베딩-모델-선택]].
@@ -47,5 +51,7 @@ weeks: [2]
 - sese2204 · 대화 청킹 → 로컬 임베딩 → 하이브리드 검색 (§검색, §배운 점) — [members/sese2204/labs/02-kakao-chunk-embed/README.md](../../members/sese2204/labs/02-kakao-chunk-embed/README.md) (PR #6 미머지)
 - do-dop · 노트 (§벡터 인덱스와 벡터 데이터베이스) — [members/do-dop/notes/02-search-generations.md](../../members/do-dop/notes/02-search-generations.md)
 - kdyann · 검색의 세 세대 (§Exact NN과 ANN) — [members/kdyann/notes/02-search-generations.md](../../members/kdyann/notes/02-search-generations.md)
-- lys0611 · 임베딩·코사인 유사도·HNSW — [members/lys0611/notes/02-embeddings-cosine-hnsw.md](../../members/lys0611/notes/02-embeddings-cosine-hnsw.md); 하이브리드 노트 (§HNSW와 방 필터) — [notes/04-hybrid-search-rrf-recall.md](../../members/lys0611/notes/04-hybrid-search-rrf-recall.md); 카톡 대화 적재 — [labs/01-ingest/README.md](../../members/lys0611/labs/01-ingest/README.md) (PR #15 미머지)
+- sunghyun · grep, BM25, 벡터 검색과 HNSW (§HNSW) — [members/sunghyun/notes/02-search-methods.md](../../members/sunghyun/notes/02-search-methods.md); 실습 — [labs/02-search-lab/README.md](../../members/sunghyun/labs/02-search-lab/README.md)
+- Yeongeunn · 하이브리드 평가 실습 (§HNSW), 임베딩 모델 노트 (§두 recall) — [members/Yeongeunn/labs/04-hybrid-evaluation/README.md](../../members/Yeongeunn/labs/04-hybrid-evaluation/README.md), [notes/07-embedding-models.md](../../members/Yeongeunn/notes/07-embedding-models.md)
+- lys0611 · 임베딩·코사인 유사도·HNSW — [members/lys0611/notes/02-embeddings-cosine-hnsw.md](../../members/lys0611/notes/02-embeddings-cosine-hnsw.md); 하이브리드 노트 (§HNSW와 방 필터) — [notes/04-hybrid-search-rrf-recall.md](../../members/lys0611/notes/04-hybrid-search-rrf-recall.md); 카톡 대화 적재 — [labs/01-ingest/README.md](../../members/lys0611/labs/01-ingest/README.md)
 - 외부: Malkov & Yashunin, Efficient and Robust Approximate Nearest Neighbor Search Using HNSW (2016) https://arxiv.org/abs/1603.09320 · pgvector https://github.com/pgvector/pgvector

@@ -4,9 +4,9 @@ type: entity
 tags: [pitfall, tooling]
 status: maintained
 created: 2026-09-16
-updated: 2026-09-16
-members: [sese2204, lys0611, dldusgh318, yujeong430]
-weeks: [1, 2, 3]
+updated: 2026-10-02
+members: [sese2204, lys0611, dldusgh318, yujeong430, sunghyun, sdunge, do-dop]
+weeks: [1, 2, 3, 5]
 ---
 
 > 공용 인프라의 PostgreSQL 17 + pgvector + pg_trgm에서 멤버들이 실제로 겪은 것들. 로케일, 플래너, 인덱스와 적재 순서, 볼륨 경로. 근거 없는 항목은 싣지 않는다.
@@ -27,6 +27,13 @@ weeks: [1, 2, 3]
 - **차원이 바뀌면 테이블을 새로 만든다** (lys0611): `vector(1536)`인데 `EMBED_DIM=768`이면 `DROP TABLE chunk_embeddings` 후 재실행하거나 모델별 테이블 분리. PK를 `(chunk_id, model)`로 두면 같은 차원의 모델은 나란히 쌓인다.
 - **정확 검색 vs ANN을 구분해서 판단** (dldusgh318, lys0611): `SET enable_indexscan = off`로 정확 검색 결과와 겹침을 재야 "벡터가 틀렸다"인지 "HNSW가 놓쳤다"인지 안다. lys0611은 ef_search=100에서 겹침 1.000.
 - 테이블은 원문 `chunks`와 벡터 `emb_*`를 분리하고 `chunk_id`로 잇는다 (dldusgh318). 정본·파생물 원칙은 [[데이터-수집과-출처-추적]].
+- **정확 검색과 HNSW의 비교 기준선을 만드는 법** (sunghyun): exact는 트랜잭션 안에서 인덱스 탐색을 끄고, hnsw는 순차 탐색을 억제한 뒤 실행 계획으로 사용 여부를 검사한다. 설정은 트랜잭션 안에서만 바꾼다. 결과 exact 65.023ms vs HNSW 6.371ms → [[HNSW와-pgvector-인덱스]].
+- **psycopg 드라이버 문제로 pgvector를 보류**한 멤버가 있다 (sdunge, 원인 미기재).
+
+## 그래프 질의 (5주차)
+
+- Postgres에 `entities`·`edges` 테이블로 그래프를 두면 홉마다 `edges` self-join이 늘고, 깊이가 가변이면 **순환 방지 배열을 둔 재귀 CTE**가 필요하다 (dldusgh318: X01 브릿지 질의 SQL 33줄 vs Cypher 17줄, 공유 기술 경로 41줄 vs 11줄). 데이터에 순환이 있으면 `WITH RECURSIVE`가 무한 반복한다 — 방문 노드 기록이나 깊이 제한 (do-dop). "Postgres는 3홉부터 느리다" 같은 고정 기준은 없다 → [[그래프-적재-Postgres와-Neo4j]], [[RDF와-프로퍼티-그래프]].
+- 집계 질문(최다 발신자)은 정본 RDB `GROUP BY`가 그래프보다 정확하다 (lys0611) → [[멀티홉-질문과-Bridge-Entity]].
 
 ## 볼륨·버전·포트
 
@@ -42,7 +49,8 @@ weeks: [1, 2, 3]
 ## 출처
 
 - sese2204 · 카카오톡 파싱 → 적재 (§배운 점), 청킹 → 임베딩 → 검색 (§검색, §배운 점) — [members/sese2204/labs/01-kakao-ingest/README.md](../../members/sese2204/labs/01-kakao-ingest/README.md), [labs/02-kakao-chunk-embed/README.md](../../members/sese2204/labs/02-kakao-chunk-embed/README.md), [infra/README.md](../../infra/README.md) (PR #6 미머지)
-- lys0611 · DDIA 노트 (§인덱스가 있다고 항상 쓰는 것은 아니다), 임베딩 노트 (§방 필터), GUIDE §트러블슈팅, 실습 02 (§배운 점) — [members/lys0611/notes/03-ddia-ch3-storage-and-search.md](../../members/lys0611/notes/03-ddia-ch3-storage-and-search.md), [notes/02-embeddings-cosine-hnsw.md](../../members/lys0611/notes/02-embeddings-cosine-hnsw.md), [labs/01-ingest/GUIDE.md](../../members/lys0611/labs/01-ingest/GUIDE.md), [labs/02-hybrid-rag-agent/README.md](../../members/lys0611/labs/02-hybrid-rag-agent/README.md) (PR #15 미머지)
+- lys0611 · DDIA 노트 (§인덱스가 있다고 항상 쓰는 것은 아니다), 임베딩 노트 (§방 필터), GUIDE §트러블슈팅, 실습 02 (§배운 점) — [members/lys0611/notes/03-ddia-ch3-storage-and-search.md](../../members/lys0611/notes/03-ddia-ch3-storage-and-search.md), [notes/02-embeddings-cosine-hnsw.md](../../members/lys0611/notes/02-embeddings-cosine-hnsw.md), [labs/01-ingest/GUIDE.md](../../members/lys0611/labs/01-ingest/GUIDE.md), [labs/02-hybrid-rag-agent/README.md](../../members/lys0611/labs/02-hybrid-rag-agent/README.md)
 - dldusgh318 · 2세대 노트 (§5), WEEK2 compose 주석 — [members/dldusgh318/notes/week2/03-embedding-vector-search.md](../../members/dldusgh318/notes/week2/03-embedding-vector-search.md), [labs/01-three-generations/WEEK2.md](../../members/dldusgh318/labs/01-three-generations/WEEK2.md)
 - yujeong430 · 카카오톡 검색 — [members/yujeong430/labs/01-kakaotalk-search/README.md](../../members/yujeong430/labs/01-kakaotalk-search/README.md)
+- sunghyun · 검색 실습 (§exact/hnsw 기준선) — [members/sunghyun/labs/02-search-lab/README.md](../../members/sunghyun/labs/02-search-lab/README.md); dldusgh318 · W5 질의 비교 — [members/dldusgh318/labs/01-three-generations/WEEK5_queries.md](../../members/dldusgh318/labs/01-three-generations/WEEK5_queries.md); do-dop · 프로퍼티 그래프와 RDF (§재귀 CTE) — [members/do-dop/notes/04-relational-and-graph-data-models.md](../../members/do-dop/notes/04-relational-and-graph-data-models.md); sdunge · 판례 검색 — [members/sdunge/labs/readme.md](../../members/sdunge/labs/readme.md)
 - 외부: PostgreSQL pg_trgm https://www.postgresql.org/docs/current/pgtrgm.html · pgvector README (Iterative index scans, Filtering) https://github.com/pgvector/pgvector · "Postgres 18 Docker Silently Ignores Your Named Volume" (lys0611 readings)

@@ -4,9 +4,9 @@ type: entity
 tags: [concept, tooling]
 status: maintained
 created: 2026-09-16
-updated: 2026-09-16
+updated: 2026-10-02
 members: [kungbi]
-weeks: [2]
+weeks: [2, 4]
 ---
 
 > volcengine의 OpenViking은 에이전트의 컨텍스트를 Resource(현재 확인할 자료)·Memory(이전 경험과 판단)·Skill(반복 절차)로 나누고 L0/L1/L2 계층으로 필요한 만큼만 불러오는 Context Database다. kungbi의 발표 요약이며, 핵심 주장은 "과거 결론은 현재 사실이 아니라 **재검증의 출발점**"이라는 것.
@@ -52,6 +52,8 @@ weeks: [2]
 
 - 오래된 Memory의 만료·갱신 기준, Memory와 최신 Resource 충돌 시 우선순위, 계층형 검색의 효과를 잴 지표([[RAG-평가-지표]]), 반복된 경험을 Skill로 승격할 시점.
 
+- kungbi의 4주차 노트는 이 경계를 KG 쪽에서 다시 그었다: "KG가 원문이나 검색을 대체하는 것은 아니다. 관계가 올바르게 추출됐는지 원문과 근거를 확인할 수 있어야 한다." 자기 데이터의 멀티홉 질문 `Slack 스레드 → PR → 코드 심볼 → 저장소`를 가상 트리플과 SPARQL 4-패턴으로 세웠다(실측 없음, 2026-09-29 `in-progress`) → [[멀티홉-질문과-Bridge-Entity]], [[데이터-수집과-출처-추적]]. 같은 종류의 경계 긋기가 [[Palantir-Foundry-Ontology]]의 "Action ≠ 추론"에도 있다.
+
 ## 관련
 
 - [[지식그래프와-온톨로지]] · [[데이터-수집과-출처-추적]] · [[RAG-변천사]] · [[RAG-실패-유형]] · [[LLM-위키-패턴]]
@@ -59,4 +61,5 @@ weeks: [2]
 ## 출처
 
 - kungbi · OpenViking: 무엇을 기억하고 무엇을 다시 확인할까? — [members/kungbi/notes/01-openviking-context-database.md](../../members/kungbi/notes/01-openviking-context-database.md) (상세는 같은 폴더의 `presentation.html`)
+- kungbi · W4 지식 그래프의 배경 — [members/kungbi/notes/02-knowledge-graph-background.md](../../members/kungbi/notes/02-knowledge-graph-background.md)
 - 외부: https://github.com/volcengine/OpenViking · https://docs.openviking.ai/en/concepts/01-architecture · …/02-context-types · …/03-context-layers · …/07-retrieval

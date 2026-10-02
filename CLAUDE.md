@@ -127,6 +127,11 @@ PR이 머지되었거나, 스터디장이 `wiki/inbox/`에 메모를 두거나, 
 
 `wiki/inbox/`의 메모는 위키에 반영한 뒤 삭제한다. `members/`의 소재는 절대 삭제·수정하지 않는다.
 
+**주간 자동 ingest**: `.github/workflows/wiki-ingest.yml`이 매주 월요일 09:00 KST에 Claude Code를 무인으로 띄워
+위 절차를 수행하고 `wiki/ingest-<날짜>-<run>` 브랜치의 PR로 올린다(절차 원문은 `.github/prompts/wiki-ingest.md`).
+밀린 소재는 `python3 scripts/wiki_backlog.py`로 뽑는다 — `wiki/log.md`를 마지막으로 바꾼 커밋 이후 바뀐 소재,
+[[스터디-노트-지도]]에 없는 소재, 열린 PR의 소재. 사람이 세션에서 ingest할 때도 같은 스크립트로 시작한다.
+
 ### Query (질문에 답하기)
 
 1. `wiki/index.md`를 먼저 읽어 관련 페이지를 찾고 들어간다. 위키에 없으면 [[스터디-노트-지도]]로

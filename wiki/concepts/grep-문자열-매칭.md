@@ -4,9 +4,9 @@ type: concept
 tags: [concept]
 status: maintained
 created: 2026-09-16
-updated: 2026-09-16
-members: [dldusgh318, yujeong430, kdyann, e0ng, do-dop, heebindev, sunghyun, jjinthung, ur2e, lys0611]
-weeks: [2]
+updated: 2026-10-02
+members: [dldusgh318, yujeong430, kdyann, e0ng, do-dop, heebindev, sunghyun, jjinthung, ur2e, lys0611, sdunge, Yeongeunn]
+weeks: [2, 3]
 ---
 
 > 0세대 검색. 인덱스 없이 파일을 처음부터 훑어 패턴과 일치하는 **줄**을 돌려준다. 정확한 문자열·코드·ID에는 강하고, 표현이 다르거나 순위가 필요하면 무너진다. 스터디 멤버 전원이 자기 데이터로 이 한계를 직접 확인했다.
@@ -36,6 +36,9 @@ weeks: [2]
 | jjinthung | 카카오톡 753청크, 정답 40개 | Hit@1 0%, Hit@5 0%, 평균 4.37ms |
 | ur2e | 합성 옵시디언 vault | 패러프레이즈 질의·시간 질의 0건 |
 | lys0611 | 카카오톡 2개 방 1,922청크, 질문 10개 | 10개 중 8개 0건. `회의록 오늘 중으로`는 정확 문구 1건이 있어 **grep이 이긴** 유일한 질문(순위화가 필요 없었다) |
+| sdunge | 법제처 형사 판례 73건 원문 | 동의어 `사기` 384줄 / `기망` 3줄 / **`속여` 0줄** — 본문 청킹 + BM25에서는 189 / 10 / 9청크 |
+| Yeongeunn | 팀 Notion JSONL, 10문항 | 질문 문장 전체를 `grep -F` 고정 문자열로 → **10문항 모두 0건**, 핵심어 `회원탈퇴`는 `rg -c -F` 24줄. "형태소 분석이나 순위가 있는 검색기와 같은 조건의 키워드 검색으로 해석하지 않는다" |
+| do-dop (03) | 기업 뉴스룸·공시 69청크, 10질문 | 자연어 질문 전체 Hit@5 **0%** vs 사람이 고른 핵심 문자열 100% (R@5 83.3%). grep은 비교용으로만 쓰고 융합에는 넣지 않았다 |
 
 ## grep이 오히려 맞는 경우
 
@@ -59,9 +62,9 @@ weeks: [2]
 - kdyann · 검색의 세 세대 (§0세대) — [members/kdyann/notes/02-search-generations.md](../../members/kdyann/notes/02-search-generations.md); Instagram 실습 — [labs/01-instagram-search/README.md](../../members/kdyann/labs/01-instagram-search/README.md)
 - e0ng · 검색의 세 세대를 직접 만든다 — [members/e0ng/notes/02-search-generations.md](../../members/e0ng/notes/02-search-generations.md); 실습 — [labs/02-search-generations/README.md](../../members/e0ng/labs/02-search-generations/README.md)
 - do-dop · grep에서 벡터 검색까지 — [members/do-dop/notes/02-search-generations.md](../../members/do-dop/notes/02-search-generations.md); 실습 — [labs/02-kakaotalk-search/README.md](../../members/do-dop/labs/02-kakaotalk-search/README.md)
-- heebindev · 검색의 세 세대 — [members/heebindev/notes/02-search-generations.md](../../members/heebindev/notes/02-search-generations.md); 실습 — [labs/01-notion-search/README.md](../../members/heebindev/labs/01-notion-search/README.md) (PR #12 미머지)
+- heebindev · 검색의 세 세대 — [members/heebindev/notes/02-search-generations.md](../../members/heebindev/notes/02-search-generations.md); 실습 — [labs/01-notion-search/README.md](../../members/heebindev/labs/01-notion-search/README.md)
 - sunghyun · grep, BM25, 벡터 검색 정리 — [members/sunghyun/note/02-search-methods.md](../../members/sunghyun/note/02-search-methods.md)
 - jjinthung · Grep vs BM25 vs Vector Search — [members/jjinthung/notes/01_results.md](../../members/jjinthung/notes/01_results.md)
 - ur2e · 검색 방식 비교 실험 — [members/ur2e/notes/01-search-methods-comparison.md](../../members/ur2e/notes/01-search-methods-comparison.md) (PR #11 미머지)
-- lys0611 · 카톡 대화 적재 비교표 — [members/lys0611/labs/01-ingest/compare.md](../../members/lys0611/labs/01-ingest/compare.md) (PR #15 미머지)
+- lys0611 · 카톡 대화 적재 비교표 — [members/lys0611/labs/01-ingest/compare.md](../../members/lys0611/labs/01-ingest/compare.md)
 - 외부: GNU grep manual https://www.gnu.org/software/grep/manual/grep.html · Furnas et al., The Vocabulary Problem (CACM 1987) · ripgrep 블로그 https://blog.burntsushi.net/ripgrep/ (dldusgh318 readings)

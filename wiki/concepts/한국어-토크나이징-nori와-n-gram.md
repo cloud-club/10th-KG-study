@@ -4,8 +4,8 @@ type: concept
 tags: [concept, pitfall]
 status: maintained
 created: 2026-09-16
-updated: 2026-09-16
-members: [yujeong430, dldusgh318, do-dop, kdyann, e0ng, ur2e, lys0611]
+updated: 2026-10-02
+members: [yujeong430, dldusgh318, do-dop, kdyann, e0ng, ur2e, lys0611, sunghyun, Yeongeunn]
 weeks: [2]
 ---
 
@@ -45,6 +45,9 @@ weeks: [2]
 4. 한 글자·공백 포함 질의는 n-gram 필드에서 0건이 될 수 있다.
 5. 토큰 분석 실습을 할 때는 실제 대화 대신 직접 만든 예시 문장을 쓴다 (do-dop) → [[개인-데이터-가명화와-공개-범위]].
 
+- sunghyun(회사 기술 문서): `Codebeamer에서 로그인에 실패했습니다` → `codebeamer | 로그인 | 실패`. Nori vs n-gram 비교는 미완. Nori·ES·BM25의 역할 분해("문장을 나누는 일 / 저장·검색하는 일 / 점수를 매기는 일")로 이해했다.
+- **용어 혼동 두 가지** (Yeongeunn): ① nori 내부 문맥 모델의 bigram은 검색용 2글자 토큰화 bigram과 다르다 ② `배송조회`를 2-gram으로 자르면 `배송`·`송조`·`조회` — `송조`처럼 사전에 없는 조각이 생긴다. "nori가 모든 띄어쓰기 오류를 고쳐주지 않는다." 토큰 ≠ 청크이고, 설명용 토큰 그림은 실제 모델의 토큰 분할 결과가 아니다. "Nori가 비교할 단위를 준비한다면 BM25는 그 단위를 바탕으로 점수를 매긴다. 형태소 분석만으로 '취소'↔'철회'는 해결되지 않는다."
+
 ## 관련
 
 - [[역색인과-BM25]] · [[Elasticsearch-운영-함정]] · [[grep-문자열-매칭]] · [[청킹-전략]]
@@ -57,6 +60,7 @@ weeks: [2]
 - kdyann · 검색의 세 세대 (§형태소 분석: Nori) — [members/kdyann/notes/02-search-generations.md](../../members/kdyann/notes/02-search-generations.md)
 - e0ng · 검색의 세 세대를 직접 만든다 (§형태소 분석과 n-gram 비교) — [members/e0ng/notes/02-search-generations.md](../../members/e0ng/notes/02-search-generations.md)
 - ur2e · 검색 방식 비교 실험 (실험 2) — [members/ur2e/notes/01-search-methods-comparison.md](../../members/ur2e/notes/01-search-methods-comparison.md) (PR #11 미머지)
-- lys0611 · 역색인과 BM25 (§한국어에서는 분석기가 먼저다) — [members/lys0611/notes/01-inverted-index-bm25.md](../../members/lys0611/notes/01-inverted-index-bm25.md); 카톡 대화 적재 — [labs/01-ingest/README.md](../../members/lys0611/labs/01-ingest/README.md) (PR #15 미머지)
+- lys0611 · 역색인과 BM25 (§한국어에서는 분석기가 먼저다) — [members/lys0611/notes/01-inverted-index-bm25.md](../../members/lys0611/notes/01-inverted-index-bm25.md); 카톡 대화 적재 — [labs/01-ingest/README.md](../../members/lys0611/labs/01-ingest/README.md)
 - jjinthung · 결과 — [members/jjinthung/notes/01_results.md](../../members/jjinthung/notes/01_results.md)
+- sunghyun · grep, BM25, 벡터 검색과 HNSW (§Nori) — [members/sunghyun/notes/02-search-methods.md](../../members/sunghyun/notes/02-search-methods.md); Yeongeunn · 2주차 검색 세대 (§nori·n-gram), 지식 그래프와 온톨로지 (§BM25의 자리) — [members/Yeongeunn/notes/02-week2-search-generations.md](../../members/Yeongeunn/notes/02-week2-search-generations.md), [notes/09-week4-ontology-background.md](../../members/Yeongeunn/notes/09-week4-ontology-background.md)
 - 외부: Elastic, Nori 공식 플러그인 소개 https://www.elastic.co/blog/nori-the-official-elasticsearch-plugin-for-korean-language-analysis · nori_tokenizer https://www.elastic.co/docs/reference/elasticsearch/plugins/analysis-nori-tokenizer · n-gram tokenizer https://www.elastic.co/docs/reference/text-analysis/analysis-ngram-tokenizer

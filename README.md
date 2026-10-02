@@ -85,8 +85,10 @@ bash infra/check.sh       # 정상 기동 확인
 - **`wiki/` 아래를 직접 고치지 마세요.** 틀린 게 있으면 자기 노트를 고치고 PR 을 올리면 다음 ingest 때 반영됩니다.
   급하면 이슈나 `wiki/inbox/`에 메모를 남기세요.
 - 옵시디언으로 보려면 `wiki/` 폴더를 볼트로 엽니다. 그래프 뷰가 주제 사이의 연결을 보여줍니다.
-- 갱신(ingest)은 이 저장소에서 Claude Code 를 열고 "PR #n 머지됐어, ingest 해줘" 또는 "위키 린트"라고 요청하면
-  됩니다. 규칙과 절차는 [CLAUDE.md](CLAUDE.md)에 있고, `.claude/hooks/`의 훅이 규칙을 강제합니다.
+- 갱신(ingest)은 **매주 월요일 아침 GitHub Actions 가 자동으로** 돌려 PR 로 올립니다
+  ([wiki-ingest.yml](.github/workflows/wiki-ingest.yml)). 급하면 이 저장소에서 Claude Code 를 열고
+  "PR #n 머지됐어, ingest 해줘" 또는 "위키 린트"라고 요청하면 됩니다. 밀린 소재는 `python3 scripts/wiki_backlog.py`.
+  규칙과 절차는 [CLAUDE.md](CLAUDE.md)에 있고, `.claude/hooks/`의 훅이 규칙을 강제합니다.
 
 ## 현황판 (dashboard)
 

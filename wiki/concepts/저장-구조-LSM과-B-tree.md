@@ -4,9 +4,9 @@ type: concept
 tags: [concept]
 status: maintained
 created: 2026-09-16
-updated: 2026-09-16
-members: [lys0611]
-weeks: [2]
+updated: 2026-10-02
+members: [lys0611, Yeongeunn, sunghyun, kungbi]
+weeks: [2, 4]
 ---
 
 > DDIA 3장(2판 4장)의 저장 구조를 스터디 실습의 Postgres·pgvector·Elasticsearch에 대입한 lys0611의 노트. 다른 멤버가 다루지 않은 주제. 핵심은 "Postgres = B-tree DB", "Elasticsearch = LSM"이라는 단순화를 거부하고, 인덱스의 존재가 아니라 실행 계획을 보라는 것.
@@ -45,11 +45,14 @@ weeks: [2]
 - 대량 색인 중 `refresh_interval` 조정 시 처리량·가시성 변화.
 - VACUUM과 LSM/Lucene merge를 "공간 회수"로 묶지 말고 각각 무엇을 정리하는지 비교.
 
+- Yeongeunn(2주차)도 DDIA 3장을 PG·ES에 대입하고 "PG 대 ES 제품 대결보다 **이 쿼리가 어떤 인덱스를 이용하는가**를 묻는다"로 같은 결론에 닿았다. sunghyun은 exact/HNSW 기준선을 트랜잭션 내 설정 토글 + 실행 계획으로 만들었다 → [[HNSW와-pgvector-인덱스]]. DDIA **2장**(관계형·문서·그래프 데이터 모델)은 kungbi·Yeongeunn이 4~5주차 교재로 삼았고 Yeongeunn readings에 4장(부호화)까지 있다 — 2장의 내용은 [[RDF와-프로퍼티-그래프]]에, 그래프 질의의 재귀 CTE vs 가변 경로는 [[그래프-적재-Postgres와-Neo4j]]에 있다.
+
 ## 관련
 
 - [[PostgreSQL과-pgvector-함정]] · [[Elasticsearch-운영-함정]] · [[역색인과-BM25]] · [[HNSW와-pgvector-인덱스]] · [[데이터-수집과-출처-추적]]
 
 ## 출처
 
-- lys0611 · DDIA 저장소와 검색 — Postgres와 Elasticsearch를 함께 쓴 이유 — [members/lys0611/notes/03-ddia-ch3-storage-and-search.md](../../members/lys0611/notes/03-ddia-ch3-storage-and-search.md) (PR #15 미머지)
+- lys0611 · DDIA 저장소와 검색 — Postgres와 Elasticsearch를 함께 쓴 이유 — [members/lys0611/notes/03-ddia-ch3-storage-and-search.md](../../members/lys0611/notes/03-ddia-ch3-storage-and-search.md)
+- Yeongeunn · 2주차 검색 세대 (§DDIA 3장) — [members/Yeongeunn/notes/02-week2-search-generations.md](../../members/Yeongeunn/notes/02-week2-search-generations.md); kungbi · W4 지식 그래프의 배경 (교재 DDIA 2장) — [members/kungbi/notes/02-knowledge-graph-background.md](../../members/kungbi/notes/02-knowledge-graph-background.md)
 - 외부: Kleppmann, Designing Data-Intensive Applications 1판 3장 https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/ch03.html · 2판 4장 (Kleppmann & Riccomini, 2026) · PostgreSQL Database Page Layout, B-Tree Indexes, WAL Introduction · Elastic Near real-time search, Merge settings

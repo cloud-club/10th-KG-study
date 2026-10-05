@@ -1,0 +1,6 @@
+-r ../01-ingest/requirements.txt
+sentence-transformers>=6,<7
+pytest>=8,<9
+
+# Gemini로 답변을 생성할 때만 필요
+# google-genai>=1.0

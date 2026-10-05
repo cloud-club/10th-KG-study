@@ -1,0 +1,100 @@
+name: Weekly wiki ingest
+
+# 매주 한 번 Claude Code 가 members/ 의 새 소재를 읽어 wiki/ 를 갱신하고 PR 로 올린다.
+# 규칙은 루트 CLAUDE.md, 무인 실행 절차는 .github/prompts/wiki-ingest.md.
+# 필요한 시크릿 (둘 중 하나): CLAUDE_CODE_OAUTH_TOKEN (`claude setup-token`, Pro/Max 구독)
+#                            또는 ANTHROPIC_API_KEY.
+# 필요한 저장소 설정: Settings → Actions → General → Workflow permissions →
+#                   "Allow GitHub Actions to create and approve pull requests" 켜기.
+
+on:
+  schedule:
+    - cron: "0 0 * * 1" # 매주 월요일 09:00 KST (UTC 00:00). 기본 브랜치에서만 돈다
+  workflow_dispatch:
+    inputs:
+      base:
+        description: "기준 커밋 (비우면 wiki/log.md 를 마지막으로 바꾼 커밋)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+  issues: read
+
+concurrency:
+  group: wiki-ingest
+  cancel-in-progress: false
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run tests
+        run: python3 -m unittest discover -s scripts -p "test_*.py"
+
+      - name: Measure backlog
+        id: backlog
+        run: |
+          BASE_ARG=""
+          if [ -n "${{ github.event.inputs.base }}" ]; then BASE_ARG="--base ${{ github.event.inputs.base }}"; fi
+          python3 scripts/wiki_backlog.py $BASE_ARG | tee "$RUNNER_TEMP/backlog.md"
+          CHANGED=$(python3 scripts/wiki_backlog.py $BASE_ARG --json | python3 -c 'import json,sys; r=json.load(sys.stdin); print(len(r["changed"]) + len(r["unmapped"]))')
+          echo "count=$CHANGED" >> "$GITHUB_OUTPUT"
+          if [ "$CHANGED" = "0" ]; then echo "::notice::밀린 소재 없음 — 종료"; fi
+
+      - name: Ingest with Claude Code
+        if: steps.backlog.outputs.count != '0'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            `.github/prompts/wiki-ingest.md` 를 읽고 그 절차대로 주간 위키 ingest 를 수행하라.
+            기준 커밋 지정: ${{ github.event.inputs.base || '(없음 — wiki/log.md 마지막 커밋)' }}
+            밀린 소재 목록은 `${{ runner.temp }}/backlog.md` 에 이미 뽑아 두었다 (다시 돌려도 된다).
+            마지막 요약(프롬프트 5절 형식)은 채팅에만 남기지 말고 `${{ runner.temp }}/summary.md` 파일로도 저장하라.
+          claude_args: |
+            --model opus
+            --max-turns 200
+            --allowedTools "Read,Edit,Write,MultiEdit,Glob,Grep,LS,Agent,Bash(python3:*),Bash(git:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(ls:*),Bash(wc:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(grep:*),Bash(find:*)"
+
+      - name: Open pull request
+        if: steps.backlog.outputs.count != '0'
+        run: |
+          git add -A wiki
+          git reset -q -- wiki/.obsidian 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "::notice::위키 변경 없음 — PR 생략"
+            exit 0
+          fi
+          if git status --porcelain | grep -v '^.. wiki/' | grep -q .; then
+            echo "::warning::wiki/ 밖 변경이 생겨 버린다:"; git status --porcelain | grep -v '^.. wiki/'
+            git checkout -- . && git clean -fdq -e wiki
+          fi
+          DATE=$(date -u +%Y-%m-%d)
+          BRANCH="wiki/ingest-$DATE-${{ github.run_id }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git commit -q -m "wiki: 주간 자동 ingest ($DATE)"
+          git push -u origin "$BRANCH"
+          BODY="$RUNNER_TEMP/summary.md"
+          if [ ! -s "$BODY" ]; then
+            { echo "## 이번 주 ingest"; echo; echo "(요약 파일 없음 — 실행 로그 참고)"; echo; cat "$RUNNER_TEMP/backlog.md"; } > "$BODY"
+          fi
+          printf '\n\n---\n자동 생성: `.github/workflows/wiki-ingest.yml` · 실행 %s\n' "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> "$BODY"
+          gh pr create --base main --head "$BRANCH" --title "wiki: 주간 자동 ingest ($DATE)" --body-file "$BODY"

@@ -1,0 +1,36 @@
+name: jjinthung-rag
+
+services:
+  elasticsearch:
+    build:
+      context: ./elasticsearch
+      args:
+        ES_VERSION: 9.1.0
+    image: jjinthung/elasticsearch-nori:9.1.0
+    container_name: jjinthung-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    volumes:
+      - jjinthung_es_data:/usr/share/elasticsearch/data
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=2s' || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+
+volumes:
+  jjinthung_es_data:

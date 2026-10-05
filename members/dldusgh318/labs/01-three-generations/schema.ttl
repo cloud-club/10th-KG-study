@@ -1,0 +1,46 @@
+@prefix kg:   <http://example.org/kg/> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+kg:Project a rdfs:Class ;
+    rdfs:label "프로젝트"@ko ;
+    rdfs:comment "소프트웨어 개발 또는 기술 적용이 이루어지는 프로젝트를 나타낸다."@ko .
+
+kg:Technology a rdfs:Class ;
+    rdfs:label "기술"@ko ;
+    rdfs:comment "프로젝트에서 사용되거나 사용이 제안된 소프트웨어, 플랫폼, 프레임워크 또는 기술을 나타낸다."@ko .
+
+kg:TechnologyUse a rdfs:Class ;
+    rdfs:label "기술 사용례"@ko ;
+    rdfs:comment "특정 프로젝트에서 특정 기술을 어떤 목적과 상태로 사용하는지를 표현하는 중간 노드다."@ko .
+
+kg:partOf a rdf:Property ;
+    rdfs:label "프로젝트에 속함"@ko ;
+    rdfs:comment "기술 사용례가 어느 프로젝트에 속하는지를 연결한다."@ko ;
+    rdfs:domain kg:TechnologyUse ;
+    rdfs:range kg:Project .
+
+kg:usesTechnology a rdf:Property ;
+    rdfs:label "기술을 사용함"@ko ;
+    rdfs:comment "기술 사용례가 대상으로 삼는 기술을 연결한다."@ko ;
+    rdfs:domain kg:TechnologyUse ;
+    rdfs:range kg:Technology .
+
+kg:hasPurpose a rdf:Property ;
+    rdfs:label "사용 목적"@ko ;
+    rdfs:comment "기술 사용례에서 기술을 사용하거나 제안한 목적을 문자열로 기록한다."@ko ;
+    rdfs:domain kg:TechnologyUse ;
+    rdfs:range xsd:string .
+
+kg:hasStatus a rdf:Property ;
+    rdfs:label "사용 상태"@ko ;
+    rdfs:comment "기술 사용례의 상태를 implemented, proposed 또는 not_implemented 문자열로 기록한다."@ko ;
+    rdfs:domain kg:TechnologyUse ;
+    rdfs:range xsd:string .
+
+kg:replaces a rdf:Property ;
+    rdfs:label "대체함"@ko ;
+    rdfs:comment "한 기술 사용례가 대체한 이전 기술 사용례를 연결한다."@ko ;
+    rdfs:domain kg:TechnologyUse ;
+    rdfs:range kg:TechnologyUse .

@@ -1,0 +1,3 @@
+{"id":"demo-july","corpus":"own","text":"스터디언은 외계인 모리랑 공부하면 행성을 모아가는 뽀모도로 앱입니다. iOS 앱으로 출시 됐습니다! App Store에서 다운로드할 수 있어요.","published_at":"2026-07-13T00:00:00+00:00"}
+{"id":"demo-august","corpus":"own","text":"스터디언에서 외계인 모리와 함께 공부하고 나만의 행성을 뽑아보세요! 스터디언이 출시되어 App Store에서 다운로드할 수 있어요.","published_at":"2026-08-25T00:00:00+00:00"}
+{"id":"demo-reference","corpus":"reference","text":"요즘 공부 습관을 만드는 타이머 콘텐츠가 인기입니다.","published_at":"2026-09-29T00:00:00+00:00","collected_at":"2026-09-30T00:00:00+00:00","selection":{"score":0.03,"observed_likes":1200,"observed_comments":20},"metrics":{"likes":1200,"comments":20}}

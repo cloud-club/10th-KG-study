@@ -1,0 +1,60 @@
+# 로컬 실습용 Postgres(pgvector) + Elasticsearch(nori).
+# 스터디에서 배포한 docker-compose 가 있으면 그걸 쓰고, 이 파일은 참고용/백업용으로 두면 된다.
+#   docker compose up -d --build
+#   docker compose ps          # 둘 다 healthy 인지
+#   docker compose down -v     # 데이터까지 지우고 초기화
+services:
+  postgres:
+    image: pgvector/pgvector:pg18          # Postgres 18 + pgvector 0.8.x
+    container_name: kg-postgres
+    environment:
+      POSTGRES_USER: kg
+      POSTGRES_PASSWORD: kg
+      POSTGRES_DB: kg
+    ports:
+      - "5432:5432"
+    volumes:
+      # Postgres 18 이미지부터 데이터 디렉터리가 /var/lib/postgresql/18/docker 로 바뀌었다.
+      # 예전처럼 /var/lib/postgresql/data 에 마운트하면 데이터가 볼륨 밖에 저장돼 재시작 때 사라진다.
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kg -d kg"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  elasticsearch:
+    build: ./es                            # 공식 이미지 + analysis-nori 플러그인 (es/Dockerfile)
+    container_name: kg-es
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false       # 로컬 실습이므로 인증/TLS 끔 (http://localhost:9200 로 바로 접속)
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g          # 노트북 메모리가 넉넉하면 2g 로
+      - cluster.routing.allocation.disk.threshold_enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  # 색인 결과를 눈으로 보고 싶으면 주석 해제 (http://localhost:5601 → Dev Tools)
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:9.5.3
+  #   container_name: kg-kibana
+  #   environment:
+  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  #   ports:
+  #     - "5601:5601"
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
+
+volumes:
+  pgdata:
+  esdata:

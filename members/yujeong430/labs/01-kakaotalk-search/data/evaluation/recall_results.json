@@ -1,0 +1,1982 @@
+{
+  "ks": [
+    1,
+    3,
+    5
+  ],
+  "input": "data\\evaluation\\retrieval_gold.json",
+  "query_count": 40,
+  "average_recall_at_k": {
+    "1": {
+      "bm25": 0.5875,
+      "vector": 0.45,
+      "hybrid_rrf": 0.575
+    },
+    "3": {
+      "bm25": 0.8875,
+      "vector": 0.8375,
+      "hybrid_rrf": 0.8625
+    },
+    "5": {
+      "bm25": 0.95,
+      "vector": 0.85,
+      "hybrid_rrf": 0.8875
+    }
+  },
+  "average_recall_at_k_by_type": {
+    "semantic_paraphrase": {
+      "1": {
+        "bm25": 0.6923076923076923,
+        "vector": 0.4230769230769231,
+        "hybrid_rrf": 0.5769230769230769
+      },
+      "3": {
+        "bm25": 0.8846153846153846,
+        "vector": 0.7692307692307693,
+        "hybrid_rrf": 0.8076923076923077
+      },
+      "5": {
+        "bm25": 0.9230769230769231,
+        "vector": 0.7692307692307693,
+        "hybrid_rrf": 0.8461538461538461
+      }
+    },
+    "detail_constraint": {
+      "1": {
+        "bm25": 0.6428571428571429,
+        "vector": 0.7857142857142857,
+        "hybrid_rrf": 0.7857142857142857
+      },
+      "3": {
+        "bm25": 1.0,
+        "vector": 1.0,
+        "hybrid_rrf": 1.0
+      },
+      "5": {
+        "bm25": 1.0,
+        "vector": 1.0,
+        "hybrid_rrf": 1.0
+      }
+    },
+    "temporal_disambiguation": {
+      "1": {
+        "bm25": 0.7142857142857143,
+        "vector": 0.2857142857142857,
+        "hybrid_rrf": 0.42857142857142855
+      },
+      "3": {
+        "bm25": 0.7142857142857143,
+        "vector": 0.7142857142857143,
+        "hybrid_rrf": 0.7142857142857143
+      },
+      "5": {
+        "bm25": 0.8571428571428571,
+        "vector": 0.7142857142857143,
+        "hybrid_rrf": 0.7142857142857143
+      }
+    },
+    "lexical_variant": {
+      "1": {
+        "bm25": 0.16666666666666666,
+        "vector": 0.25,
+        "hybrid_rrf": 0.4166666666666667
+      },
+      "3": {
+        "bm25": 0.9166666666666666,
+        "vector": 0.9166666666666666,
+        "hybrid_rrf": 1.0
+      },
+      "5": {
+        "bm25": 1.0,
+        "vector": 1.0,
+        "hybrid_rrf": 1.0
+      }
+    },
+    "lexical_exact": {
+      "1": {
+        "bm25": 0.7,
+        "vector": 0.7,
+        "hybrid_rrf": 0.9
+      },
+      "3": {
+        "bm25": 1.0,
+        "vector": 1.0,
+        "hybrid_rrf": 1.0
+      },
+      "5": {
+        "bm25": 1.0,
+        "vector": 1.0,
+        "hybrid_rrf": 1.0
+      }
+    },
+    "multi_evidence": {
+      "1": {
+        "bm25": 0.25,
+        "vector": 0.0,
+        "hybrid_rrf": 0.0
+      },
+      "3": {
+        "bm25": 0.75,
+        "vector": 0.5,
+        "hybrid_rrf": 0.5
+      },
+      "5": {
+        "bm25": 1.0,
+        "vector": 0.5,
+        "hybrid_rrf": 0.75
+      }
+    }
+  },
+  "queries": [
+    {
+      "id": "retake-application",
+      "type": "semantic_paraphrase",
+      "query": "이미 들은 과목을 다시 신청하려면 어디에서 해야 해?",
+      "relevant_ids": [
+        "kakao-00001"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.0,
+          "recall_at_5": 0.0,
+          "result_ids": [
+            "kakao-00009",
+            "kakao-00057",
+            "kakao-00030",
+            "kakao-00738",
+            "kakao-00179"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.0,
+          "recall_at_5": 0.0,
+          "result_ids": [
+            "kakao-00780",
+            "kakao-00567",
+            "kakao-00228",
+            "kakao-00207",
+            "kakao-00226"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.0,
+          "recall_at_5": 0.0,
+          "result_ids": [
+            "kakao-00226",
+            "kakao-00057",
+            "kakao-00722",
+            "kakao-00009",
+            "kakao-00780"
+          ]
+        }
+      }
+    },
+    {
+      "id": "grade-waiver-eligibility",
+      "type": "detail_constraint",
+      "query": "몇 학기 이수해야 학점 포기를 할 수 있어?",
+      "relevant_ids": [
+        "kakao-00213",
+        "kakao-00232"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00213",
+            "kakao-00232",
+            "kakao-00314",
+            "kakao-00154",
+            "kakao-00009"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00213",
+            "kakao-00232",
+            "kakao-00212",
+            "kakao-00228",
+            "kakao-00001"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00213",
+            "kakao-00232",
+            "kakao-00314",
+            "kakao-00212",
+            "kakao-00154"
+          ]
+        }
+      }
+    },
+    {
+      "id": "locker-cleaning-deadline",
+      "type": "semantic_paraphrase",
+      "query": "사물함 위에 둔 개인 물건은 언제까지 치워야 해?",
+      "relevant_ids": [
+        "kakao-00005",
+        "kakao-00010"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00215",
+            "kakao-00005",
+            "kakao-00010",
+            "kakao-00247",
+            "kakao-00653"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00005",
+            "kakao-00215",
+            "kakao-00010",
+            "kakao-00770",
+            "kakao-00778"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00005",
+            "kakao-00215",
+            "kakao-00010",
+            "kakao-00653",
+            "kakao-00178"
+          ]
+        }
+      }
+    },
+    {
+      "id": "locker-first-semester",
+      "type": "temporal_disambiguation",
+      "query": "1학기 사물함을 빌리려면 어디에 신청해?",
+      "relevant_ids": [
+        "kakao-00231"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00231",
+            "kakao-00735",
+            "kakao-00178",
+            "kakao-00653",
+            "kakao-00247"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00178",
+            "kakao-00247",
+            "kakao-00231",
+            "kakao-00735",
+            "kakao-00770"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00178",
+            "kakao-00231",
+            "kakao-00735",
+            "kakao-00247",
+            "kakao-00653"
+          ]
+        }
+      }
+    },
+    {
+      "id": "locker-lost-and-found",
+      "type": "semantic_paraphrase",
+      "query": "사물함 청소 때 나온 분실물은 어디에 있어?",
+      "relevant_ids": [
+        "kakao-00778"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00778",
+            "kakao-00653",
+            "kakao-00215",
+            "kakao-00005",
+            "kakao-00231"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00778",
+            "kakao-00653",
+            "kakao-00215",
+            "kakao-00770",
+            "kakao-00005"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00778",
+            "kakao-00653",
+            "kakao-00215",
+            "kakao-00005",
+            "kakao-00735"
+          ]
+        }
+      }
+    },
+    {
+      "id": "work-study-deadline",
+      "type": "lexical_variant",
+      "query": "2학기 국가근로장학금 1차 신청 마감",
+      "relevant_ids": [
+        "kakao-00543",
+        "kakao-00583"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00543",
+            "kakao-00583",
+            "kakao-00584",
+            "kakao-00544",
+            "kakao-00410"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00583",
+            "kakao-00543",
+            "kakao-00584",
+            "kakao-00544",
+            "kakao-00671"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00543",
+            "kakao-00583",
+            "kakao-00584",
+            "kakao-00544",
+            "kakao-00045"
+          ]
+        }
+      }
+    },
+    {
+      "id": "absence-online-application",
+      "type": "semantic_paraphrase",
+      "query": "2학기부터 공결을 종이 말고 어디에서 신청해?",
+      "relevant_ids": [
+        "kakao-00787",
+        "kakao-00793"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.5,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00207",
+            "kakao-00787",
+            "kakao-00067",
+            "kakao-00793",
+            "kakao-00567"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.0,
+          "recall_at_5": 0.0,
+          "result_ids": [
+            "kakao-00207",
+            "kakao-00671",
+            "kakao-00567",
+            "kakao-00154",
+            "kakao-00583"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.5,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00207",
+            "kakao-00567",
+            "kakao-00793",
+            "kakao-00787",
+            "kakao-00583"
+          ]
+        }
+      }
+    },
+    {
+      "id": "absence-flu-rule",
+      "type": "detail_constraint",
+      "query": "독감으로 통원 치료하면 출석 인정이 되나?",
+      "relevant_ids": [
+        "kakao-00793"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00793",
+            "kakao-00207",
+            "kakao-00567",
+            "kakao-00161",
+            "kakao-00572"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00793",
+            "kakao-00567",
+            "kakao-00207",
+            "kakao-00794",
+            "kakao-00561"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00793",
+            "kakao-00207",
+            "kakao-00567",
+            "kakao-00794",
+            "kakao-00561"
+          ]
+        }
+      }
+    },
+    {
+      "id": "graduation-gown-location",
+      "type": "lexical_variant",
+      "query": "졸업생 학위복 대여 장소",
+      "relevant_ids": [
+        "kakao-00021",
+        "kakao-00068"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.5,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00034",
+            "kakao-00044",
+            "kakao-00021",
+            "kakao-00676",
+            "kakao-00068"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00021",
+            "kakao-00068",
+            "kakao-00676",
+            "kakao-00755",
+            "kakao-00199"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00021",
+            "kakao-00068",
+            "kakao-00676",
+            "kakao-00034",
+            "kakao-00755"
+          ]
+        }
+      }
+    },
+    {
+      "id": "course-registration-contact",
+      "type": "semantic_paraphrase",
+      "query": "수강신청하다가 일반적인 문의가 생기면 어디로 전화해야 해?",
+      "relevant_ids": [
+        "kakao-00074"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00074",
+            "kakao-00067",
+            "kakao-00177",
+            "kakao-00695",
+            "kakao-00731"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00074",
+            "kakao-00177",
+            "kakao-00655",
+            "kakao-00028",
+            "kakao-00077"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00074",
+            "kakao-00177",
+            "kakao-00057",
+            "kakao-00067",
+            "kakao-00695"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tuition-survey-deadline",
+      "type": "semantic_paraphrase",
+      "query": "등록금 인상안에 의견 내는 설문은 언제까지야?",
+      "relevant_ids": [
+        "kakao-00007"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00007",
+            "kakao-00081",
+            "kakao-00082",
+            "kakao-00577",
+            "kakao-00622"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00082",
+            "kakao-00081",
+            "kakao-00007",
+            "kakao-00567",
+            "kakao-00797"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00007",
+            "kakao-00082",
+            "kakao-00081",
+            "kakao-00063",
+            "kakao-00061"
+          ]
+        }
+      }
+    },
+    {
+      "id": "likelion-application-deadline",
+      "type": "lexical_exact",
+      "query": "멋쟁이사자처럼 14기 서류 모집 마감",
+      "relevant_ids": [
+        "kakao-00027",
+        "kakao-00076"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00027",
+            "kakao-00076",
+            "kakao-00140",
+            "kakao-00699",
+            "kakao-00716"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00076",
+            "kakao-00027",
+            "kakao-00140",
+            "kakao-00382",
+            "kakao-00236"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00027",
+            "kakao-00076",
+            "kakao-00140",
+            "kakao-00716",
+            "kakao-00115"
+          ]
+        }
+      }
+    },
+    {
+      "id": "sports-event-fee",
+      "type": "lexical_variant",
+      "query": "홍익초등학교 운동회 참가비",
+      "relevant_ids": [
+        "kakao-00757",
+        "kakao-00775"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00746",
+            "kakao-00757",
+            "kakao-00775",
+            "kakao-00149",
+            "kakao-00223"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00757",
+            "kakao-00775",
+            "kakao-00746",
+            "kakao-00639",
+            "kakao-00669"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00746",
+            "kakao-00757",
+            "kakao-00775",
+            "kakao-00669",
+            "kakao-00635"
+          ]
+        }
+      }
+    },
+    {
+      "id": "festival-market-location",
+      "type": "semantic_paraphrase",
+      "query": "문화제 플리마켓 셀러는 어디에서 운영해?",
+      "relevant_ids": [
+        "kakao-00799"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00799",
+            "kakao-00350",
+            "kakao-00471",
+            "kakao-00574",
+            "kakao-00734"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00799",
+            "kakao-00471",
+            "kakao-00350",
+            "kakao-00725",
+            "kakao-00477"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00799",
+            "kakao-00350",
+            "kakao-00471",
+            "kakao-00801",
+            "kakao-00574"
+          ]
+        }
+      }
+    },
+    {
+      "id": "kusitms-result-date",
+      "type": "detail_constraint",
+      "query": "큐시즘 신규 학회원 최종 결과 발표일",
+      "relevant_ids": [
+        "kakao-00004"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00004",
+            "kakao-00651",
+            "kakao-00797",
+            "kakao-00189",
+            "kakao-00198"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00004",
+            "kakao-00652",
+            "kakao-00797",
+            "kakao-00651",
+            "kakao-00207"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00004",
+            "kakao-00651",
+            "kakao-00797",
+            "kakao-00652",
+            "kakao-00189"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ceos-eligibility",
+      "type": "lexical_variant",
+      "query": "CEOS 창업학회 지원 자격",
+      "relevant_ids": [
+        "kakao-00013",
+        "kakao-00015"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00013",
+            "kakao-00015",
+            "kakao-00680",
+            "kakao-00706",
+            "kakao-00709"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.5,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00110",
+            "kakao-00709",
+            "kakao-00015",
+            "kakao-00013",
+            "kakao-00706"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00013",
+            "kakao-00015",
+            "kakao-00110",
+            "kakao-00709",
+            "kakao-00680"
+          ]
+        }
+      }
+    },
+    {
+      "id": "semester-retake-exact",
+      "type": "lexical_exact",
+      "query": "학기재수강 신청",
+      "relevant_ids": [
+        "kakao-00001"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00001",
+            "kakao-00009",
+            "kakao-00025",
+            "kakao-00144",
+            "kakao-00212"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00001",
+            "kakao-00228",
+            "kakao-00212",
+            "kakao-00074",
+            "kakao-00232"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00001",
+            "kakao-00228",
+            "kakao-00212",
+            "kakao-00074",
+            "kakao-00057"
+          ]
+        }
+      }
+    },
+    {
+      "id": "information-security-application-period",
+      "type": "lexical_exact",
+      "query": "정보보안 수강신청 기간",
+      "relevant_ids": [
+        "kakao-00057"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00057",
+            "kakao-00073",
+            "kakao-00177",
+            "kakao-00009",
+            "kakao-00032"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00177",
+            "kakao-00057",
+            "kakao-00073",
+            "kakao-00032",
+            "kakao-00009"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00057",
+            "kakao-00177",
+            "kakao-00073",
+            "kakao-00009",
+            "kakao-00032"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jacket-first-order-price",
+      "type": "lexical_exact",
+      "query": "컴퓨터공학과 과잠 1차 신청 가격",
+      "relevant_ids": [
+        "kakao-00031"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00224",
+            "kakao-00421",
+            "kakao-00031",
+            "kakao-00200",
+            "kakao-00045"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00031",
+            "kakao-00200",
+            "kakao-00421",
+            "kakao-00224",
+            "kakao-00045"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00031",
+            "kakao-00224",
+            "kakao-00421",
+            "kakao-00200",
+            "kakao-00045"
+          ]
+        }
+      }
+    },
+    {
+      "id": "curriculum-rename-exact",
+      "type": "lexical_exact",
+      "query": "데이터통신 과목 이름 변경",
+      "relevant_ids": [
+        "kakao-00642"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00642",
+            "kakao-00643",
+            "kakao-00057",
+            "kakao-00009",
+            "kakao-00808"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00642",
+            "kakao-00779",
+            "kakao-00789",
+            "kakao-00057",
+            "kakao-00419"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00642",
+            "kakao-00057",
+            "kakao-00643",
+            "kakao-00809",
+            "kakao-00789"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jacket-second-pickup",
+      "type": "lexical_variant",
+      "query": "과잠 2차 수령은 어디서 언제까지 가능해?",
+      "relevant_ids": [
+        "kakao-00421"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00224",
+            "kakao-00421",
+            "kakao-00045",
+            "kakao-00031",
+            "kakao-00200"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00246",
+            "kakao-00421",
+            "kakao-00156",
+            "kakao-00045",
+            "kakao-00200"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00421",
+            "kakao-00224",
+            "kakao-00246",
+            "kakao-00045",
+            "kakao-00200"
+          ]
+        }
+      }
+    },
+    {
+      "id": "equipment-early-loan",
+      "type": "lexical_variant",
+      "query": "노트북 사전 대여 날짜",
+      "relevant_ids": [
+        "kakao-00144"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00179",
+            "kakao-00712",
+            "kakao-00144",
+            "kakao-00755",
+            "kakao-00199"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00179",
+            "kakao-00712",
+            "kakao-00144",
+            "kakao-00182",
+            "kakao-00199"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00179",
+            "kakao-00712",
+            "kakao-00144",
+            "kakao-00755",
+            "kakao-00199"
+          ]
+        }
+      }
+    },
+    {
+      "id": "locker-second-semester-deadline",
+      "type": "temporal_disambiguation",
+      "query": "2학기 사물함 신청 마감은 언제야?",
+      "relevant_ids": [
+        "kakao-00735"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00735",
+            "kakao-00231",
+            "kakao-00653",
+            "kakao-00178",
+            "kakao-00247"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00247",
+            "kakao-00735",
+            "kakao-00653",
+            "kakao-00215",
+            "kakao-00178"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00735",
+            "kakao-00247",
+            "kakao-00653",
+            "kakao-00231",
+            "kakao-00178"
+          ]
+        }
+      }
+    },
+    {
+      "id": "book-loan-return-deadline",
+      "type": "temporal_disambiguation",
+      "query": "2학기 전공책은 언제까지 반납해야 해?",
+      "relevant_ids": [
+        "kakao-00742"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.0,
+          "recall_at_5": 0.0,
+          "result_ids": [
+            "kakao-00569",
+            "kakao-00144",
+            "kakao-00712",
+            "kakao-00117",
+            "kakao-00755"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.0,
+          "recall_at_5": 0.0,
+          "result_ids": [
+            "kakao-00569",
+            "kakao-00564",
+            "kakao-00068",
+            "kakao-00117",
+            "kakao-00712"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.0,
+          "recall_at_5": 0.0,
+          "result_ids": [
+            "kakao-00569",
+            "kakao-00564",
+            "kakao-00712",
+            "kakao-00117",
+            "kakao-00144"
+          ]
+        }
+      }
+    },
+    {
+      "id": "toeic-fee-discount",
+      "type": "semantic_paraphrase",
+      "query": "홍익대 학생이 토익 시험비를 할인받을 수 있어?",
+      "relevant_ids": [
+        "kakao-00702"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00702",
+            "kakao-00407",
+            "kakao-00277",
+            "kakao-00312",
+            "kakao-00609"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.0,
+          "recall_at_5": 0.0,
+          "result_ids": [
+            "kakao-00639",
+            "kakao-00036",
+            "kakao-00611",
+            "kakao-00106",
+            "kakao-00082"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.0,
+          "recall_at_5": 0.0,
+          "result_ids": [
+            "kakao-00639",
+            "kakao-00611",
+            "kakao-00609",
+            "kakao-00592",
+            "kakao-00415"
+          ]
+        }
+      }
+    },
+    {
+      "id": "midterm-snack-place-time",
+      "type": "semantic_paraphrase",
+      "query": "중간고사 간식은 언제 어디서 받을 수 있어?",
+      "relevant_ids": [
+        "kakao-00328"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00328",
+            "kakao-00354",
+            "kakao-00537",
+            "kakao-00532",
+            "kakao-00556"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00354",
+            "kakao-00328",
+            "kakao-00549",
+            "kakao-00537",
+            "kakao-00556"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00328",
+            "kakao-00354",
+            "kakao-00537",
+            "kakao-00549",
+            "kakao-00556"
+          ]
+        }
+      }
+    },
+    {
+      "id": "festival-stage-entry",
+      "type": "semantic_paraphrase",
+      "query": "학교 축제 메인무대는 학생이면 어떻게 들어가?",
+      "relevant_ids": [
+        "kakao-00458"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00500",
+            "kakao-00486",
+            "kakao-00458",
+            "kakao-00496",
+            "kakao-00433"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00500",
+            "kakao-00458",
+            "kakao-00211",
+            "kakao-00486",
+            "kakao-00459"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00500",
+            "kakao-00458",
+            "kakao-00486",
+            "kakao-00211",
+            "kakao-00724"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rural-volunteer-deadline",
+      "type": "semantic_paraphrase",
+      "query": "여름방학 농촌 봉사는 언제까지 신청해?",
+      "relevant_ids": [
+        "kakao-00588"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00588",
+            "kakao-00601",
+            "kakao-00607",
+            "kakao-00618",
+            "kakao-00510"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00601",
+            "kakao-00607",
+            "kakao-00588",
+            "kakao-00618",
+            "kakao-00639"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00601",
+            "kakao-00588",
+            "kakao-00607",
+            "kakao-00618",
+            "kakao-00597"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tumbler-washer-location",
+      "type": "semantic_paraphrase",
+      "query": "학교에서 텀블러를 씻을 수 있는 곳은 어디야?",
+      "relevant_ids": [
+        "kakao-00807"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00807",
+            "kakao-00321",
+            "kakao-00484",
+            "kakao-00382",
+            "kakao-00727"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00807",
+            "kakao-00778",
+            "kakao-00375",
+            "kakao-00106",
+            "kakao-00166"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00807",
+            "kakao-00321",
+            "kakao-00778",
+            "kakao-00375",
+            "kakao-00484"
+          ]
+        }
+      }
+    },
+    {
+      "id": "engineering-league-team-size",
+      "type": "detail_constraint",
+      "query": "공대리그 축구팀은 몇 명으로 신청해야 해?",
+      "relevant_ids": [
+        "kakao-00657"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00657",
+            "kakao-00746",
+            "kakao-00757",
+            "kakao-00775",
+            "kakao-00149"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00657",
+            "kakao-00149",
+            "kakao-00223",
+            "kakao-00028",
+            "kakao-00077"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00657",
+            "kakao-00149",
+            "kakao-00223",
+            "kakao-00746",
+            "kakao-00775"
+          ]
+        }
+      }
+    },
+    {
+      "id": "hongik-day-fee",
+      "type": "detail_constraint",
+      "query": "홍익대학교 DAY 야구 관람 참가비는 얼마야?",
+      "relevant_ids": [
+        "kakao-00669"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00669",
+            "kakao-00438",
+            "kakao-00524",
+            "kakao-00498",
+            "kakao-00486"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00669",
+            "kakao-00438",
+            "kakao-00524",
+            "kakao-00635",
+            "kakao-00158"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00669",
+            "kakao-00438",
+            "kakao-00524",
+            "kakao-00105",
+            "kakao-00319"
+          ]
+        }
+      }
+    },
+    {
+      "id": "c-programming-capacity",
+      "type": "detail_constraint",
+      "query": "C프로그래밍 추가 수강 가능한 정원이 몇 명이야?",
+      "relevant_ids": [
+        "kakao-00731"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00732",
+            "kakao-00731",
+            "kakao-00259",
+            "kakao-00264",
+            "kakao-00084"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00732",
+            "kakao-00731",
+            "kakao-00779",
+            "kakao-00790",
+            "kakao-00095"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00732",
+            "kakao-00731",
+            "kakao-00259",
+            "kakao-00264",
+            "kakao-00790"
+          ]
+        }
+      }
+    },
+    {
+      "id": "second-semester-rental-return",
+      "type": "detail_constraint",
+      "query": "2학기 대여사업 물품은 언제까지 반납해야 해?",
+      "relevant_ids": [
+        "kakao-00755"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00363",
+            "kakao-00755",
+            "kakao-00199",
+            "kakao-00569",
+            "kakao-00463"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00755",
+            "kakao-00199",
+            "kakao-00021",
+            "kakao-00363",
+            "kakao-00068"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00755",
+            "kakao-00363",
+            "kakao-00199",
+            "kakao-00021",
+            "kakao-00569"
+          ]
+        }
+      }
+    },
+    {
+      "id": "first-jacket-order-and-second-pickup",
+      "type": "multi_evidence",
+      "query": "1차 과잠 신청 기간과 2차 과잠 배부 기간을 각각 알려줘.",
+      "relevant_ids": [
+        "kakao-00031",
+        "kakao-00421"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.5,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00224",
+            "kakao-00421",
+            "kakao-00045",
+            "kakao-00031",
+            "kakao-00200"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.5,
+          "recall_at_5": 0.5,
+          "result_ids": [
+            "kakao-00246",
+            "kakao-00045",
+            "kakao-00421",
+            "kakao-00224",
+            "kakao-00028"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.5,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00224",
+            "kakao-00045",
+            "kakao-00421",
+            "kakao-00246",
+            "kakao-00031"
+          ]
+        }
+      }
+    },
+    {
+      "id": "online-absence-and-flu-rule",
+      "type": "multi_evidence",
+      "query": "2학기 공결 신청 방식과 독감 통원 치료 인정 여부를 알려줘.",
+      "relevant_ids": [
+        "kakao-00787",
+        "kakao-00793"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.5,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00793",
+            "kakao-00207",
+            "kakao-00787",
+            "kakao-00567",
+            "kakao-00649"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.5,
+          "recall_at_5": 0.5,
+          "result_ids": [
+            "kakao-00207",
+            "kakao-00793",
+            "kakao-00567",
+            "kakao-00099",
+            "kakao-00655"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.5,
+          "recall_at_5": 0.5,
+          "result_ids": [
+            "kakao-00207",
+            "kakao-00793",
+            "kakao-00567",
+            "kakao-00074",
+            "kakao-00564"
+          ]
+        }
+      }
+    },
+    {
+      "id": "graduation-album-booking",
+      "type": "semantic_paraphrase",
+      "query": "졸업앨범 사진 촬영은 어디에서 예약해?",
+      "relevant_ids": [
+        "kakao-00508"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00508",
+            "kakao-00521",
+            "kakao-00531",
+            "kakao-00513",
+            "kakao-00536"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00508",
+            "kakao-00513",
+            "kakao-00536",
+            "kakao-00531",
+            "kakao-00521"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00508",
+            "kakao-00513",
+            "kakao-00521",
+            "kakao-00531",
+            "kakao-00536"
+          ]
+        }
+      }
+    },
+    {
+      "id": "book-loan-first-semester-deadline",
+      "type": "temporal_disambiguation",
+      "query": "1학기 전공책은 언제까지 반납해야 해?",
+      "relevant_ids": [
+        "kakao-00088"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00569",
+            "kakao-00144",
+            "kakao-00712",
+            "kakao-00755",
+            "kakao-00088"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.0,
+          "recall_at_5": 0.0,
+          "result_ids": [
+            "kakao-00569",
+            "kakao-00564",
+            "kakao-00068",
+            "kakao-00021",
+            "kakao-00144"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 0.0,
+          "recall_at_5": 0.0,
+          "result_ids": [
+            "kakao-00569",
+            "kakao-00144",
+            "kakao-00564",
+            "kakao-00712",
+            "kakao-00021"
+          ]
+        }
+      }
+    },
+    {
+      "id": "student-council-fee-second-semester",
+      "type": "temporal_disambiguation",
+      "query": "2학기 총학생회비는 어떻게 납부해?",
+      "relevant_ids": [
+        "kakao-00711"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00711",
+            "kakao-00056",
+            "kakao-00577",
+            "kakao-00085",
+            "kakao-00068"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00711",
+            "kakao-00056",
+            "kakao-00068",
+            "kakao-00556",
+            "kakao-00744"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00711",
+            "kakao-00056",
+            "kakao-00068",
+            "kakao-00085",
+            "kakao-00744"
+          ]
+        }
+      }
+    },
+    {
+      "id": "late-graduation-gown-reservation",
+      "type": "temporal_disambiguation",
+      "query": "후기 학위복 사전 예약 수정은 언제까지 가능해?",
+      "relevant_ids": [
+        "kakao-00676"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00676",
+            "kakao-00044",
+            "kakao-00034",
+            "kakao-00505",
+            "kakao-00021"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00044",
+            "kakao-00676",
+            "kakao-00780",
+            "kakao-00750",
+            "kakao-00639"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00044",
+            "kakao-00676",
+            "kakao-00034",
+            "kakao-00021",
+            "kakao-00179"
+          ]
+        }
+      }
+    },
+    {
+      "id": "first-semester-rental-end",
+      "type": "temporal_disambiguation",
+      "query": "1학기 대여사업은 언제 끝났어?",
+      "relevant_ids": [
+        "kakao-00550"
+      ],
+      "methods": {
+        "bm25": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00550",
+            "kakao-00199",
+            "kakao-00755",
+            "kakao-00742",
+            "kakao-00088"
+          ]
+        },
+        "vector": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00550",
+            "kakao-00199",
+            "kakao-00755",
+            "kakao-00363",
+            "kakao-00144"
+          ]
+        },
+        "hybrid_rrf": {
+          "recall_at_1": 1.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
+          "result_ids": [
+            "kakao-00550",
+            "kakao-00199",
+            "kakao-00755",
+            "kakao-00742",
+            "kakao-00088"
+          ]
+        }
+      }
+    }
+  ]
+}

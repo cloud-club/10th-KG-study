@@ -1,0 +1,48 @@
+@prefix kg: <https://example.org/erumpay/ontology/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+kg:Service a rdfs:Class ;
+    rdfs:label "서비스"@ko ;
+    rdfs:comment "프로젝트 문서에서 API의 제공 주체 또는 호출 대상으로 식별되는 소프트웨어 서비스."@ko .
+kg:API a rdfs:Class ;
+    rdfs:label "API"@ko ;
+    rdfs:comment "제공 서비스, HTTP 메서드, 경로 템플릿으로 식별하는 엔드포인트. 실제 호출 한 건과 구분한다."@ko .
+kg:Operation a rdfs:Class ;
+    rdfs:label "업무 기능"@ko ;
+    rdfs:comment "회원탈퇴·미결제 내역 확인 등 API가 수행하는 업무. API 경로 자체와 구분한다."@ko .
+kg:Policy a rdfs:Class ;
+    rdfs:label "업무 정책"@ko ;
+    rdfs:comment "기능 수행 여부를 판단하는 명시된 조건과 처리 규칙. 조건·적용 범위·문서 버전을 함께 관리한다."@ko .
+kg:TransactionType a rdfs:Class ;
+    rdfs:label "거래 유형"@ko ;
+    rdfs:comment "더치페이·원격결제 등 문서가 구분하는 거래의 종류. 고객의 실제 거래 한 건이나 거래 상태가 아니다."@ko .
+
+kg:exposesAPI a rdf:Property ;
+    rdfs:label "API를 제공한다"@ko ;
+    rdfs:domain kg:Service ; rdfs:range kg:API ;
+    rdfs:comment "API 명세 또는 명시된 서비스 분류에서 제공 주체를 확인한다."@ko .
+kg:implementsOperation a rdf:Property ;
+    rdfs:label "업무 기능을 수행한다"@ko ;
+    rdfs:domain kg:API ; rdfs:range kg:Operation ;
+    rdfs:comment "API 설명에서 수행 업무가 명시된 경우에만 부여한다."@ko .
+kg:callsService a rdf:Property ;
+    rdfs:label "처리 중 서비스를 호출한다"@ko ;
+    rdfs:domain kg:API ; rdfs:range kg:Service ;
+    rdfs:comment "해당 API의 처리 설명에 호출 대상이 명시되어야 한다. 서비스 간 통신 정보만으로 특정 API에 전파하지 않는다."@ko .
+kg:requiresPolicy a rdf:Property ;
+    rdfs:label "정책 확인을 요구한다"@ko ;
+    rdfs:domain kg:Operation ; rdfs:range kg:Policy ;
+    rdfs:comment "업무 수행의 선행 확인 조건으로 문서에 명시된 정책을 연결한다."@ko .
+kg:checksPolicy a rdf:Property ;
+    rdfs:label "정책 조건을 확인한다"@ko ;
+    rdfs:domain kg:API ; rdfs:range kg:Policy ;
+    rdfs:comment "조건 확인 결과를 제공하는 API에 연결한다. 단순히 관련된 API에는 부여하지 않는다."@ko .
+kg:blocksOperation a rdf:Property ;
+    rdfs:label "조건 충족 시 업무를 차단한다"@ko ;
+    rdfs:domain kg:Policy ; rdfs:range kg:Operation ;
+    rdfs:comment "정책에 기록된 차단 조건이 성립할 때의 제한을 표현한다. 무조건적인 실행 금지가 아니다."@ko .
+kg:concernsTransactionType a rdf:Property ;
+    rdfs:label "거래 유형을 대상으로 한다"@ko ;
+    rdfs:domain kg:Policy ; rdfs:range kg:TransactionType ;
+    rdfs:comment "정책의 검사 대상에 명시된 거래 유형을 연결한다. 해당 유형의 모든 거래를 차단한다는 의미가 아니다."@ko .

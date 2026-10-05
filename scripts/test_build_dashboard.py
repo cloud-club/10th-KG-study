@@ -282,7 +282,7 @@ class FeedTests(unittest.TestCase):
 
     def test_feed_texts_uses_per_event_cache_and_batches_new_ones(self):
         llm._state["model"] = "gpt-5-mini"
-        cache = {"feed:gpt-5-mini:commit:old": {"text": "cached", "summary": "", "tags": []}}
+        cache = {f"feed:v{llm.FEED_CACHE_VERSION}:gpt-5-mini:commit:old": {"text": "cached", "summary": "", "tags": []}}
         events = [
             {"id": "commit:old", "date": "d", "member": "a", "kind": "note", "title": "t", "url": "", "summary": "", "tags": [],
              "items": [], "stats": None, "files": [], "_diff": ""},
@@ -294,11 +294,32 @@ class FeedTests(unittest.TestCase):
             texts = llm.feed_texts(events, "key", cache)
         self.assertEqual(texts["commit:old"]["text"], "cached")
         self.assertEqual(texts["commit:new"], {"text": "새 중계", "summary": "요약", "tags": ["nlp"]})
-        self.assertIn("feed:gpt-5-mini:commit:new", cache)
+        self.assertIn(f"feed:v{llm.FEED_CACHE_VERSION}:gpt-5-mini:commit:new", cache)
         prompt = fake.call_args[0][0]
         self.assertIn("commit:new", prompt)
         self.assertNotIn("commit:old", prompt)
         llm._state["model"] = None
+
+    def test_feed_texts_strips_speaker_prefix_from_new_and_cached_lines(self):
+        llm._state["model"] = "gpt-5-mini"
+        cache = {f"feed:v{llm.FEED_CACHE_VERSION}:gpt-5-mini:commit:old": {"text": "캐스터: 옛 중계", "summary": "", "tags": []}}
+        events = [
+            {"id": "commit:old", "date": "d", "member": "a", "kind": "note", "title": "t", "url": "", "summary": "", "tags": [],
+             "items": [], "stats": None, "files": [], "_diff": ""},
+            {"id": "commit:new", "date": "d", "member": "a", "kind": "lab", "title": "t2", "url": "", "summary": "", "tags": [],
+             "items": [], "stats": None, "files": [], "_diff": ""},
+        ]
+        fake = mock.Mock(return_value={"lines": [{"id": "commit:new", "text": " 캐스터 : 새 중계", "summary": "", "tags": []}]})
+        with mock.patch.object(llm, "cached_call", fake):
+            texts = llm.feed_texts(events, "key", cache)
+        self.assertEqual(texts["commit:old"]["text"], "옛 중계")
+        self.assertEqual(texts["commit:new"]["text"], "새 중계")
+        self.assertEqual(cache[f"feed:v{llm.FEED_CACHE_VERSION}:gpt-5-mini:commit:new"]["text"], "새 중계")
+        llm._state["model"] = None
+
+    def test_strip_speaker_leaves_plain_text(self):
+        self.assertEqual(llm.strip_speaker("클둥이 a, 노트 커밋!"), "클둥이 a, 노트 커밋!")
+        self.assertEqual(llm.strip_speaker("해설: 멘트"), "멘트")
 
 
 class ModelFallbackTests(unittest.TestCase):
@@ -424,3 +445,93 @@ class CohortTests(unittest.TestCase):
         self.assertEqual([n["id"] for n in out[0]["graph"]["nodes"]], ["m:kim", "n:kim/n1", "t:rag"])
         self.assertEqual([n["id"] for n in out[1]["graph"]["nodes"]], ["m:park", "n:park/n1", "t:rag"])
         self.assertEqual(out[0]["members"], ["kim"])
+
+
+class NameTests(unittest.TestCase):
+    def test_member_name_precedence(self):
+        names = {"sese2204": "박세현", "Yeongeunn": "나영은"}
+        self.assertEqual(bd.member_name("sese2204", {"name": "세현"}, "# sese2204", names), "세현")
+        self.assertEqual(bd.member_name("sese2204", {}, "# sese2204", names), "박세현")
+        self.assertEqual(bd.member_name("yeongeunn", {}, "", names), "나영은")  # 폴더 이름 대소문자가 달라도
+        self.assertEqual(bd.member_name("kim", {}, "# 김철수\n", {}), "김철수")
+        self.assertEqual(bd.member_name("kim", {}, "# Kim\n", {}), "kim")  # 제목이 아이디 그대로면 아이디
+        self.assertEqual(bd.member_name("kim", {}, "", {}), "kim")
+
+    def test_load_names_skips_bad_values(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "names.json"
+            path.write_text('{"a": "가", "b": "", "c": 3, "d": " 다 "}', encoding="utf-8")
+            with mock.patch("sys.stderr"):
+                self.assertEqual(bd.load_names(path), {"a": "가", "d": "다"})
+            path.write_text("[]", encoding="utf-8")
+            with mock.patch("sys.stderr"):
+                self.assertEqual(bd.load_names(path), {})
+            self.assertEqual(bd.load_names(Path(tmp) / "missing.json"), {})
+
+    def test_feed_events_carry_member_name(self):
+        member = {"id": "kim", "name": "김철수", "last_active": "2026-09-10", "folder_url": "u", "streak": 3,
+                  "progress": {"level": 1}, "notes": [], "labs": []}
+        events = bd.milestone_events([member])
+        self.assertEqual([(e["member"], e["name"]) for e in events], [("kim", "김철수")])
+        commit = {"sha": "abcdef1234567890", "date": "2026-09-10", "message": "docs: x", "files": ["members/kim/notes/01.md"],
+                  "kind": "note", "member": "kim"}
+        with mock.patch.object(bd, "sum_numstat", return_value=None), mock.patch.object(bd, "group_diff_excerpt", return_value=""):
+            event = bd.commit_event([commit], {"kim": member}, {"url": "https://github.com/x/y"})
+        self.assertEqual(event["name"], "김철수")
+        with mock.patch.object(bd, "sum_numstat", return_value=None), mock.patch.object(bd, "group_diff_excerpt", return_value=""):
+            event = bd.commit_event([{**commit, "member": "ghost"}], {"kim": member}, {"url": "https://github.com/x/y"})
+        self.assertEqual(event["name"], "ghost")  # 폴더 없는 작성자는 아이디 그대로
+
+
+class FolderNameTests(unittest.TestCase):
+    def test_classify_commit_accepts_singular_folders(self):
+        self.assertEqual(bd.classify_commit(["members/kim/note/01.md"]), "note")
+        self.assertEqual(bd.classify_commit(["members/kim/lab/01-x/README.md"]), "lab")
+
+    def test_content_dir_prefers_plural_then_singular(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.assertEqual(bd.content_dir(root, bd.NOTES_DIR_NAMES), root / "notes")  # 없으면 표준 경로
+            (root / "note").mkdir()
+            self.assertEqual(bd.content_dir(root, bd.NOTES_DIR_NAMES), root / "note")
+            (root / "notes").mkdir()
+            self.assertEqual(bd.content_dir(root, bd.NOTES_DIR_NAMES), root / "notes")
+
+
+class WeekCalendarTests(unittest.TestCase):
+    def test_week1_monday_aligns_to_monday(self):
+        self.assertEqual(bd.week1_monday("2026-08-31"), dt.date(2026, 8, 31))  # 월요일 그대로
+        self.assertEqual(bd.week1_monday("2026-09-03"), dt.date(2026, 8, 31))  # 목요일 → 그 주 월요일
+
+    def test_week_of_and_range(self):
+        monday = dt.date(2026, 8, 31)
+        self.assertEqual(bd.week_of(dt.date(2026, 8, 31), monday), 1)
+        self.assertEqual(bd.week_of(dt.date(2026, 9, 6), monday), 1)
+        self.assertEqual(bd.week_of(dt.date(2026, 9, 16), monday), 3)
+        self.assertEqual(bd.week_range(3, monday), ("2026-09-14", "2026-09-20"))
+
+    def test_build_readings_attaches_date_range(self):
+        def reading(member, week, title):
+            return {"week": week, "label": "", "title": title, "url": "", "note": "", "member": member, "source_url": ""}
+        members = [{"readings": [reading("kim", 3, "a"), reading("kim", None, "b")]}]
+        weeks = bd.build_readings(members, dt.date(2026, 8, 31))
+        self.assertEqual((weeks[0]["starts"], weeks[0]["ends"]), ("2026-09-14", "2026-09-20"))
+        self.assertEqual((weeks[1]["starts"], weeks[1]["ends"]), ("", ""))
+        self.assertNotIn("starts", bd.build_readings(members)[0]) if False else None
+        self.assertEqual(bd.build_readings(members)[0]["starts"], "")
+
+
+class NoteSubfolderTests(unittest.TestCase):
+    REPO = {"url": "https://github.com/x/y", "branch": "main"}
+
+    def test_parse_note_id_keeps_subfolder(self):
+        text = "---\ntitle: 멀티홉\ndate: 2026-09-16\ntags: [rag]\n---\n# 멀티홉\n"
+        with mock.patch.object(bd, "read_text", return_value=text):
+            note = bd.parse_note(bd.ROOT / "members/kim/notes/week3/06-multi-hop.md", "kim", self.REPO)
+            flat = bd.parse_note(bd.ROOT / "members/kim/notes/01-intro.md", "kim", self.REPO)
+        self.assertEqual(note["id"], "kim/notes/week3/06-multi-hop")
+        self.assertEqual(note["file"], "notes/week3/06-multi-hop.md")
+        self.assertEqual(flat["id"], "kim/notes/01-intro")
+        self.assertTrue(note["url"].endswith("members/kim/notes/week3/06-multi-hop.md"))

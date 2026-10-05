@@ -42,17 +42,18 @@ python3 members/heebindev/labs/01-notion-search/src/notion_parser.py \
 
 기본 설정은 제목 단위로 문서를 나누고, 본문이 너무 길면 최대 1,000자와 150자 중복을 적용한다.
 
-Elasticsearch를 실행한다.
+스터디 공용 인프라를 실행한다.
 
 ```bash
-cd members/heebindev/labs/01-notion-search
-docker compose up -d elasticsearch
+# 저장소 루트에서 실행
+docker compose up -d
 ```
 
 실행 상태를 확인한다.
 
 ```bash
 docker compose ps
+bash infra/check.sh
 curl http://localhost:9200
 ```
 
@@ -67,7 +68,6 @@ docker compose down
 ```text
 01-notion-search/
 ├── README.md
-├── compose.yaml             # Elasticsearch, PostgreSQL 실행 설정
 ├── requirements.txt         # Python 패키지 목록
 ├── data/
 │   ├── raw/                 # Git에 올리지 않는 Notion 원본
@@ -75,6 +75,7 @@ docker compose down
 └── src/
     ├── notion_parser.py          # Markdown 파싱 및 청킹
     ├── elasticsearch_index.py    # Elasticsearch 인덱스 생성 및 적재
+    ├── elasticsearch_search.py   # Elasticsearch BM25 검색
     ├── pgvector_index.py         # 임베딩 생성 및 PostgreSQL 적재
     └── pgvector_search.py        # pgvector 유사도 검색
 ```
@@ -85,7 +86,7 @@ docker compose down
 
 - Notion Markdown 문서를 읽고 청크로 나누는 `notion_parser.py` 작성
 - Elasticsearch 인덱스를 만들고 청크 454개를 적재하는 `elasticsearch_index.py` 작성
-- Docker Compose로 Elasticsearch와 PostgreSQL + pgvector 실행 환경 구성
+- 스터디 공용 Docker Compose의 Elasticsearch와 PostgreSQL + pgvector에 데이터 적재
 - 로컬 임베딩 모델로 청크를 벡터로 변환하고 PostgreSQL에 적재하는 `pgvector_index.py` 작성 및 실행
 - 자연어 검색어를 벡터로 변환하고 유사한 청크를 찾는 `pgvector_search.py` 작성
 
@@ -241,8 +242,8 @@ BM25 점수를 계산하여 관련도가 높은 결과부터 정렬했다.
 이제 검색해보겠다.
 
 ```bash
-cd members/heebindev/labs/01-notion-search
-docker compose exec postgres psql -U study -d knowledge_graph
+# 저장소 루트에서 실행
+docker compose exec postgres psql -U kg -d kg
 ```
 
 ![PostgreSQL 접속](image-8.png)

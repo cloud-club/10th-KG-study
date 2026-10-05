@@ -1,0 +1,11 @@
+# 개인 카톡 RAG용 로컬 모델. Ollama 기본 컨텍스트(4,096 토큰)로는 근거 5개가 잘릴 수 있고,
+# OpenAI 호환 API(/v1)로는 num_ctx를 넘길 수 없어 컨텍스트를 키운 모델을 미리 만들어 둔다.
+#
+#   ollama pull exaone3.5:7.8b
+#   ollama create kakao-rag -f ollama/Modelfile.exaone
+#   .env: LLM_PROVIDER=openai-compatible  LLM_MODEL=kakao-rag  LLM_BASE_URL=http://localhost:11434/v1
+#
+# 메모리가 부족하면(16 GiB에서 Colima 6 GiB 사용 중) FROM 을 exaone3.5:2.4b 로 바꾼다.
+FROM exaone3.5:7.8b
+PARAMETER num_ctx 8192
+PARAMETER temperature 0

@@ -1,0 +1,4 @@
+psycopg[binary]==3.2.10
+openai==1.109.1
+streamlit==1.50.0
+pandas==2.2.3

@@ -65,3 +65,7 @@ Append-only, 최신이 아래. 항목은 `## [YYYY-MM-DD] verb | title` 로 시�
 - flagged (민감 정보 — 위키에 옮기지 않음): 멤버 실명·소속 기관을 RDF 예시 주어로 쓴 노트 여럿(ex:person으로 치환), dldusgh318 자체 compose·공용 Neo4j 비밀번호 평문, kdyann 게시물 ID·permalink, Yeongeunn 사내 업무 정책·거래 상품명, sunghyun 사내 제품 약어, yujeong430 공지 질문 문장, e0ng 04-2 취업 지원 관련 절. CLAUDE.md 소재 범위에 Yeongeunn schemas/*.ttl 같은 보조 자료를 넣을지는 미결(지도에만 적음)
 - note: Palantir·RAGAS·BEIR·Wikidata 등 고유명사는 CLAUDE.md "도구는 entity" 규칙대로 entities/에. SPARQL은 질의 언어(일반명사)라 concepts/에. 새 페이지는 전부 _templates 구조를 따랐고 상태는 maintained(소재 3명 이상) 또는 draft(1~2명)
 - note: 주간 자동 ingest 도입 — `.github/workflows/wiki-ingest.yml`(월 09:00 KST, claude-code-action, PR 생성), `.github/prompts/wiki-ingest.md`, `scripts/wiki_backlog.py` + 테스트. CLAUDE.md·CONTRIBUTING·README에 한 줄씩. 시크릿(CLAUDE_CODE_OAUTH_TOKEN 또는 ANTHROPIC_API_KEY)과 "Allow GitHub Actions to create and approve pull requests" 설정은 저장소 관리자가 해야 한다
+
+## [2026-10-05] refactor | ur2e names.json 등재 (PR #11 머지)
+- updated: entities/10기-KG-스터디 (멤버 표 ur2e 이름·14명 등재, 남은 일에서 names.json 항목 제거), entities/현황판 (names.json 미등재 문구 갱신), sources/스터디-노트-지도 (ur2e 절 제목에서 미머지·미등재 표시 제거)
+- note: 같은 날 PR #11·#19·#34·#36 머지. 위키 출처의 나머지 `(PR #n 미머지)` 표시는 주간 자동 ingest에 맡긴다

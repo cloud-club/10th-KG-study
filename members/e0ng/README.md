@@ -21,3 +21,4 @@
 | # | 실습 | 상태 |
 |---|---|---|
 | 03 | [개인 데이터 검색 에이전트](labs/03-personal-data-agent/README.md) | 완료 |
+| 05 | [지식그래프 적재와 Cypher 다중 홉](labs/05-graph-store/README.md) | 진행 중 |

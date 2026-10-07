@@ -1,0 +1,23 @@
+[
+  {
+    "subject": "SJF",
+    "predicate": "IS_A",
+    "object": "Non-preemptive",
+    "status": null,
+    "reason": "Non-preemptive는 클래스라기보다 SJF의 실행 방식에 가까워 현재 IS_A 관계로 표현하기 애매하다."
+  },
+  {
+    "subject": "SJF",
+    "predicate": "PREVENTS",
+    "object": "평균 Turnaround time",
+    "status": null,
+    "reason": "SJF가 평균 처리 시간을 방지하는 것은 아니다. REDUCES 또는 OPTIMIZES 같은 술어가 현재 스키마에 없다."
+  },
+  {
+    "subject": "job A",
+    "predicate": "REQUIRES",
+    "object": "A arrival",
+    "status": null,
+    "reason": "도착 시간은 job A가 필요로 하는 자원이 아니므로 REQUIRES 관계에 억지로 넣지 않는다."
+  }
+]

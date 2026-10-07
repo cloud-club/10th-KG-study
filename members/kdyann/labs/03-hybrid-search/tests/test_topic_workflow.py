@@ -28,6 +28,13 @@ def document(identifier="1", age=1, metrics=None):
 
 
 class TopicTests(unittest.TestCase):
+    def test_existing_corpus_keeps_unicode_line_separators_inside_caption(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "posts.jsonl"
+            expected = {"id": "1", "text": "첫 줄\u2028둘째 줄\u2029셋째 줄"}
+            path.write_text(json.dumps(expected, ensure_ascii=False) + "\n", encoding="utf-8")
+            self.assertEqual(topics.read_jsonl(path), [expected])
+
     def test_both_edges_dedup_and_all_topics_preserved(self):
         pages = [{"data": [{"id": "200"}]}, {"data": [{"id": "1", "caption": "코딩", "like_count": 0}]},
                  {"data": [{"id": "1", "comments_count": 2}]}, {"data": [{"id": "201"}]},
@@ -61,6 +68,7 @@ class TopicTests(unittest.TestCase):
         rows.append(bad)
         selected = topics.select_documents(rows, NOW, 3, 7)
         self.assertEqual([row["id"] for row in selected], ["1"])
+        self.assertEqual(selected[0]["language_status"], "pending_review")
         self.assertIsNone(selected[0]["selection"]["observed_comments"])
         self.assertEqual(selected[0]["selection"], {"method": "likes_comments_rrf", "score": 1 / 61,
                          "k": 60, "likes_rank": 1, "comments_rank": None, "min_age_hours": 24,

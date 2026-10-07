@@ -110,7 +110,8 @@ def _read_jsonl(path: Path) -> list[dict[str, Any]]:
             out[key] = value
         return out
     rows = []
-    for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+    # U+2028/U+2029가 JSON 문자열 안에 있어도 물리적인 LF만 레코드 경계로 본다.
+    for line_no, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
         if line.strip():
             try:
                 rows.append(json.loads(line, object_pairs_hook=unique_fields))
@@ -316,7 +317,7 @@ def load_documents_from_rows(rows: list[dict[str, Any]], limit_own: int, limit_r
             raise ValidationError("문서 ID·본문·corpus가 잘못되었거나 ID가 중복입니다.")
         seen.add(row["id"])
         document = {key: row.get(key) for key in ("id", "text", "corpus", "permalink", "published_at",
-                                                 "collected_at", "selection", "metrics")}
+                                                 "collected_at", "selection", "metrics", "reviewed_language")}
         if corpus == "own":
             if len(own) < limit_own:
                 own.append(document)

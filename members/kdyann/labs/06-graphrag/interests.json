@@ -1,0 +1,28 @@
+{
+  "profile_id": "junyounge",
+  "interests": ["개발", "앱", "AI", "게임", "야구"],
+  "topic_areas": {
+    "개발": "개발",
+    "오픈소스 기여": "개발",
+    "NextJS": "개발",
+    "coding": "개발",
+    "Developer Tech Stack": "개발",
+    "Developer Tools": "개발",
+    "Web Frameworks": "개발",
+    "오픈소스 보안 도구": "개발",
+    "Python 학습": "개발",
+    "Python 학습 앱": "앱",
+    "공부 앱": "앱",
+    "알림 앱": "앱",
+    "사이드 프로젝트": "개발",
+    "AI 에이전트 운영": "AI",
+    "AI": "AI",
+    "AI 계정": "AI",
+    "AI 아이돌": "AI",
+    "AI 시트콤": "AI",
+    "AI 애니메이션": "AI",
+    "AI tools": "AI",
+    "게임": "게임",
+    "야구": "야구"
+  }
+}

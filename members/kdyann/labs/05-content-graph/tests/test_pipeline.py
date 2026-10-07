@@ -13,6 +13,13 @@ import persist
 
 
 class PipelineTests(unittest.TestCase):
+    def test_jsonl_caption_keeps_unicode_line_separators(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "posts.jsonl"
+            expected = {"id": "1", "text": "첫 줄\u2028둘째 줄\u2029셋째 줄", "corpus": "reference"}
+            path.write_text(json.dumps(expected, ensure_ascii=False) + "\n", encoding="utf-8")
+            self.assertEqual(pipeline._read_jsonl(path), [expected])
+
     def setUp(self):
         self.documents = pipeline.load_documents([LAB / "examples/documents.jsonl"], limit_own=2,
                                                  limit_reference=1, no_recency_filter=True)

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "doc:1",
+    "text": "task:1 hasIssue issue:1",
+    "entity_id": "task:1"
+  },
+  {
+    "id": "doc:2",
+    "text": "issue:1 relatedCommit commit:1",
+    "entity_id": "issue:1"
+  },
+  {
+    "id": "doc:3",
+    "text": "issue:1 hasVerification case:1",
+    "entity_id": "issue:1"
+  },
+  {
+    "id": "doc:4",
+    "text": "case:1 hasExecution case-run:1",
+    "entity_id": "case:1"
+  },
+  {
+    "id": "doc:5",
+    "text": "case-run:1 partOfRun run:1",
+    "entity_id": "case-run:1"
+  },
+  {
+    "id": "doc:6",
+    "text": "file:1 hasTestRun run:1",
+    "entity_id": "file:1"
+  },
+  {
+    "id": "doc:7",
+    "text": "file:1 forRelease release:1",
+    "entity_id": "file:1"
+  },
+  {
+    "id": "doc:8",
+    "text": "commit:1 produces file:1",
+    "entity_id": "commit:1"
+  },
+  {
+    "id": "qa:1",
+    "text": "v0.1.0 1차 run:1의 case:1 실행 case-run:1은 Failed다. file:1을 기준으로 했다. 이 결과는 시뮬레이션이다.",
+    "entity_id": "case-run:1"
+  }
+]

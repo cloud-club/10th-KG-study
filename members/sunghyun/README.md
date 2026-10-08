@@ -18,7 +18,9 @@ members/sunghyun/
 │   ├── 01-knowledge-graph-and-ontology.md
 │   ├── 02-search-methods.md
 │   ├── 03-hybrid-rag-and-evaluation.md
-│   └── 04-knowledge-graph-background.md
+│   ├── 04-knowledge-graph-background.md
+│   ├── 05-rdf-ontology-pipeline.md
+│   └── 06-graphrag-and-agentic-search.md
 ├── labs/                      # 실습 기록과 코드
 │   ├── 01-rag-basics/          # 1주차: RAG·KG 기초
 │   │   ├── README.md
@@ -31,9 +33,11 @@ members/sunghyun/
 │   ├── 03-hybrid-rag/          # 3주차: RRF·RAG·Recall 평가
 │   │   ├── README.md
 │   │   └── src/
-│   └── 04-knowledge-graph/     # 4주차: 지식 그래프·온톨로지
-│       ├── README.md
-│       └── src/
+│   ├── 04-knowledge-graph/     # 4주차: 지식 그래프·온톨로지
+│   │   ├── README.md
+│   │   └── src/
+│   ├── 05-rdf-pipeline/        # 5주차: 근거 검증·DB 적재·RDF 내보내기
+│   └── 06-graphrag/            # 6주차: 검색·그래프·에이전틱 비교
 └── assets/                    # 노트·실습에서 사용하는 스크린샷
 ```
 
@@ -55,3 +59,6 @@ members/sunghyun/
 - [2주차: 검색의 세 세대 비교](labs/02-search-lab/README.md)
 - [3주차: 하이브리드 검색, RAG와 Recall 평가](labs/03-hybrid-rag/README.md)
 - [4주차: 지식 그래프와 온톨로지](labs/04-knowledge-graph/README.md)
+
+- 5주차: [문서에서 근거 있는 트리플로](notes/05-rdf-ontology-pipeline.md) · [실습 코드](labs/05-rdf-pipeline/README.md)
+- 6주차: [GraphRAG와 에이전틱 검색 비교](notes/06-graphrag-and-agentic-search.md) · [실습 코드](labs/06-graphrag/README.md)

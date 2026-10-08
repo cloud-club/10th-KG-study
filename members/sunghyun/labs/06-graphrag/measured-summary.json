@@ -1,0 +1,117 @@
+{
+  "date": "2026-10-08",
+  "model": "zai-org/GLM-5.2",
+  "scope": "Actual private corpus experiment, distinct from public synthetic lab",
+  "cases": [
+    {
+      "case_id": "reproduction",
+      "modes": {
+        "text_agent": {
+          "fact_checks": {
+            "issue_id": true,
+            "reproduction_steps_count": false
+          },
+          "model_calls": 6,
+          "input_tokens": 28926,
+          "output_tokens": 1228,
+          "elapsed_seconds": 26.363,
+          "graph_query_count": 0
+        },
+        "graph_agent": {
+          "fact_checks": {
+            "issue_id": true,
+            "reproduction_steps_count": false
+          },
+          "model_calls": 6,
+          "input_tokens": 28456,
+          "output_tokens": 906,
+          "elapsed_seconds": 21.636,
+          "graph_query_count": 0
+        }
+      }
+    },
+    {
+      "case_id": "resume",
+      "modes": {
+        "text_agent": {
+          "fact_checks": {
+            "issue_id": true,
+            "v0.1.0_passed": false,
+            "v0.1.0_failed": false,
+            "v0.2.0_passed": false,
+            "v0.2.0_failed": true
+          },
+          "model_calls": 5,
+          "input_tokens": 8259,
+          "output_tokens": 2139,
+          "elapsed_seconds": 40.51,
+          "graph_query_count": 0
+        },
+        "graph_agent": {
+          "fact_checks": {
+            "issue_id": true,
+            "v0.1.0_passed": false,
+            "v0.1.0_failed": false,
+            "v0.2.0_passed": false,
+            "v0.2.0_failed": false
+          },
+          "model_calls": 3,
+          "input_tokens": 12555,
+          "output_tokens": 1442,
+          "elapsed_seconds": 17.694,
+          "graph_query_count": 2
+        }
+      }
+    },
+    {
+      "case_id": "no_cases",
+      "modes": {
+        "text_agent": {
+          "fact_checks": {
+            "task_count": false
+          },
+          "model_calls": 6,
+          "input_tokens": 15337,
+          "output_tokens": 2940,
+          "elapsed_seconds": 34.132,
+          "graph_query_count": 0
+        },
+        "graph_agent": {
+          "fact_checks": {
+            "task_count": false
+          },
+          "model_calls": 6,
+          "input_tokens": 29011,
+          "output_tokens": 3172,
+          "elapsed_seconds": 33.124,
+          "graph_query_count": 5
+        }
+      }
+    },
+    {
+      "case_id": "failed_v02",
+      "modes": {
+        "text_agent": {
+          "fact_checks": {
+            "failed_count": true
+          },
+          "model_calls": 5,
+          "input_tokens": 9466,
+          "output_tokens": 1551,
+          "elapsed_seconds": 16.688,
+          "graph_query_count": 0
+        },
+        "graph_agent": {
+          "fact_checks": {
+            "failed_count": true
+          },
+          "model_calls": 3,
+          "input_tokens": 12061,
+          "output_tokens": 776,
+          "elapsed_seconds": 10.259,
+          "graph_query_count": 2
+        }
+      }
+    }
+  ]
+}

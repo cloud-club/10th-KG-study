@@ -15,6 +15,14 @@
 | ④ 1-hop → 1..3 경로 | `queries.cypher`, 직접 연결과 다중 홉 비교 |
 | ⑤ 브라우저 시각화 | 개인 실행 UI의 화면 참고, 공개 예제는 Neo4j Browser 조회 |
 
+## 최신 업무 흐름 구조도
+
+![업무·개발·환경별 산출물·QA·릴리즈 확정 흐름](../../assets/week5-workflow-release-confirmation.png)
+
+Task와 Issue에서 Test Case를 정의하고, 성공한 빌드의 Harbor 파일을 대상으로 실행한다. Case Run들을 Test Run으로 묶어 결과를 검토한 뒤 릴리즈를 확정하는 흐름이다. Linux·Windows·Darwin 아이콘은 산출물의 설치 환경을 나타낸다.
+
+이 구조도는 전체 업무 설계다. 아래 공개 샘플은 8개 노드·8개 관계만 재현하며, Task→Test Case 직접 관계와 릴리즈 승인·자동 확정 로직을 추가한 것은 아니다. 샘플의 `forRelease`는 버전 배정이다. [설계와 현재 적재 관계의 차이](../../notes/05-rdf-ontology-pipeline.md#구조도와-현재-저장된-관계는-어디가-다른가)를 함께 확인한다.
+
 ## 전체 그래프 화면과 읽는 순서
 
 ![업무에서 빌드·테스트·릴리즈까지 연결한 실제 실습 화면](../../assets/week5-graph-overview.png)

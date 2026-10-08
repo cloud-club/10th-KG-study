@@ -11,7 +11,7 @@ status: done
 
 관련 실습: [5주차 파이프라인](../labs/05-rdf-pipeline/README.md).
 
-Notion 「5-6 Week」의 공부·실습 순서에 맞춰 정리했다. 페이지의 일부 ‘학습 예정’ 설명은 구현 전 기록이므로, 아래에는 이후 실행한 과정과 확인한 범위를 반영했다.
+Notion 「5-6 Week」의 공부·실습 순서와 학습용 HTML의 최신 구조도를 함께 반영했다.
 
 | 공부·실습 항목 | 이번에 확인한 것 |
 |---|---|
@@ -21,6 +21,29 @@ Notion 「5-6 Week」의 공부·실습 순서에 맞춰 정리했다. 페이지
 | Postgres·Neo4j 적재 | 엔티티/관계/근거 보존, 안정적인 ID로 중복 없는 재적재 |
 | 1-hop·다중 홉 | Task→Issue, Task→Issue→Test Case, 빌드 기준 실행 결과 |
 | 브라우저 시각화 | 노드·관계 필터, 확대/축소, 연결 강조, 메타데이터·출처 |
+
+## 업무부터 테스트·릴리즈 확정까지의 흐름
+
+![플랫폼별 업무·개발·빌드·QA와 릴리즈 확정 흐름](../assets/week5-workflow-release-confirmation.png)
+
+왼쪽에서 오른쪽으로 업무 → 개발 → 빌드 산출물 → 테스트 → 릴리즈 확정 순서로 읽는다. 이 그림은 **진행하려는 업무 흐름**이며, 아래 전체 그래프 화면은 실제로 저장한 노드·관계의 스냅샷이다.
+
+1. Codebeamer Task에서 요청과 목표 버전을 정하고 GitLab Issue에 개발 내용을 기록한다. 협의가 있으면 Mattermost 대화를 연결한다.
+2. Task와 Issue의 요구·완료 기준으로 Codebeamer Test Case를 정의한다. 테스트 정의는 개발·빌드 진행과 병행한다.
+3. 관련 Commit·MR에서 실행된 CI Pipeline과 성공한 Build Job을 확인한다.
+4. Harbor에 환경별 산출물을 보관한다. Linux·Windows·Darwin 아이콘은 파일의 설치 대상이며, Harbor 서버의 운영체제를 뜻하지 않는다. 파일마다 OS·CPU·digest·기준 커밋을 구분한다.
+5. 특정 Harbor 파일을 대상으로 Test Case를 실행한다. Case Run은 케이스 하나의 결과, Test Run은 같은 실행 차수의 여러 Case Run을 묶은 기록이다.
+6. Test Run의 결과와 릴리즈 기준을 검토하고 승인한 뒤 릴리즈를 확정한다. 실행 종료 상태인 Finished만으로 확정하지 않으며 실패·차단·미실행 결과도 확인한다.
+
+### 구조도와 현재 저장된 관계는 어디가 다른가?
+
+| 구조도의 의도 | 현재 그래프에서 확인하는 방법 |
+|---|---|
+| Task·Issue에서 QA 정의 | 현재 저장된 경로는 Task→Issue→Test Case다. Task→Test Case 직접 연결은 추가 설계 방향이다. |
+| Harbor 파일을 기준으로 케이스 실행 | 파일→Test Run←Case Run←Test Case를 조회한다. 파일→Case Run 직접 관계를 가정하지 않는다. |
+| 테스트 결과 확인·승인 후 릴리즈 확정 | 현재 파일→`FOR_RELEASE`→Release는 목표 버전 배정이다. Test Run→Release 승인 관계나 자동 확정 로직을 새로 적재한 것은 아니다. |
+
+따라서 파일에 릴리즈가 연결됐다는 사실과 테스트를 통과해 릴리즈가 승인됐다는 사실은 구분한다. 이번 Case Run 결과는 시뮬레이션이며 실제 제품 QA 완료를 증명하지 않는다. 외부 테스팅 도구는 최종 구조도 범위에서 제외했다.
 
 ## 전체 그래프 구조
 

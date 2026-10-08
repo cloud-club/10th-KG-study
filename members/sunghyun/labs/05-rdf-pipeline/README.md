@@ -4,6 +4,31 @@
 
 회사 플랫폼에서 실행한 로직을 작은 합성 데이터로 옮겼다. 플랫폼 API 호출·사내 원문·접속 정보는 포함하지 않는다. 예제는 5개 클래스와 8개 관계, 8개 노드·8개 트리플이다. `approved`는 예제의 검토 표시이며 실제 사람 승인 절차를 대신하지 않는다.
 
+## W5 공부·실습과 코드의 대응
+
+| Notion 항목 | 실행 파일·확인할 결과 |
+|---|---|
+| 닫힌 스키마, JSON·few-shot·evidence | `sample.json`, `src/extract.py`의 허용 클래스·관계·추출 프롬프트 |
+| ① 청크에서 트리플 추출 | 후보 JSON과 원문 인용 일치, 채택 여부 |
+| ② Postgres + Turtle 저장 | `src/pipeline.py`, entities/edges/evidence, `outputs/graph.ttl` |
+| ③ Neo4j MERGE | `--neo4j`, 고정 ID로 재적재 전후 개수 비교 |
+| ④ 1-hop → 1..3 경로 | `queries.cypher`, 직접 연결과 다중 홉 비교 |
+| ⑤ 브라우저 시각화 | 개인 실행 UI의 화면 참고, 공개 예제는 Neo4j Browser 조회 |
+
+## 전체 그래프 화면과 읽는 순서
+
+![업무에서 빌드·테스트·릴리즈까지 연결한 실제 실습 화면](../../assets/week5-graph-overview.png)
+
+제공된 과거 화면은 216개 표시 노드·341개 관계이며 전체 노드는 226개다. 최신 적재 수나 공개 샘플의 8개 노드와 혼동하지 않는다.
+
+1. Task→Issue를 확인하고, 대화가 있으면 Task→Mattermost→Issue 경로도 본다.
+2. 이슈→관련 커밋·MR→Pipeline→Build Job→Harbor 파일을 따라간다.
+3. 파일의 OS·CPU·digest 메타데이터로 테스트할 빌드를 구별한다.
+4. 파일→Test Run←Case Run←Test Case에서 실행 차수와 케이스별 결과를 본다.
+5. 파일→Release로 어떤 릴리즈에 배정됐는지 확인한다.
+
+관련 커밋이나 릴리즈 배정은 테스트 통과를 뜻하지 않는다. QA 결과는 시뮬레이션이며, 기준 파일이 확인되지 않은 실행을 실제 빌드 검증 관계로 만들지 않는다. [설계 변경 과정과 메타데이터 설명](../../notes/05-rdf-ontology-pipeline.md).
+
 ## 실행
 
 Python 3.10 이상에서 이 폴더로 이동한다.

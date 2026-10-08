@@ -1,0 +1,140 @@
+{
+  "nodes": [
+    {
+      "id": "task:1",
+      "type": "Task",
+      "label": "병렬 세션 실행 안정화"
+    },
+    {
+      "id": "issue:1",
+      "type": "Issue",
+      "label": "새 채팅 시작 시 기존 작업 중단"
+    },
+    {
+      "id": "commit:1",
+      "type": "Change",
+      "label": "세션 요청 분리"
+    },
+    {
+      "id": "case:1",
+      "type": "Verification",
+      "kind": "test_case",
+      "label": "세션 A 실행 유지"
+    },
+    {
+      "id": "case-run:1",
+      "type": "Verification",
+      "kind": "test_case_run",
+      "label": "A 실행 유지 1차",
+      "result": "Failed",
+      "release_version": "v0.1.0",
+      "run_attempt": 1,
+      "simulation": true
+    },
+    {
+      "id": "run:1",
+      "type": "Verification",
+      "kind": "test_run",
+      "label": "v0.1.0 1차",
+      "run_attempt": 1,
+      "simulation": true
+    },
+    {
+      "id": "file:1",
+      "type": "Artifact",
+      "kind": "installation_artifact",
+      "label": "example-linux-x64.vsix",
+      "release_version": "v0.1.0",
+      "target": "linux-x64"
+    },
+    {
+      "id": "release:1",
+      "type": "Artifact",
+      "kind": "release",
+      "label": "v0.1.0",
+      "version": "v0.1.0"
+    }
+  ],
+  "edges": [
+    {
+      "subject": "task:1",
+      "predicate": "hasIssue",
+      "object": "issue:1",
+      "document_id": "doc:1",
+      "evidence": "task:1 hasIssue issue:1",
+      "start": 0,
+      "end": 23,
+      "approved": true
+    },
+    {
+      "subject": "issue:1",
+      "predicate": "relatedCommit",
+      "object": "commit:1",
+      "document_id": "doc:2",
+      "evidence": "issue:1 relatedCommit commit:1",
+      "start": 0,
+      "end": 30,
+      "approved": true
+    },
+    {
+      "subject": "issue:1",
+      "predicate": "hasVerification",
+      "object": "case:1",
+      "document_id": "doc:3",
+      "evidence": "issue:1 hasVerification case:1",
+      "start": 0,
+      "end": 30,
+      "approved": true
+    },
+    {
+      "subject": "case:1",
+      "predicate": "hasExecution",
+      "object": "case-run:1",
+      "document_id": "doc:4",
+      "evidence": "case:1 hasExecution case-run:1",
+      "start": 0,
+      "end": 30,
+      "approved": true
+    },
+    {
+      "subject": "case-run:1",
+      "predicate": "partOfRun",
+      "object": "run:1",
+      "document_id": "doc:5",
+      "evidence": "case-run:1 partOfRun run:1",
+      "start": 0,
+      "end": 26,
+      "approved": true
+    },
+    {
+      "subject": "file:1",
+      "predicate": "hasTestRun",
+      "object": "run:1",
+      "document_id": "doc:6",
+      "evidence": "file:1 hasTestRun run:1",
+      "start": 0,
+      "end": 23,
+      "approved": true
+    },
+    {
+      "subject": "file:1",
+      "predicate": "forRelease",
+      "object": "release:1",
+      "document_id": "doc:7",
+      "evidence": "file:1 forRelease release:1",
+      "start": 0,
+      "end": 27,
+      "approved": true
+    },
+    {
+      "subject": "commit:1",
+      "predicate": "produces",
+      "object": "file:1",
+      "document_id": "doc:8",
+      "evidence": "commit:1 produces file:1",
+      "start": 0,
+      "end": 24,
+      "approved": true
+    }
+  ]
+}

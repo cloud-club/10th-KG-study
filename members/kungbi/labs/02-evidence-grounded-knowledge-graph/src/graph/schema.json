@@ -1,0 +1,127 @@
+{
+  "dataset_id": "synthetic-demo-v1",
+  "nodes": {
+    "Case": [
+      "id",
+      "dataset_id",
+      "label"
+    ],
+    "SlackThread": [
+      "id",
+      "dataset_id",
+      "channel_id",
+      "thread_ts"
+    ],
+    "PullRequest": [
+      "id",
+      "dataset_id",
+      "repository",
+      "number"
+    ],
+    "Commit": [
+      "id",
+      "dataset_id",
+      "repository",
+      "sha"
+    ],
+    "CodeFile": [
+      "id",
+      "dataset_id",
+      "repository",
+      "path"
+    ],
+    "APIContract": [
+      "id",
+      "dataset_id",
+      "service",
+      "service_role",
+      "method",
+      "path",
+      "path_scope",
+      "caller_path_scope",
+      "global_prefix_status",
+      "runtime_deployment_proven",
+      "evidence_chunk_ids",
+      "source_system",
+      "source_record_id",
+      "route_prefix_basis"
+    ],
+    "EventContract": [
+      "id",
+      "dataset_id",
+      "name"
+    ],
+    "AWSResource": [
+      "id",
+      "dataset_id",
+      "resource_type",
+      "anonymous_label",
+      "source_system",
+      "source_record_id",
+      "evidence_chunk_ids"
+    ],
+    "SourceFact": [
+      "id",
+      "dataset_id",
+      "topic",
+      "display_name"
+    ],
+    "Identity": [
+      "id",
+      "dataset_id",
+      "source_system"
+    ],
+    "Person": [
+      "id",
+      "dataset_id"
+    ]
+  },
+  "relationships": [
+    "INCLUDES",
+    "LINKS_TO",
+    "INCLUDES_COMMIT",
+    "CHANGES_FILE",
+    "CONTRIBUTED_TO",
+    "AUTHORED",
+    "COMMITTED_AS_AUTHOR",
+    "COMMITTED_AS_COMMITTER",
+    "IDENTITY_OF",
+    "REQUESTS",
+    "DISCUSSES",
+    "IMPLEMENTS",
+    "CALLS_WITH",
+    "PUBLISHES",
+    "CONSUMES",
+    "DECLARES_TARGET",
+    "INVOKES",
+    "RELATED_TO"
+  ],
+  "relationship_provenance_required": [
+    "edge_id",
+    "dataset_id",
+    "case_ids",
+    "source_system",
+    "source_record_id",
+    "evidence_chunk_ids",
+    "evidence_quote",
+    "extraction_method",
+    "basis",
+    "review_status",
+    "confidence"
+  ],
+  "private_fields_never_written_to_neo4j": [
+    "slack_user_id",
+    "github_account_id",
+    "github_login",
+    "commit_author_name",
+    "commit_author_email",
+    "commit_committer_name",
+    "commit_committer_email",
+    "canonical_arn",
+    "account_id",
+    "source_resource_id",
+    "raw_message",
+    "raw_body",
+    "credential"
+  ]
+}

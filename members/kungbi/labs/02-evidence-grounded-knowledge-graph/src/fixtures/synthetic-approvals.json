@@ -1,0 +1,14 @@
+{
+  "label": "SYNTHETIC EDUCATIONAL FIXTURE \u2014 invented data; not real measured graph results.",
+  "approval": {
+    "status": "user_approved",
+    "note": "Simulated approval for invented identities only."
+  },
+  "mappings": [
+    {
+      "person_id": "person:synthetic",
+      "slack_user_id": "synthetic-slack",
+      "github_account_id": "synthetic-github"
+    }
+  ]
+}

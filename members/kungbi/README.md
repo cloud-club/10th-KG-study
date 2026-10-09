@@ -16,6 +16,9 @@
 ### labs
 
 - [01. Knowledge Graph 데이터 수집 실습][collection-lab] — 진행 중
+- [02. 근거 기반 Knowledge Graph 구축 방법과 합성 예제][graph-lab] — 공개용 합성 예제 검증 중
+
+[graph-lab]: labs/02-evidence-grounded-knowledge-graph/
 
 [openviking-note]: notes/01-openviking-context-database.md
 [collection-lab]: labs/01-data-collection-practice/

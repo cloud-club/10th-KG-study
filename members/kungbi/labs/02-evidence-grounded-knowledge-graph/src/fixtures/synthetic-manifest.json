@@ -1,0 +1,26 @@
+{
+  "label": "SYNTHETIC EDUCATIONAL FIXTURE \u2014 invented data; not real measured graph results.",
+  "source_snapshot": "synthetic-only",
+  "source_paths": {
+    "slack_chunks": "fixtures/slack-chunks.jsonl",
+    "github_chunks": "fixtures/github-chunks.jsonl",
+    "slack_payload_root": "fixtures/slack-payload",
+    "github_payload_root": "fixtures/github-payload",
+    "identity_approvals": "fixtures/synthetic-approvals.json"
+  },
+  "cases": [
+    {
+      "id": "case:synthetic",
+      "label": "Synthetic widget change",
+      "pull_requests": [
+        "synthetic-repo#1"
+      ],
+      "slack_threads": [
+        [
+          "SYNTHETIC_CHANNEL",
+          "1.0"
+        ]
+      ]
+    }
+  ]
+}

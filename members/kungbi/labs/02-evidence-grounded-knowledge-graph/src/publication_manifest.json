@@ -1,0 +1,53 @@
+{
+  "artifact_scope": "Generic graph-construction code and independently invented synthetic fixtures only.",
+  "synthetic_fixture_notice": "Every JSON/JSONL fixture is invented for this lab; it is not transformed, anonymized, sampled, or measured company data.",
+  "python_minimum": "3.10",
+  "requirements": {
+    "offline_demo_and_builder": "Python standard library",
+    "full_public_tests": "neo4j>=5.26,<7; driver calls are mocked",
+    "live_database": "Optional and not exercised by this lab"
+  },
+  "included": {
+    "modules": [
+      "graph/ids.py",
+      "graph/build_graph.py",
+      "graph/validate_graph.py",
+      "graph/api_contract.py",
+      "graph/aws_snapshot.py",
+      "graph/loader.py",
+      "graph/experiment.py",
+      "graph/schema.json"
+    ],
+    "fixtures": "One fully invented collaboration fixture and simulated approval mapping",
+    "tests": "Unit, validation, parser, query-generation, and synthetic integration tests"
+  },
+  "excluded": [
+    "Company Slack, GitHub, git, source-code, endpoint, AWS, and operational data",
+    "Company-derived topology, counts, screenshots, diagrams, case descriptions, and measured results",
+    "Private bindings, approvals, snapshots, candidates, indexes, .env files, credentials, and local database files",
+    "Private source-specific integration and evaluation inputs"
+  ],
+  "public_verification": {
+    "tests_command": "python3 -m unittest discover -s tests -v",
+    "tests_run": 50,
+    "tests_result": "OK; no skips",
+    "demo_command": "python3 synthetic_demo.py",
+    "demo_result": "SYNTHETIC DEMO ONLY — 10 nodes, 11 edges, valid provenance; no network or database",
+    "database_runtime_verified": false
+  },
+  "evidence_boundary": {
+    "endpoint": "A static route/call proof is not resolved runtime routing or an observed HTTP request.",
+    "aws": "An event-contract match and snapshot membership are not publisher resolution or event delivery."
+  },
+  "privacy_audit": {
+    "checked_for": [
+      "company-data-derived literals",
+      "absolute paths",
+      "emails",
+      "credentials and access keys",
+      "real Slack identifiers",
+      "AWS ARNs and non-synthetic account identifiers"
+    ],
+    "result": "No company data or company-derived topology is intentionally included."
+  }
+}

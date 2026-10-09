@@ -30,3 +30,4 @@
 | 03 | [하이브리드 검색과 RAG](labs/03-hybrid-search/README.md) | 완료 |
 | 04 | [SPARQL 질의와 계약 비교 그래프 모델링](labs/04-sparql-graph/README.md) | 완료 |
 | 05 | [내 콘텐츠와 참고 게시물을 연결하는 지식 그래프](labs/05-content-graph/README.md) | 완료 |
+| 06 | [GraphRAG 리트리버와 v1·v2 비교](labs/06-graphrag/README.md) | 완료 |

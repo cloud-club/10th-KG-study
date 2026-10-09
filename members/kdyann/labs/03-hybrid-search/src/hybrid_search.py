@@ -21,10 +21,12 @@ OWNER = "kdyann-w3-hybrid-search-v1"
 DIMENSION = 384
 MODEL_NAME = "intfloat/multilingual-e5-small"
 RRF_C = 60
-SOURCES = {
-    "own": REPO_ROOT / "data/kdyann/processed/instagram_documents.jsonl",
-    "reference": REPO_ROOT / "data/kdyann/processed/instagram_topic_documents.jsonl",
-}
+_corpus_dir = os.environ.get("W3_CORPUS_DIR")
+SOURCES = ({name: Path(_corpus_dir).resolve() / f"{name}.jsonl" for name in ("own", "reference")}
+           if _corpus_dir else {
+               "own": REPO_ROOT / "data/kdyann/processed/instagram_documents.jsonl",
+               "reference": REPO_ROOT / "data/kdyann/processed/instagram_topic_documents.jsonl",
+           })
 OUTPUT_DIR = REPO_ROOT / "data/kdyann/processed/hybrid_search"
 
 
@@ -32,7 +34,7 @@ def load_corpus() -> list[dict[str, Any]]:
     merged: dict[str, dict[str, Any]] = {}
     for corpus, path in SOURCES.items():
         seen: set[str] = set()
-        rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        rows = [json.loads(line) for line in path.read_text(encoding="utf-8").split("\n") if line.strip()]
         if not rows:
             raise ValueError(f"{corpus} 코퍼스가 비어 있습니다.")
         for row in rows:

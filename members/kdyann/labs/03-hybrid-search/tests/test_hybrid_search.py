@@ -56,6 +56,15 @@ class CorpusTests(unittest.TestCase):
             self.assertEqual(rows[0]["provenance"], ["own", "reference"])
             self.assertEqual(rows[1]["corpus"], "reference")
 
+    def test_unicode_line_separator_inside_caption_is_not_jsonl_boundary(self):
+        with tempfile.TemporaryDirectory() as directory:
+            own, reference = Path(directory) / "own.jsonl", Path(directory) / "ref.jsonl"
+            self.write(own, [document("a", text="첫 줄\u2028둘째 줄")])
+            self.write(reference, [document("b", "reference")])
+            with patch.object(hs, "SOURCES", {"own": own, "reference": reference}):
+                rows = hs.load_corpus()
+            self.assertEqual(rows[0]["text"], "첫 줄\u2028둘째 줄")
+
     def test_empty_duplicate_and_invalid_url_are_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             own, ref = Path(directory) / "own", Path(directory) / "ref"

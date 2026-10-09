@@ -142,7 +142,8 @@ def select_documents(documents: list[dict[str, Any]], now: datetime, count: int,
               + (1 / (RRF_K + comments_ranks[row["id"]]) if row["id"] in comments_ranks else 0)
               for row in eligible}
     result = sorted(eligible, key=lambda row: (-scores[row["id"]], row["id"]))[:count]
-    return [{**row, "selection": {"method": "likes_comments_rrf", "score": scores[row["id"]],
+    return [{**row, "language_status": "pending_review",
+             "selection": {"method": "likes_comments_rrf", "score": scores[row["id"]],
                                   "k": RRF_K, "likes_rank": likes_ranks[row["id"]],
                                   "comments_rank": comments_ranks.get(row["id"]),
                                   "min_age_hours": MIN_AGE_HOURS, "min_likes": MIN_LIKES,
@@ -155,7 +156,8 @@ def select_documents(documents: list[dict[str, Any]], now: datetime, count: int,
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
-    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    # 캡션 JSON 문자열 안의 U+2028/U+2029는 JSONL 레코드 경계가 아니다.
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").split("\n") if line.strip()]
     if any(not isinstance(row, dict) or not isinstance(row.get("id"), str) or not row["id"] for row in rows):
         raise ValueError("기존 후보 코퍼스 형식이 올바르지 않습니다. 저장하지 않았습니다.")
     return rows

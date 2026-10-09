@@ -1,0 +1,52 @@
+{
+  "18029336216850454": {
+    "review_note": "스터디 메이트 앱을 캡션에서 명시한다.",
+    "facts": [
+      {"subject_type": "Post", "subject_name": "18029336216850454", "predicate": "coversTopic", "object_type": "Topic", "object_name": "공부 앱", "evidence": "외계인 스터디 메이트 앱"}
+    ]
+  },
+  "18084823565536221": {
+    "review_note": "공부할 때 사용하는 뽀모도로 앱을 캡션에서 설명한다.",
+    "facts": [
+      {"subject_type": "Post", "subject_name": "18084823565536221", "predicate": "coversTopic", "object_type": "Topic", "object_name": "공부 앱", "evidence": "뽀모도로 앱"}
+    ]
+  },
+  "18089796404194917": {
+    "review_note": "야구 선수 이름 입력 게임을 만들었다고 직접 밝힌다.",
+    "facts": [
+      {"subject_type": "Post", "subject_name": "18089796404194917", "predicate": "coversTopic", "object_type": "Topic", "object_name": "게임", "evidence": "#게임"},
+      {"subject_type": "Post", "subject_name": "18089796404194917", "predicate": "coversTopic", "object_type": "Topic", "object_name": "야구", "evidence": "#야구"}
+    ]
+  },
+  "18102969725591942": {
+    "review_note": "본문의 야구 해시태그만 주제 근거로 채택한다.",
+    "facts": [
+      {"subject_type": "Post", "subject_name": "18102969725591942", "predicate": "coversTopic", "object_type": "Topic", "object_name": "야구", "evidence": "#야구"}
+    ]
+  },
+  "18125003041828008": {
+    "review_note": "사이드 프로젝트 진행 방법을 캡션에서 설명한다.",
+    "facts": [
+      {"subject_type": "Post", "subject_name": "18125003041828008", "predicate": "coversTopic", "object_type": "Topic", "object_name": "사이드 프로젝트", "evidence": "사이드 프로젝트 하는 방법"}
+    ]
+  },
+  "18461156551119746": {
+    "review_note": "알림을 설정한 곳으로 연결하는 앱을 본문에서 소개한다.",
+    "facts": [
+      {"subject_type": "Post", "subject_name": "18461156551119746", "predicate": "coversTopic", "object_type": "Topic", "object_name": "알림 앱", "evidence": "알림이 오면 설정한 곳으로 바로 연결해주는 앱"}
+    ]
+  },
+  "17946173829068366": {
+    "review_note": "새로 수집한 내 게시물의 #야구 태그를 본문에서 확인했다.",
+    "facts": [
+      {
+        "subject_type": "Post",
+        "subject_name": "17946173829068366",
+        "predicate": "coversTopic",
+        "object_type": "Topic",
+        "object_name": "야구",
+        "evidence": "#야구"
+      }
+    ]
+  }
+}

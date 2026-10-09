@@ -1,0 +1,53 @@
+node.OwnPost {
+  color: #4D96DB;
+  border-color: #2F70A9;
+  text-color-internal: #FFFFFF;
+  caption: "{post_number}";
+}
+node.ReferencePost {
+  color: #71B8F0;
+  border-color: #3F8FC9;
+  text-color-internal: #173B57;
+  caption: "{display_name}";
+}
+node.Topic {
+  color: #F19BCF;
+  border-color: #C06EA4;
+  text-color-internal: #442840;
+  caption: "{name}";
+}
+node.Project {
+  color: #A08BE1;
+  caption: "{name}";
+}
+node.Feature {
+  color: #C3A3E7;
+  caption: "{name}";
+}
+node.Concept {
+  color: #DEC389;
+  caption: "{name}";
+}
+node.InterestArea {
+  color: #87CA8D;
+  border-color: #5CA363;
+  caption: "{display_name}";
+}
+node.Profile {
+  color: #4EA856;
+  border-color: #31783A;
+  text-color-internal: #FFFFFF;
+  caption: "{display_name}";
+}
+relationship.COVERS_TOPIC {
+  caption: "다룸";
+}
+relationship.PUBLISHED {
+  caption: "게시";
+}
+relationship.INTERESTED_IN {
+  caption: "관심";
+}
+relationship.IN_AREA {
+  caption: "분야";
+}

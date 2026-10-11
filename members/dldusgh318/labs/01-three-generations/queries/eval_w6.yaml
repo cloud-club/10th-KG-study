@@ -1,0 +1,456 @@
+# 6주차 평가셋 초안 — 정답 및 동등성 확정 전
+version: 1
+status: 확정
+created_at: '2026-10-07'
+legacy_source: data/week3/cases.json
+retrieval_policy:
+  methods: [bm25, vector]
+  top_k_each: 10
+  pooling: union_by_chunk_id
+  query_expansion: false
+  graph_retriever_used: false
+  embedding_model: BAAI/bge-m3
+  vector_ef_search: 100
+  preview_rule: 원문 text의 앞 200자 (공백과 줄바꿈 보존)
+review_notes:
+  - 기존 5문항의 question과 gold_chunks는 3주차 원본을 그대로 복사했으며 재판정하지 않았다.
+  - 새 문항 gold_chunks는 비어 있다. candidate_chunks와 equivalent_groups는 확인 필요인 후보일 뿐이다.
+  - expected는 모든 문항에서 비워 두었다.
+  - equivalent_groups는 명시된 공통 사실에 대해서만 동등성 후보이며 청크 전체가 대체 가능하다는 뜻은 아니다.
+  - 기존 queries/eval_w6.yml은 다른 평가셋이므로 수정하지 않는다.
+questions:
+  - id: S01
+    kind: "single-hop"
+    question: "Spring에서 @Transactional 메서드를 같은 클래스 내부에서 호출하면 왜 트랜잭션이 적용되지 않을 수 있나?"
+    expected: "같은 클래스 내부 호출은 Spring AOP 프록시를 거치지 않아 @Transactional이 적용되지 않는다"
+    status: 확인 필요
+    provenance: 3주차 question/gold_chunks 원문 복사
+    gold_chunks:
+      - "클라우드와_CS#1040"
+    candidate_chunks: []
+    equivalent_groups: []
+  - id: M01
+    kind: "2-hop"
+    question: "SeCause 분석 요청은 Spring에서 저장된 뒤 FastAPI 워커가 처리하기까지 어떤 단계를 거치나?"
+    expected: "DB 저장 → 커밋 후 AFTER_COMMIT 리스너 → FastAPI 호출 → Redis/RQ 큐 적재 → 워커가 처리"
+    status: 확인 필요
+    provenance: 3주차 question/gold_chunks 원문 복사
+    gold_chunks:
+      - "스마일샤크_지원자_이연호_포트폴리오#652"
+      - "스마일샤크_지원자_이연호_포트폴리오#653"
+    candidate_chunks: []
+    equivalent_groups: []
+  - id: X01
+    kind: "bridge-2-hop"
+    question: "SeCause에서 분석 작업 큐에 사용한 기술을 TEAMFICIAL에서는 어떤 용도로 사용했나?"
+    expected: "Redis. SeCause는 분석 작업 큐(RQ)로, TEAMFICIAL은 지원자 수 집계 캐시(INCR 증가, MGET 조회, DB 폴백)로 사용"
+    status: 확인 필요
+    provenance: 3주차 question/gold_chunks 원문 복사
+    gold_chunks:
+      - "경력기술서#326"
+      - "경력기술서#325"
+    candidate_chunks: []
+    equivalent_groups: []
+  - id: X03
+    kind: "bridge-2-hop"
+    question: "직행 프로젝트에서 통근 시간 API 비용을 줄이기 위해 제안한 방법 중, TEAMFICIAL 지원자 수 집계에 실제 적용한 방법은 무엇이며 두 프로젝트에서 각각 어떻게 쓰였나?"
+    expected: "Redis 캐시. 직행에서는 같은 출발지-도착지 통근 시간을 캐싱하자고 제안만 했고, TEAMFICIAL에서는 지원자 수 집계 캐시로 실제 구현"
+    status: 확인 필요
+    provenance: 3주차 question/gold_chunks 원문 복사
+    gold_chunks:
+      - "KUSITMS_X_직행_기업과제#180"
+      - "경력기술서#325"
+    candidate_chunks: []
+    equivalent_groups: []
+  - id: H01
+    kind: "3-hop"
+    question: "운영 배포의 RDS 인증 실패에서 원인은 무엇이었고, 무엇을 수정했으며, 어떻게 정상화를 검증했나?"
+    expected: "원인: prod 설정이 과거 비밀번호 참조 / 수정: 환경변수 참조로 변경 후 Production CD 재실행 / 검증: 내부·외부 HTTPS 헬스 체크 200"
+    status: 확인 필요
+    provenance: 3주차 question/gold_chunks 원문 복사
+    gold_chunks:
+      - "트러블슈팅_2#1051"
+      - "트러블슈팅_2#1052"
+      - "트러블슈팅_2#1054"
+    candidate_chunks: []
+    equivalent_groups: []
+  - id: A1
+    kind: aggregation
+    question: "가장 많은 프로젝트에서 쓴 기술은?"
+    expected: "Redis (SeCause, TEAMFICIAL, 직행으로 총 3개 프로젝트)"
+    status: 확인 필요
+    gold_chunks: []
+    review_note: "검색된 합집합만으로 전체 프로젝트의 기술 사용 빈도와 최댓값을 확정할 수 없다. 평가 범위(전체 문서/그래프 표본), 실제 사용 상태, 동률 처리 기준 확인 필요."
+    retrieval:
+      query: "가장 많은 프로젝트에서 쓴 기술은?"
+      bm25_top10:
+        - "모앤디~2#608"
+        - "캐시~2#978"
+        - "지피티_클클#939"
+        - "핸드북_2_포트폴리오와_관측#1431"
+        - "핸드북_5_캐시#1536"
+        - "지피티_클클#907"
+        - "객체지향으로_해결하는_코드와_구조_1_#316"
+        - "포트폴리오#1105"
+        - "KUSITMS#160"
+        - "핸드북_4_예상질문과_암기카드#1518"
+      vector_top10:
+        - "모앤디~2#608"
+        - "경력기술서#319"
+        - "이연호_포트폴리오#784"
+        - "이연호_포트폴리오#787"
+        - "핸드북_4_예상질문과_암기카드#1502"
+        - "KUSITMS#160"
+        - "경력기술서#320"
+        - "경력기술서#333"
+        - "경력기술서#321"
+        - "경력기술서#322"
+      union_count: 18
+    candidate_chunks:
+      - chunk_id: "모앤디~2#608"
+        bm25_rank: 1
+        vector_rank: 1
+        source: "모앤디.md"
+        heading: "모앤디 > ⚙️ 사용 기술 > 📝해당 활동에서 느낀 점"
+        status: 확인 필요
+        preview_200: "모앤디 > 모앤디 > ⚙️ 사용 기술 > 📝해당 활동에서 느낀 점\n\n해당 프로젝트는 제가 25년 9월부터 참여하였던 신촌연합IT창업학회 CEOS에서 진행한 프로젝트로, 체험 모델과 디자이너를 매칭해주는 서비스입니다.\n\n지금까지 해봤던 프로젝트 중, 가장 개발 볼륨이 커서 처음에는 어떻게 시작해야할지 막막했습니다. 또한 팀원중에서도 프로젝트 경험이 많은 사람"
+      - chunk_id: "캐시~2#978"
+        bm25_rank: 2
+        vector_rank: null
+        source: "캐시.md"
+        heading: "캐시 > 🚨 0. 가장 위험한 지점부터 > 위험 1. \"발표·연구\"와 \"적용\"의 간극"
+        status: 확인 필요
+        preview_200: "캐시 > 캐시 > 🚨 0. 가장 위험한 지점부터 > 위험 1. \"발표·연구\"와 \"적용\"의 간극\n\n이력서 표현을 보면:\n\n```\n\"비교 분석을 통해 … 발표\"     ← 발표했다\n\"… 대응 전략 연구\"            ← 연구했다\n```\n\n그런데 **포트폴리오 프로젝트 3개 어디에도 캐시 적용 성과가 없습니다.** Redis는 Tech Stack 목록에만"
+      - chunk_id: "지피티_클클#939"
+        bm25_rank: 3
+        vector_rank: null
+        source: "지피티_클클.md"
+        heading: "취약점 12. RabbitMQ를 쓰면서 broker 장애 전 략 없음 > 취약점 14. 많은 활동 이력"
+        status: 확인 필요
+        preview_200: "지피티_클클 > 취약점 12. RabbitMQ를 쓰면서 broker 장애 전 략 없음 > 취약점 14. 많은 활동 이력\n\nCloud Club 입장에서 가장 비기술적 위험.\n공식 모집에서도 주도적 참여와 필수 일정 참석을 명시한다.\n면접관:\n“이 사람 스펙용으로 또 하나 하는 거 아닌가?”\n방어의 방향\n절대:\n“저 시간관리 잘해요.”\n만 하지 마.\n대신:\n\n"
+      - chunk_id: "핸드북_2_포트폴리오와_관측#1431"
+        bm25_rank: 4
+        vector_rank: null
+        source: "핸드북 2 포트폴리오와 관측.md"
+        heading: "PART 3. Portfolio 기술 질문 > 3-G. Moandi ① 이벤트 기반 FCM 알림 ★★★☆☆"
+        status: 확인 필요
+        preview_200: "핸드북 2 포트폴리오와 관측 > PART 3. Portfolio 기술 질문 > 3-G. Moandi ① 이벤트 기반 FCM 알림 ★★★☆☆\n\nSeCause ①과 **같은 패턴**입니다. 면접관이 이걸 눈치채면 아래 질문이 나옵니다.\n\n> ⚠️ **함정 질문**: \"두 프로젝트에서 같은 Application Event 방식을 쓰셨는데, 첫 번째에서 유실 한계"
+      - chunk_id: "핸드북_5_캐시#1536"
+        bm25_rank: 5
+        vector_rank: null
+        source: "핸드북 5 캐시.md"
+        heading: "Cloud Club 10기 면접 핸드북 — 부록 > 🚨 0. 가장 위험한 지점부터 > 위험 1. \"발표·연구\"와 \"적용\"의 간극"
+        status: 확인 필요
+        preview_200: "핸드북 5 캐시 > Cloud Club 10기 면접 핸드북 — 부록 > 🚨 0. 가장 위험한 지점부터 > 위험 1. \"발표·연구\"와 \"적용\"의 간극\n\n이력서 표현을 보면:\n\n```\n\"비교 분석을 통해 … 발표\"     ← 발표했다\n\"… 대응 전략 연구\"            ← 연구했다\n```\n\n그런데 **포트폴리오 프로젝트 3개 어디에도 캐시 적용 성과가 "
+      - chunk_id: "지피티_클클#907"
+        bm25_rank: 6
+        vector_rank: null
+        source: "지피티_클클.md"
+        heading: "지피티_클클 > 15. 그럼 그냥 RabbitMQ 쓰면 되는데 왜 Application Event를 썼나요?"
+        status: 확인 필요
+        preview_200: "지피티_클클 > 지피티_클클 > 15. 그럼 그냥 RabbitMQ 쓰면 되는데 왜 Application Event를 썼나요?\n\n답변 스크립트\n“당시 프로젝트 규모와 개발 기간을 고려한 선택이었습니다. 백엔드 두 명이 만드는 졸업프로젝트 였고, 우선 외부 분석 서버 호출과 DB transaction을 분리하는 것이 가장 중요한 문제였습니다. 메 시지 브로커를"
+      - chunk_id: "객체지향으로_해결하는_코드와_구조_1_#316"
+        bm25_rank: 7
+        vector_rank: null
+        source: "객체지향으로 해결하는 코드와 구조 (1).md"
+        heading: "객체지향으로 해결하는 코드와 구조 (1) > 아키텍처 관점에서도 OOP를 적용할 수 있다??? > 그러나 헥사고날 아키텍처도 장단점이 있습니다.."
+        status: 확인 필요
+        preview_200: "객체지향으로 해결하는 코드와 구조 (1) > 객체지향으로 해결하는 코드와 구조 (1) > 아키텍처 관점에서도 OOP를 적용할 수 있다??? > 그러나 헥사고날 아키텍처도 장단점이 있습니다..\n\n| 장점 | 단점 |\n| --- | --- |\n| 기술 교체가 쉽다 | 클래스·파일 수가 많아진다 |\n| 테스트가 쉽다 | 레이어마다 DTO 변환 코드 필요 |\n| "
+      - chunk_id: "포트폴리오#1105"
+        bm25_rank: 8
+        vector_rank: null
+        source: "포트폴리오.md"
+        heading: "포트폴리오 > SeCause > 1. 트랜잭션 이벤트 기반 비동기 호출 > 꼬리질문: 그럼 메시지 큐(ex. RabbitMQ)는 왜 안쓰셧어요?"
+        status: 확인 필요
+        preview_200: "포트폴리오 > 포트폴리오 > SeCause > 1. 트랜잭션 이벤트 기반 비동기 호출 > 꼬리질문: 그럼 메시지 큐(ex. RabbitMQ)는 왜 안쓰셧어요?\n\n백엔드 팀원이 2명이기도 하고, 졸업프로젝트라 전시 때 시연 용도라, 여러 비용을 고료했을 때 애플리케이션 이벤트가 가장 적합할 거 같아 쓰지 않았습니다. 만약 프로덕셪ㄴ이면 사용했을 거 같습니다."
+      - chunk_id: "KUSITMS#160"
+        bm25_rank: 9
+        vector_rank: 6
+        source: "KUSITMS.md"
+        heading: "KUSITMS"
+        status: 확인 필요
+        preview_200: "KUSITMS > KUSITMS\n\n정말 많은 인사이트를 얻을 수 있었다.\n\n처음 오티에서 백엔드 사람들과 대화를 하고, 프로젝트 중간중간 같은 파트 사람들과 토의할 때 내가 많이 부족하다는 걸 느꼈다\n\n그래서 더 노력했다 뒤처지지않기 위해…\n\n로그인과 배포를 처음에 일주일안에 구현해야했을 때 사실 자신이 없었지만 좋은 팀원들에게 폐를 끼치고 싶지않아 3일연"
+      - chunk_id: "핸드북_4_예상질문과_암기카드#1518"
+        bm25_rank: 10
+        vector_rank: null
+        source: "핸드북 4 예상질문과 암기카드.md"
+        heading: "PART 10. 공격 질문 / 함정 질문 ★★★★★ > 공격 1. \"Kubernetes 안 해보셨는데 왜 지원서에 쓰셨나요?\" > 공격 13. \"그냥 스펙 쌓으려고 지원하신 건 아닌가요?\" (드물지만 나올 수 있음)"
+        status: 확인 필요
+        preview_200: "핸드북 4 예상질문과 암기카드 > PART 10. 공격 질문 / 함정 질문 ★★★★★ > 공격 1. \"Kubernetes 안 해보셨는데 왜 지원서에 쓰셨나요?\" > 공격 13. \"그냥 스펙 쌓으려고 지원하신 건 아닌가요?\" (드물지만 나올 수 있음)\n\n**침착하게, 방어적으로 굴지 말 것.**\n\n> 활동이 많으니 그렇게 보일 수 있다고 생각합니다. 다만 제"
+      - chunk_id: "경력기술서#319"
+        bm25_rank: null
+        vector_rank: 2
+        source: "경력기술서.md"
+        heading: "경력기술서 > 요약"
+        status: 확인 필요
+        preview_200: "경력기술서 > 경력기술서 > 요약\n\n백엔드 개발자로 여러 프로젝트를 진행하며 인프라 운영 영역까지 경험을 넓혀왔습니다. AWS 기반의 배포 환경을 직접 구축하고, 분산된 로그를 통합해 장애 원인을 추적할 수 있는 관측 환경을 설계했으며, 캐시 계층 장애가 서비스 전체로 번지지 않도록 폴백 구조를 설계하는 등 **\"장애가 발생했을 때 얼마나 빠르게 원인을 찾"
+      - chunk_id: "이연호_포트폴리오#784"
+        bm25_rank: null
+        vector_rank: 3
+        source: "이연호 포트폴리오.md"
+        heading: "🛠️ Tech Stacks"
+        status: 확인 필요
+        preview_200: "이연호 포트폴리오 > 🛠️ Tech Stacks\n\n![](Line_1_(1).png)\n\n**Backend**\n\nJAVA, Spring Boot, JPA / Hibernate\n\n**Database**\n\nMySQL, PostgreSQL, Redis, Index tuning, Query Optimization\n\n**Infra / DevOps**\n\nDocker, "
+      - chunk_id: "이연호_포트폴리오#787"
+        bm25_rank: null
+        vector_rank: 4
+        source: "이연호 포트폴리오.md"
+        heading: "👩🏻‍🚀 Experience"
+        status: 확인 필요
+        preview_200: "이연호 포트폴리오 > 👩🏻‍🚀 Experience\n\n5.09*\n⇒  최우수상 수여\n- [**소프트스킬 기반 팀빌딩 서비스**](https://github.com/TEAMFICIAL/teamficial-be) :  **TEAMFICIAL** BE Lead 참여 *2025.10 ~ 2026.01*\n- [**시술 모델 - 디자이너 매칭 서비스**](https:/"
+      - chunk_id: "핸드북_4_예상질문과_암기카드#1502"
+        bm25_rank: null
+        vector_rank: 5
+        source: "핸드북 4 예상질문과 암기카드.md"
+        heading: "PART 9. 예상 면접 질문 30개 > 9-3. 포트폴리오 기술 (Q16~Q25) → 상세는 PART 3·4"
+        status: 확인 필요
+        preview_200: "핸드북 4 예상질문과 암기카드 > PART 9. 예상 면접 질문 30개 > 9-3. 포트폴리오 기술 (Q16~Q25) → 상세는 PART 3·4\n\n**Q16. 가장 기억에 남는 기술적 문제는?** ★★★★★\n\n- **정답은 로그 중앙화**입니다(지원서 3번과 일치). 3단계 서사로: 분산 → 중앙화 → Trace ID → 사용자 행동 로그.\n- **핵심 문"
+      - chunk_id: "경력기술서#320"
+        bm25_rank: null
+        vector_rank: 7
+        source: "경력기술서.md"
+        heading: "경력기술서 > 요약"
+        status: 확인 필요
+        preview_200: "경력기술서 > 경력기술서 > 요약\n\n- **Cloud / Infra** — AWS(EC2, RDS, Lambda, S3), NCP, Docker(Buildx/QEMU 멀티아키텍처), GitHub Actions CI/CD, Nginx\n- **Observability** — Promtail, Loki, Grafana, Prometheus, Spring Actu"
+      - chunk_id: "경력기술서#333"
+        bm25_rank: null
+        vector_rank: 8
+        source: "경력기술서.md"
+        heading: "경력기술서 > 강점"
+        status: 확인 필요
+        preview_200: "경력기술서 > 경력기술서 > 강점\n\n**1. 문제를 재사용 가능한 구조로 해결합니다.**\n같은 유형의 문제가 여러 도메인에서 반복될 때, 개별 수정으로 넘기지 않고 팀이 재사용할 수 있는 패턴으로 정립합니다. Moandi의 AFTER_COMMIT 비동기 패턴이 대표적인 사례입니다.\n\n**2. 장애를 전제로 설계합니다.**\n캐시를 도입할 때 폴백 경로를 함께"
+      - chunk_id: "경력기술서#321"
+        bm25_rank: null
+        vector_rank: 9
+        source: "경력기술서.md"
+        heading: "경력기술서 > 프로젝트 경험 > 1. 청바지 — 청년 정책 알림 서비스"
+        status: 확인 필요
+        preview_200: "경력기술서 > 경력기술서 > 프로젝트 경험 > 1. 청바지 — 청년 정책 알림 서비스\n\n**기간** 2025.01 ~ 현재 (V2 재설계 진행 중)\n**역할** Backend Developer\n**기술** Spring Boot / AOP / Logback / Promtail / Loki / Grafana / Prometheus / Spring Actuato"
+      - chunk_id: "경력기술서#322"
+        bm25_rank: null
+        vector_rank: 10
+        source: "경력기술서.md"
+        heading: "경력기술서 > 프로젝트 경험 > 1. 청바지 — 청년 정책 알림 서비스"
+        status: 확인 필요
+        preview_200: "경력기술서 > 경력기술서 > 프로젝트 경험 > 1. 청바지 — 청년 정책 알림 서비스\n\n- 장애 인지·복구 시간 **기존 대비 30% 단축**\n- 일 단위 배치 스케줄러로 **2,690건 데이터를 약 53.2초에 처리** (신규 저장 1,784건)\n- 관측 환경을 팀의 기본 개발 환경으로 정착시켜, 이후 기능 개발 시에도 로그 기반 디버깅이 가능하도록 개선"
+    equivalent_groups:
+      - id: A1-EG1
+        status: 확인 필요
+        common_fact: "캐시 적용 성과의 근거 부족 및 Redis 임시 저장소/조회 캐시 구분"
+        reason: "문서 경로를 제외한 본문이 같음. A1 정답을 증명하는 근거인지는 별도 검토 필요."
+        chunk_ids:
+          - "캐시~2#978"
+          - "핸드북_5_캐시#1536"
+  - id: A2
+    kind: aggregation
+    question: "제안만 하고 구현 안 한 기술은?"
+    expected: "직행의 Redis(동일한 출발지 - 도착지의 통근 시간 저장), SeCause의 메시지 큐, SeCause의 outbox 패턴. 현재 표본 DB에서 status=proposed인 사용례 3개이며, 해당 기술이 모든 프로젝트에서 미구현이라는 뜻은 아니다."
+    expected_source:
+      kind: postgres_query
+      checked_at: '2026-10-07'
+      scope: 20개 청크 표본에서 추출·병합한 현재 DB
+      status_field: entities.props.status
+      use_ids: [kg:use-jikhaeng-redis-1, kg:use-secause-mesiji-kyu-1, kg:use-secause-outbox-paeteon-1]
+      sql: >-
+        SELECT DISTINCT u.entity_id, p.label AS project, t.label AS technology,
+        u.props->>'purpose' AS purpose, u.props->>'status' AS status
+        FROM entities u
+        JOIN edges pt ON pt.subject=u.entity_id AND pt.predicate='partOf'
+        JOIN entities p ON p.entity_id=pt.object
+        JOIN edges ut ON ut.subject=u.entity_id AND ut.predicate='usesTechnology'
+        JOIN entities t ON t.entity_id=ut.object
+        WHERE u.type='TechnologyUse' AND u.props->>'status'='proposed'
+        ORDER BY p.label, t.label, u.entity_id;
+      caveat: 메시지 큐와 outbox 패턴의 Technology 분류는 기존 모델링 문제로 유지된 항목이다. 이번에는 DB 조회 결과를 그대로 기록하며 노드를 수정하지 않는다.
+    status: 확인 필요
+    gold_chunks: []
+    review_note: "제안된 기술의 미구현과 단순 미경험·향후 학습·UI 기획 제안을 구분해야 한다. 다른 프로젝트의 구현 여부와 시점도 확인 필요."
+    retrieval:
+      query: "제안만 하고 구현 안 한 기술은?"
+      bm25_top10:
+        - "매출_확인_버튼_워딩_가시성_개선#411"
+        - "사업자_메인_신규_주문_요청_더_잘_보이게#610"
+        - "지피티_클클#930"
+        - "모앤디~2#599"
+        - "KUSITMS_X_직행_기업과제#175"
+        - "검색_필터_UI_분리로_복잡도_낮추기#317"
+        - "KUSITMS_X_직행_기업과제#167"
+        - "지피티_클클#940"
+        - "고객_주문내역_상태별_필터링#335"
+        - "면접_스토리라인#450"
+      vector_top10:
+        - "지피티_클클#926"
+        - "지피티_클클#895"
+        - "핸드북_5_캐시#1536"
+        - "포트폴리오#1123"
+        - "핸드북_4_예상질문과_암기카드#1517"
+        - "면접_스토리라인#429"
+        - "핸드북_3_클라우드와_CS#1471"
+        - "핸드북_4_예상질문과_암기카드#1518"
+        - "핸드북_4_예상질문과_암기카드#1506"
+        - "캐시~2#978"
+      union_count: 20
+    candidate_chunks:
+      - chunk_id: "매출_확인_버튼_워딩_가시성_개선#411"
+        bm25_rank: 1
+        vector_rank: null
+        source: "매출 확인 버튼 워딩 가시성 개선.md"
+        heading: "매출 확인 버튼 워딩/가시성 개선"
+        status: 확인 필요
+        preview_200: "매출 확인 버튼 워딩 가시성 개선 > 매출 확인 버튼 워딩/가시성 개선\n\n내용: 매출 확인이 버튼으로 잘 안 보임. 더 직관적인 워딩/표현으로 개선 제안.\n뷰: 홈\n카테고리: 사업자\n확인 / 반영 완료: No"
+      - chunk_id: "사업자_메인_신규_주문_요청_더_잘_보이게#610"
+        bm25_rank: 2
+        vector_rank: null
+        source: "사업자 메인 신규 주문 요청 더 잘 보이게.md"
+        heading: "사업자 메인: 신규 주문 요청 더 잘 보이게"
+        status: 확인 필요
+        preview_200: "사업자 메인 신규 주문 요청 더 잘 보이게 > 사업자 메인: 신규 주문 요청 더 잘 보이게\n\n내용: 새로운 주문 요청 건이 메인에서 잘 안 보일 수 있음. 중앙 배치/강조 + 주문 페이지로 이동 플로우 연결 제안.\n뷰: 홈\n카테고리: 사업자\n확인 / 반영 완료: No"
+      - chunk_id: "지피티_클클#930"
+        bm25_rank: 3
+        vector_rank: null
+        source: "지피티_클클.md"
+        heading: "지피티_클클 > 취약점 5. “요청 단위 장애 원인 추적 환경 구축”"
+        status: 확인 필요
+        preview_200: "지피티_클클 > 지피티_클클 > 취약점 5. “요청 단위 장애 원인 추적 환경 구축”\n\n문제\n3번 지원서에는 MDC를 안 썼지만 포트폴리오에는 별도 성과로 있음.\n예상\n“여러 서버에 걸친 요청도 trace 가능합니까?”\n위험\nMDC Trace ID는 distributed trace가 아님.\n방어\n“동일 Spring application에서 요청 로그 cor"
+      - chunk_id: "모앤디~2#599"
+        bm25_rank: 4
+        vector_rank: null
+        source: "모앤디.md"
+        heading: "모앤디 > ⚙️ 사용 기술 > 트러블 슈팅 > [PR #92 — Firebase FCM 푸시 알림 시스템](https://github.com/Modelly-official/MODELLY-BE/pull/92)"
+        status: 확인 필요
+        preview_200: "모앤디 > 모앤디 > ⚙️ 사용 기술 > 트러블 슈팅 > [PR #92 — Firebase FCM 푸시 알림 시스템](https://github.com/Modelly-official/MODELLY-BE/pull/92)\n\n채팅 메시지 수신, 예약 상태 변경, 리뷰 작성 등 앱 내 주요 이벤트가 발생할 때 사용자에게 실시간 푸시 알림을 전달해야 했습니다. Fi"
+      - chunk_id: "KUSITMS_X_직행_기업과제#175"
+        bm25_rank: 5
+        vector_rank: null
+        source: "KUSITMS X 직행 기업과제.md"
+        heading: "KUSITMS X 직행 기업과제 > 기능별 사용 기술 > 4.2.2 시스템 아키텍처"
+        status: 확인 필요
+        preview_200: "KUSITMS X 직행 기업과제 > KUSITMS X 직행 기업과제 > 기능별 사용 기술 > 4.2.2 시스템 아키텍처\n\n![image.png](image%2065.png)\n\n- 데이터 파이프라인\n\n![image.png](image%2066.png)\n\n- 시스템 아키텍쳐\n\n**시기**\n\n- 2025.08 ~ 2025.09\n\n해당 프로젝트에서 제가 담당했던 "
+      - chunk_id: "검색_필터_UI_분리로_복잡도_낮추기#317"
+        bm25_rank: 6
+        vector_rank: null
+        source: "검색 필터 UI 분리로 복잡도 낮추기.md"
+        heading: "검색/필터 UI 분리로 복잡도 낮추기"
+        status: 확인 필요
+        preview_200: "검색 필터 UI 분리로 복잡도 낮추기 > 검색/필터 UI 분리로 복잡도 낮추기\n\n관련 파트: 기획\n내용: 홈에 기능이 몰려 복잡할 수 있음. 검색을 누르면 별도 페이지로 이동 후 필터링하도록 분리 제안.\n뷰: 홈\n카테고리: 고객\n확인 / 반영 완료: No"
+      - chunk_id: "KUSITMS_X_직행_기업과제#167"
+        bm25_rank: 7
+        vector_rank: null
+        source: "KUSITMS X 직행 기업과제.md"
+        heading: "KUSITMS X 직행 기업과제 > 기능별 사용 기술"
+        status: 확인 필요
+        preview_200: "KUSITMS X 직행 기업과제 > KUSITMS X 직행 기업과제 > 기능별 사용 기술\n\n> **useState로 6단계 테스트 진행을 관리**하고, **두 개의 Zustand 스토어로 신규/재테스트 상황을 구분해 온보딩 데이터를 저장**하는 성향 테스트 플로우.\n> \n> \n> **useEffect로 완료 시점을 감지해 accessToken 존재 여부에 "
+      - chunk_id: "지피티_클클#940"
+        bm25_rank: 8
+        vector_rank: null
+        source: "지피티_클클.md"
+        heading: "취약점 12. RabbitMQ를 쓰면서 broker 장애 전 략 없음 > 취약점 15. “사람 특성을 빠르게 파악한다”"
+        status: 확인 필요
+        preview_200: "지피티_클클 > 취약점 12. RabbitMQ를 쓰면서 broker 장애 전 략 없음 > 취약점 15. “사람 특성을 빠르게 파악한다”\n\n1 번 자기소개 문항에서 근거가 약함.\n예상\n“실제로 사람 특성을 파악해서 팀을 조율한 사례가 있나요?”\n반드시 구체적 사건 하나 준비해야 함.\n구조:\n“Moandi에서 A는 구현 속도가 빠르고 B는 설계 검토를 꼼꼼하게"
+      - chunk_id: "고객_주문내역_상태별_필터링#335"
+        bm25_rank: 9
+        vector_rank: null
+        source: "고객 주문내역 상태별 필터링.md"
+        heading: "고객 주문내역: 상태별 필터링"
+        status: 확인 필요
+        preview_200: "고객 주문내역 상태별 필터링 > 고객 주문내역: 상태별 필터링\n\n관련 파트: 기획\n내용: 거절/완료 주문이 대기 주문과 함께 보이면 불편. 상태별 필터로 확인 편의 개선 제안.\n뷰: 주문 내역\n카테고리: 고객\n확인 / 반영 완료: No"
+      - chunk_id: "면접_스토리라인#450"
+        bm25_rank: 10
+        vector_rank: null
+        source: "면접 스토리라인.md"
+        heading: "**최종적으로 진짜 외울 건 5개 흐름뿐** > **1. 나라는 사람** > **5. 비동기**"
+        status: 확인 필요
+        preview_200: "면접 스토리라인 > **최종적으로 진짜 외울 건 5개 흐름뿐** > **1. 나라는 사람** > **5. 비동기**\n\n**외부 API 지연 → AFTER_COMMIT + Async → 유실 위험 → MQ/Outbox**\n\n이 다섯 줄만 머릿속에 있으면 **질문을 외우는 게 아니라 질문이 어디로 들어오는지만 판단하면 돼.**\n\n예를 들어 면접관이 갑자기 “A"
+      - chunk_id: "지피티_클클#926"
+        bm25_rank: null
+        vector_rank: 1
+        source: "지피티_클클.md"
+        heading: "지피티_클클 > 취약점 1. “Lambda를 이용한 썸네일 생성 함수”"
+        status: 확인 필요
+        preview_200: "지피티_클클 > 지피티_클클 > 취약점 1. “Lambda를 이용한 썸네일 생성 함수”\n\n문제\n지원서에는 있는데 현재 제출 포트폴리오 주요 프로젝트 3개에는 없음.\n면접관 입장:\n“어? 포트폴리오엔 없는데 이건 뭐지?”\n예상 질문\n“Lambda 썸네일 생성은 어느 프로젝트고 직접 구현했나요?”\n방어\n이건 실제 네 경험만 말해야 함.\n예:\n“Moandi에서 "
+      - chunk_id: "지피티_클클#895"
+        bm25_rank: null
+        vector_rank: 2
+        source: "지피티_클클.md"
+        heading: "지피티_클클 > 4. Kubernetes 해본 적 있나요?"
+        status: 확인 필요
+        preview_200: "지피티_클클 > 지피티_클클 > 4. Kubernetes 해본 적 있나요?\n\n절대 아는 척하지 말 것.\n답변 스크립트\n“프로젝트에 실제 적용해본 경험은 없습니다. 지금까지는 Docker Compose 기반으로 EC2에서 컨테이너를 관리했습니다. 다만 그 방식으로 운영하면서 Kubernetes가 해결하려는 문제는 조금 씩 느꼈습니다. 예를 들어 현재 배포는 "
+      - chunk_id: "핸드북_5_캐시#1536"
+        bm25_rank: null
+        vector_rank: 3
+        source: "핸드북 5 캐시.md"
+        heading: "Cloud Club 10기 면접 핸드북 — 부록 > 🚨 0. 가장 위험한 지점부터 > 위험 1. \"발표·연구\"와 \"적용\"의 간극"
+        status: 확인 필요
+        preview_200: "핸드북 5 캐시 > Cloud Club 10기 면접 핸드북 — 부록 > 🚨 0. 가장 위험한 지점부터 > 위험 1. \"발표·연구\"와 \"적용\"의 간극\n\n이력서 표현을 보면:\n\n```\n\"비교 분석을 통해 … 발표\"     ← 발표했다\n\"… 대응 전략 연구\"            ← 연구했다\n```\n\n그런데 **포트폴리오 프로젝트 3개 어디에도 캐시 적용 성과가 "
+      - chunk_id: "포트폴리오#1123"
+        bm25_rank: null
+        vector_rank: 4
+        source: "포트폴리오.md"
+        heading: "포트폴리오 > 청바지 > **⭐️⭐️⭐️ 모니터링 구축 ⭐️⭐️⭐️** > 꼬리질문: 그럼 님은 옵저버리티까지 구현하셨나요?"
+        status: 확인 필요
+        preview_200: "포트폴리오 > 포트폴리오 > 청바지 > **⭐️⭐️⭐️ 모니터링 구축 ⭐️⭐️⭐️** > 꼬리질문: 그럼 님은 옵저버리티까지 구현하셨나요?\n\n아닙니다. 현재 저는 로그와 트레이스까지는 경험해보았으나, 메트릭은 아직 완벽하지 못합니다. 프로메테우스를 사용했다고 말씀드렸는데, 메트릭을 수집하는 정도까지 경험했고, 아직 메트릭을 활용해보진 못했습니다.\n\n대신 추"
+      - chunk_id: "핸드북_4_예상질문과_암기카드#1517"
+        bm25_rank: null
+        vector_rank: 5
+        source: "핸드북 4 예상질문과 암기카드.md"
+        heading: "PART 10. 공격 질문 / 함정 질문 ★★★★★ > 공격 1. \"Kubernetes 안 해보셨는데 왜 지원서에 쓰셨나요?\" > 공격 12. \"지원서에 Observability 적용하고 싶다고 하셨는데, 이미 하셨잖아요?\""
+        status: 확인 필요
+        preview_200: "핸드북 4 예상질문과 암기카드 > PART 10. 공격 질문 / 함정 질문 ★★★★★ > 공격 1. \"Kubernetes 안 해보셨는데 왜 지원서에 쓰셨나요?\" > 공격 12. \"지원서에 Observability 적용하고 싶다고 하셨는데, 이미 하셨잖아요?\"\n\n**①** 로그 쪽은 했습니다. 하지만 Observability 전체를 했다고 말하기는 어렵습니다"
+      - chunk_id: "면접_스토리라인#429"
+        bm25_rank: null
+        vector_rank: 6
+        source: "면접 스토리라인.md"
+        heading: "**⑧ 그래서 Kubernetes를 배우고 싶다**"
+        status: 확인 필요
+        preview_200: "면접 스토리라인 > **⑧ 그래서 Kubernetes를 배우고 싶다**\n\n여기서 가장 중요한 건:\n\n**“써봤습니다”가 아니라 “왜 필요한지는 압니다.”**\n\n말하는 흐름:\n\n“Kubernetes는 실제 프로젝트에 적용해본 적은 없습니다.”\n\n먼저 인정.\n\n그다음:\n\n“다만 Docker Compose로 운영하면서 컨테이너 수를 유지하거나, 장애 난 컨테이너"
+      - chunk_id: "핸드북_3_클라우드와_CS#1471"
+        bm25_rank: null
+        vector_rank: 7
+        source: "핸드북 3 클라우드와 CS.md"
+        heading: "PART 7. Cloud Native / CNCF ★★★★☆ > 7-3. 내 경험과 CNCF 프로젝트 연결 ★★★★☆"
+        status: 확인 필요
+        preview_200: "핸드북 3 클라우드와 CS > PART 7. Cloud Native / CNCF ★★★★☆ > 7-3. 내 경험과 CNCF 프로젝트 연결 ★★★★☆\n\n| CNCF 프로젝트 | 내 접점 |\n| --- | --- |\n| **Prometheus** | Spring Actuator로 메트릭 노출까지는 경험. 알림 규칙은 미완 |\n| **OpenTelemetry**"
+      - chunk_id: "핸드북_4_예상질문과_암기카드#1518"
+        bm25_rank: null
+        vector_rank: 8
+        source: "핸드북 4 예상질문과 암기카드.md"
+        heading: "PART 10. 공격 질문 / 함정 질문 ★★★★★ > 공격 1. \"Kubernetes 안 해보셨는데 왜 지원서에 쓰셨나요?\" > 공격 13. \"그냥 스펙 쌓으려고 지원하신 건 아닌가요?\" (드물지만 나올 수 있음)"
+        status: 확인 필요
+        preview_200: "핸드북 4 예상질문과 암기카드 > PART 10. 공격 질문 / 함정 질문 ★★★★★ > 공격 1. \"Kubernetes 안 해보셨는데 왜 지원서에 쓰셨나요?\" > 공격 13. \"그냥 스펙 쌓으려고 지원하신 건 아닌가요?\" (드물지만 나올 수 있음)\n\n**침착하게, 방어적으로 굴지 말 것.**\n\n> 활동이 많으니 그렇게 보일 수 있다고 생각합니다. 다만 제"
+      - chunk_id: "핸드북_4_예상질문과_암기카드#1506"
+        bm25_rank: null
+        vector_rank: 9
+        source: "핸드북 4 예상질문과 암기카드.md"
+        heading: "PART 10. 공격 질문 / 함정 질문 ★★★★★ > 공격 1. \"Kubernetes 안 해보셨는데 왜 지원서에 쓰셨나요?\""
+        status: 확인 필요
+        preview_200: "핸드북 4 예상질문과 암기카드 > PART 10. 공격 질문 / 함정 질문 ★★★★★ > 공격 1. \"Kubernetes 안 해보셨는데 왜 지원서에 쓰셨나요?\"\n\n**① 인정**\n\n> 맞습니다. 실제 프로젝트에 적용해본 적 없습니다. 지원서의 \"적용하고 싶다\"는 **합격 후 학습 목표**를 쓴 거였는데, 경험처럼 읽혔다면 제 표현이 부족했습니다.\n> \n\n*"
+      - chunk_id: "캐시~2#978"
+        bm25_rank: null
+        vector_rank: 10
+        source: "캐시.md"
+        heading: "캐시 > 🚨 0. 가장 위험한 지점부터 > 위험 1. \"발표·연구\"와 \"적용\"의 간극"
+        status: 확인 필요
+        preview_200: "캐시 > 캐시 > 🚨 0. 가장 위험한 지점부터 > 위험 1. \"발표·연구\"와 \"적용\"의 간극\n\n이력서 표현을 보면:\n\n```\n\"비교 분석을 통해 … 발표\"     ← 발표했다\n\"… 대응 전략 연구\"            ← 연구했다\n```\n\n그런데 **포트폴리오 프로젝트 3개 어디에도 캐시 적용 성과가 없습니다.** Redis는 Tech Stack 목록에만"
+    equivalent_groups:
+      - id: A2-EG1
+        status: 확인 필요
+        common_fact: "캐시 적용 성과의 근거 부족 및 Redis 임시 저장소/조회 캐시 구분"
+        reason: "중복 본문 후보. 캐시 미구현 확정 근거로 사용하지 말 것."
+        chunk_ids:
+          - "캐시~2#978"
+          - "핸드북_5_캐시#1536"
+      - id: A2-EG2
+        status: 확인 필요
+        common_fact: "Kubernetes 실제 프로젝트 적용 경험이 없고 향후 적용·학습을 희망함"
+        reason: "이 공통 진술만 동등성 후보. 미경험과 특정 프로젝트의 proposed 상태가 같은 뜻인지는 확인 필요."
+        chunk_ids:
+          - "지피티_클클#895"
+          - "면접_스토리라인#429"
+          - "핸드북_4_예상질문과_암기카드#1506"
+      - id: A2-EG3
+        status: 확인 필요
+        common_fact: "메트릭/SLO 기반 알림 규칙을 아직 적용하지 않았고 향후 구축하려 함"
+        reason: "이 공통 진술만 동등성 후보. 로그·트레이스 구현 범위 진술은 서로 달라 청크 전체를 동등하게 취급하지 말 것."
+        chunk_ids:
+          - "포트폴리오#1123"
+          - "핸드북_4_예상질문과_암기카드#1517"

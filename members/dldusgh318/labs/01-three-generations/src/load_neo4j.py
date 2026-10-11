@@ -67,6 +67,7 @@ RELATION_QUERIES = {
         MERGE (source)-[relation:PART_OF {edge_key: row.edge_key}]->(target)
         SET relation.chunk_id = row.chunk_id,
             relation.evidence = row.evidence,
+            relation.evidence_originals = row.evidence_originals,
             relation.confidence = row.confidence,
             relation.extraction_run = row.extraction_run,
             relation.ingested_from = 'postgres'
@@ -78,6 +79,7 @@ RELATION_QUERIES = {
         MERGE (source)-[relation:USES_TECHNOLOGY {edge_key: row.edge_key}]->(target)
         SET relation.chunk_id = row.chunk_id,
             relation.evidence = row.evidence,
+            relation.evidence_originals = row.evidence_originals,
             relation.confidence = row.confidence,
             relation.extraction_run = row.extraction_run,
             relation.ingested_from = 'postgres'
@@ -89,6 +91,7 @@ RELATION_QUERIES = {
         MERGE (source)-[relation:REPLACES {edge_key: row.edge_key}]->(target)
         SET relation.chunk_id = row.chunk_id,
             relation.evidence = row.evidence,
+            relation.evidence_originals = row.evidence_originals,
             relation.confidence = row.confidence,
             relation.extraction_run = row.extraction_run,
             relation.ingested_from = 'postgres'
@@ -152,10 +155,22 @@ def read_postgres(dsn: str) -> tuple[RowGroups, RowGroups]:
                         "object": obj,
                         "chunk_id": chunk_id,
                         "evidence": evidence,
+                        "evidence_originals": [evidence],
                         "confidence": confidence,
                         "extraction_run": run,
                     }
                 )
+            cursor.execute("SELECT to_regclass('kg_merge_evidence')")
+            if cursor.fetchone()[0] is not None:
+                cursor.execute('SELECT subject,predicate,object,chunk_id,evidence FROM kg_merge_evidence')
+                extra = {}
+                for subject,predicate,obj,chunk_id,evidence in cursor.fetchall():
+                    key = make_edge_key(subject,predicate,obj,chunk_id)
+                    extra.setdefault(key, []).append(evidence)
+                for rows in relationships.values():
+                    for row in rows:
+                        row['evidence_originals'] = list(dict.fromkeys(
+                            row['evidence_originals'] + extra.get(row['edge_key'], [])))
     return nodes, relationships
 
 

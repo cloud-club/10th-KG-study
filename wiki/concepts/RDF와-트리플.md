@@ -4,8 +4,8 @@ type: concept
 tags: [concept, glossary]
 status: maintained
 created: 2026-10-02
-updated: 2026-10-02
-members: [dldusgh318, do-dop, e0ng, heebindev, lys0611, kdyann, Yeongeunn, yujeong430, kungbi]
+updated: 2026-10-18
+members: [dldusgh318, do-dop, e0ng, heebindev, lys0611, kdyann, Yeongeunn, yujeong430, kungbi, sunghyun]
 weeks: [4, 5]
 ---
 
@@ -50,6 +50,8 @@ weeks: [4, 5]
 - dldusgh318의 설계 결정(2026-09-23): RDF를 그대로 구현하지 않는다. 트리플 중심 → `entities`/`edges` 분리, 값도 Object → 목적·상태는 JSONB 속성, 관계 출처 별도 모델링 → **엣지에 `chunk_id`·`evidence`를 직접 저장**, RDF 표준 호환 → 검색·평가 편의 우선. 3주차 Citation 재검증 경험의 연장으로 `Graph Fact → 원본 Chunk → 실제 Evidence` 사슬을 남긴다 → [[데이터-수집과-출처-추적]].
 - do-dop은 트리플 구성요소별 허용 값 표와 직렬화 관계도를 정리했고, e0ng은 Literal 타입·언어 태그와 네임스페이스 분해를 가장 자세히 썼다. heebindev는 `heebindev –참여한다→ KG 스터디 –사용한다→ PostgreSQL` 2-hop 예제로 최소 문법만 다뤘다.
 
+- **sunghyun** (5주차 노트, PR #46): 같은 RDF를 Turtle과 JSON-LD로 내보낸 뒤 **두 파일을 다시 파싱해 같은 그래프인지 비교**했다(Yeongeunn의 재파싱 동형 검증과 같은 방법). RDFS는 의미를 표현할 뿐 입력 오류를 거부하지 않으므로, 허용 종류·방향은 JSON Schema와 코드로 제한했다. OWL 추론은 적용하지 않았다. 설치 환경·저장소를 별도 노드로 뒀다가 파일 속성으로 합쳤는데, 이유는 질문이 "어느 파일을 설치해 테스트했나"였기 때문이다(노드 vs 속성은 질문이 정한다).
+
 ## 함정 · 주의
 
 - 문자열이 같다고 같은 대상이 아니고, 다른 IRI를 쓴 같은 대상은 별도 연결·정규화가 필요하다 (do-dop). `owl:sameAs`는 표현 방법을 줄 뿐 판단을 대신하지 않는다 → [[온톨로지와-추론]].
@@ -75,7 +77,8 @@ weeks: [4, 5]
 - lys0611 · 지식 그래프의 배경 (§2) — [members/lys0611/notes/06-knowledge-graph-foundations.md](../../members/lys0611/notes/06-knowledge-graph-foundations.md)
 - kdyann · 온톨로지 모델링 (§RDF·Turtle) — [members/kdyann/notes/04-2-ontology-modeling.md](../../members/kdyann/notes/04-2-ontology-modeling.md); RDF·OWL 데이터 파이프라인 (§직렬화) — [notes/05-rdf-owl-data-pipeline.md](../../members/kdyann/notes/05-rdf-owl-data-pipeline.md)
 - Yeongeunn · 지식 그래프와 온톨로지 (§RDF), 트리플 파이프라인 (§6층 구분, §10 직렬화) — [members/Yeongeunn/notes/09-week4-ontology-background.md](../../members/Yeongeunn/notes/09-week4-ontology-background.md), [notes/10-week5-triple-pipeline.md](../../members/Yeongeunn/notes/10-week5-triple-pipeline.md)
-- yujeong430 · 시맨틱 웹에서 지식 그래프까지 (§IRI·리터럴), RDF 데이터 파이프라인 개념 (§8–12 직렬화) — [members/yujeong430/notes/10-semantic-web-to-knowledge-graph.md](../../members/yujeong430/notes/10-semantic-web-to-knowledge-graph.md), [notes/11-rdf-data-pipeline-concepts.md](../../members/yujeong430/notes/11-rdf-data-pipeline-concepts.md) (PR #19 미머지)
+- yujeong430 · 시맨틱 웹에서 지식 그래프까지 (§IRI·리터럴), RDF 데이터 파이프라인 개념 (§8–12 직렬화) — [members/yujeong430/notes/10-semantic-web-to-knowledge-graph.md](../../members/yujeong430/notes/10-semantic-web-to-knowledge-graph.md), [notes/11-rdf-data-pipeline-concepts.md](../../members/yujeong430/notes/11-rdf-data-pipeline-concepts.md)
 - kungbi · W4 지식 그래프의 배경 (§RDF 트리플 타입 규칙, 그림 3) — [members/kungbi/notes/02-knowledge-graph-background.md](../../members/kungbi/notes/02-knowledge-graph-background.md)
-- 5주차 직렬화: dldusgh318 · W5-3 RDF 형식 — [members/dldusgh318/notes/week5/03-rdf-format.md](../../members/dldusgh318/notes/week5/03-rdf-format.md); e0ng · RDF 직렬화 포맷 — [members/e0ng/notes/05-3-rdf-serialization.md](../../members/e0ng/notes/05-3-rdf-serialization.md) (PR #34 미머지); heebindev · 데이터 파이프라인 (§7) — [members/heebindev/notes/05-rdf-owl-data-pipeline.md](../../members/heebindev/notes/05-rdf-owl-data-pipeline.md)
+- 5주차 직렬화: dldusgh318 · W5-3 RDF 형식 — [members/dldusgh318/notes/week5/03-rdf-format.md](../../members/dldusgh318/notes/week5/03-rdf-format.md); e0ng · RDF 직렬화 포맷 — [members/e0ng/notes/05-3-rdf-serialization.md](../../members/e0ng/notes/05-3-rdf-serialization.md); heebindev · 데이터 파이프라인 (§7) — [members/heebindev/notes/05-rdf-owl-data-pipeline.md](../../members/heebindev/notes/05-rdf-owl-data-pipeline.md)
 - 외부: RDF 1.1 Primer https://www.w3.org/TR/rdf11-primer/ · RDF 1.1 Concepts https://www.w3.org/TR/rdf11-concepts/ · Turtle https://www.w3.org/TR/turtle/ · JSON-LD 1.1 https://www.w3.org/TR/json-ld11/
+- sunghyun · 문서에서 근거 있는 트리플로 — [members/sunghyun/notes/05-rdf-ontology-pipeline.md](../../members/sunghyun/notes/05-rdf-ontology-pipeline.md); RDF 파이프라인 실습 — [labs/05-rdf-pipeline/README.md](../../members/sunghyun/labs/05-rdf-pipeline/README.md)

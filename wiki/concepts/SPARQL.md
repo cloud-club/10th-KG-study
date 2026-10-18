@@ -62,5 +62,5 @@ weeks: [4]
 - kdyann · SPARQL 질의와 계약 비교 그래프 모델링 (§1 실행) — [members/kdyann/labs/04-sparql-graph/README.md](../../members/kdyann/labs/04-sparql-graph/README.md)
 - sunghyun · 4주차 지식 그래프 실습 — [members/sunghyun/labs/04-knowledge-graph/README.md](../../members/sunghyun/labs/04-knowledge-graph/README.md)
 - Yeongeunn · 지식 그래프와 온톨로지 (§10) — [members/Yeongeunn/notes/09-week4-ontology-background.md](../../members/Yeongeunn/notes/09-week4-ontology-background.md)
-- yujeong430 · 시맨틱 웹에서 지식 그래프까지 (§SPARQL) — [members/yujeong430/notes/10-semantic-web-to-knowledge-graph.md](../../members/yujeong430/notes/10-semantic-web-to-knowledge-graph.md) (PR #19 미머지)
+- yujeong430 · 시맨틱 웹에서 지식 그래프까지 (§SPARQL) — [members/yujeong430/notes/10-semantic-web-to-knowledge-graph.md](../../members/yujeong430/notes/10-semantic-web-to-knowledge-graph.md)
 - 외부: SPARQL 1.1 Overview https://www.w3.org/TR/sparql11-overview/ · SPARQL 1.1 Query Language https://www.w3.org/TR/sparql11-query/ · Property Paths https://www.w3.org/TR/sparql11-query/#propertypaths · Wikidata Query Service https://query.wikidata.org/ · DBpedia SPARQL endpoint https://dbpedia.org/sparql

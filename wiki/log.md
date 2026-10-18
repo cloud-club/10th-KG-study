@@ -69,3 +69,13 @@ Append-only, 최신이 아래. 항목은 `## [YYYY-MM-DD] verb | title` 로 시�
 ## [2026-10-05] refactor | ur2e names.json 등재 (PR #11 머지)
 - updated: entities/10기-KG-스터디 (멤버 표 ur2e 이름·14명 등재, 남은 일에서 names.json 항목 제거), entities/현황판 (names.json 미등재 문구 갱신), sources/스터디-노트-지도 (ur2e 절 제목에서 미머지·미등재 표시 제거)
 - note: 같은 날 PR #11·#19·#34·#36 머지. 위키 출처의 나머지 `(PR #n 미머지)` 표시는 주간 자동 ingest에 맡긴다
+
+## [2026-10-18] ingest | 6주차 GraphRAG — PR #43·#44·#46·#47·#48·#49 + PR #45 미머지
+- created: concepts/GraphRAG (세 패턴·하이브리드 리트리버·빌드 시점 선지불·다섯 멤버 v1/v2 비교·고정 vs 에이전틱), concepts/Text2Cypher (네 멤버 실측·실패 유형 9·쓰기 차단)
+- updated: comparisons/RAG-vs-그래프-질의 (6주차 v1/v2 표), comparisons/실습-비교표 (GraphRAG 실습 표, sunghyun 05·kungbi 02 그래프 행, 실습 37개), comparisons/RAG-변천사 (5기 자리), concepts/멀티홉-질문과-Bridge-Entity (중간 고리·경로 단축 오류), concepts/폐쇄-스키마-설계 (null + review_queue, sunghyun·kungbi 스키마), concepts/엔티티-신원해소 (dldusgh318 MERGE_USES), concepts/데이터-수집과-출처-추적 (근거=진입로, kungbi 7단계 근거 검증), concepts/지식그래프와-온톨로지, concepts/쿼리-재작성 (에이전틱 실측), concepts/리랭커 (확장 결과 재정렬), concepts/RDF와-트리플, concepts/그래프-적재-Postgres와-Neo4j, concepts/LLM-트리플-추출 (sunghyun 14→5), entities/10기-KG-스터디 (6주차 타임라인·주제·멤버 진행·남은 일), sources/스터디-노트-지도, index
+- lint: PR #11·#19·#34·#36(2026-10-05 머지)의 `미머지` 표시 제거(29개 페이지). sunghyun 옛 `note/01~03`(PR #46에서 삭제) 인용을 `notes/`로 옮기거나 "옛 note/ (커밋 0ab77d2)"로 표시. 현황판 미스캔 경로에서 sunghyun `note/` 해소.
+- flagged: 그래프가 이기는 폭 — kdyann·sunghyun 고정 v2는 크게 개선, heebindev·dldusgh318은 "거의 같음"(규모·범위 차). 에이전틱(sunghyun)은 그래프 도구로 오히려 하락. dldusgh318 `WEEK6_result.md` "네 번 틀렸다" vs 리포트 wrong 3 + partial 1 → 리포트 기준.
+- 미증류: PR #6·#42 sese2204 실습(미머지, 미ingest). Yeongeunn `labs/06-graphrag/`는 README 없음.
+
+## [2026-10-18] refactor | 멤버 수 정정 — 15명 (저장소 폴더 14명)
+- updated: entities/10기-KG-스터디 (전체 15명, 스터디장 확인), index

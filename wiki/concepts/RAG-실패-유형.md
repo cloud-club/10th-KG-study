@@ -89,6 +89,6 @@ kungbi의 Retrieval(후보 찾기) vs Validation(현재 원문으로 검증)은 
 - kungbi · OpenViking (§검색 결과가 곧 현재의 근거는 아니다) — [members/kungbi/notes/01-openviking-context-database.md](../../members/kungbi/notes/01-openviking-context-database.md)
 - do-dop · RAG 루프 (§진단), 멀티홉에서 KG로 (7유형), 못 답한 질문 — [members/do-dop/notes/03-rag-loop.md](../../members/do-dop/notes/03-rag-loop.md), [03-multihop-to-kg.md](../../members/do-dop/notes/03-multihop-to-kg.md), [labs/03-company-analysis-kg/failed_questions.md](../../members/do-dop/labs/03-company-analysis-kg/failed_questions.md)
 - Yeongeunn · 평가 실습 (§생성 관찰), 지식 그래프와 온톨로지 (§검색 실패 vs 연결 실패) — [members/Yeongeunn/labs/04-hybrid-evaluation/README.md](../../members/Yeongeunn/labs/04-hybrid-evaluation/README.md), [notes/09-week4-ontology-background.md](../../members/Yeongeunn/notes/09-week4-ontology-background.md)
-- yujeong430 · 다중 홉 질문 (§실패 유형) — [members/yujeong430/notes/08-multi-hop-questions.md](../../members/yujeong430/notes/08-multi-hop-questions.md) (PR #19 미머지)
+- yujeong430 · 다중 홉 질문 (§실패 유형) — [members/yujeong430/notes/08-multi-hop-questions.md](../../members/yujeong430/notes/08-multi-hop-questions.md)
 - kungbi · W4 지식 그래프의 배경 (§7) — [members/kungbi/notes/02-knowledge-graph-background.md](../../members/kungbi/notes/02-knowledge-graph-background.md)
 - 외부: Tang & Yang, MultiHop-RAG https://arxiv.org/abs/2401.15391 (do-dop)

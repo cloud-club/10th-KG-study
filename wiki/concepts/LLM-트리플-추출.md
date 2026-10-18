@@ -4,9 +4,9 @@ type: concept
 tags: [concept, methodology]
 status: maintained
 created: 2026-10-02
-updated: 2026-10-02
-members: [dldusgh318, heebindev, e0ng, do-dop, kdyann, Yeongeunn, yujeong430]
-weeks: [5]
+updated: 2026-10-18
+members: [dldusgh318, heebindev, e0ng, do-dop, kdyann, Yeongeunn, yujeong430, sunghyun, kungbi]
+weeks: [5, 6]
 ---
 
 > 문장은 표현이 다양해 규칙만으로 트리플을 뽑기 어렵고(heebindev), 그래서 LLM을 쓰지만 LLM이 뽑았다고 사실은 아니다. 형식은 JSON Schema로 강제하고, 내용은 **원문 evidence 완전일치**로 검증하고, ID는 코드가 정규화하고, 탈락한 것도 저장한다. 5주차 세 멤버의 실측: 20청크 표본에서 형식·근거 검증 통과율 99.38%(dldusgh318), 그러나 같은 접근에서 **의미 정확도는 8건 중 3건 오류**(heebindev), LLM에 맡기는 면적을 Topic 하나로 줄이면 오류 면적 자체가 준다(e0ng). "LLM은 구축 비용을 낮췄지만 정규화와 신원해소 문제까지 없애주지는 않았다. 오히려 대량 생성이 가능하기 때문에 잘못된 기준을 두면 문제도 대량 생성된다" (dldusgh318).
@@ -36,13 +36,16 @@ weeks: [5]
 |---|---|---|---|---|
 | dldusgh318 | OpenAI 구조화 출력 (문서에 모델명 미기재) | enum + 빈 배열 게이트 + evidence 완전일치 + ID 정규화 + 재시도·재개 | 선별 **20청크** (전체 1,562는 의도적으로 보류) | 청크 18 성공 / 2 오류(10.00%), 후보 161 → 통과 160 (**99.38%**), `evidence_not_found` **0**. "0.00%는 20개 표본에서 없었다는 뜻일 뿐 전체 환각률이 0이라는 뜻이 아니다" |
 | heebindev | `gpt-5-mini`, reasoning `minimal`, 출력 4,000토큰 | JSON Schema(type 5값, predicate 8값) + evidence 포함 필터 | `--contains "SJF" --limit 5` → 실제 3청크 | 엔티티 38, 관계 8, 근거 8. **사람이 의미를 검수: 8건 중 3건 오류** → [[폐쇄-스키마-설계]] |
-| e0ng (PR #36 미머지) | `gpt-4.1-mini`, **Topic 추출에만** | 폴더 경로 + `Status:`/`type:` 필드로 **결정적 추출**, LLM은 Topic만 | 3~4주차 적재 청크 (건수 미기재) | 엔티티 246, 엣지 304, 근거 237, 자동 테스트 12 통과. 단 Topic 포함 전체 실행은 미완이라 수치에 단서 필요 |
+| e0ng | `gpt-4.1-mini`, **Topic 추출에만** | 폴더 경로 + `Status:`/`type:` 필드로 **결정적 추출**, LLM은 Topic만 | 3~4주차 적재 청크 (건수 미기재) | 엔티티 246, 엣지 304, 근거 237, 자동 테스트 12 통과. 단 Topic 포함 전체 실행은 미완이라 수치에 단서 필요 |
 | kdyann | OpenAI (W3 모듈 재사용, 모델명 README 미기재) | JSON Schema + 근거 스팬 **문자 오프셋** + 로컬 검증 + 의미 검토 | Instagram 캡션 39문서 | 채택 사실 38건 → RDF 트리플 589. "38개 사실과 589개 트리플은 같은 단위가 아니다" |
 | Yeongeunn | `gemini-3.1-flash-lite` | 허용 목록 + 3층 검증 + 긍정·부정 few-shot | 회원탈퇴 관련 청크 4개(1차) / 5개(2차) | 후보 **7 → 5** (입력·예시가 함께 바뀌어 A/B가 아님 — "후보가 줄었다고 정확도가 높아진 것은 아니다"). 1차는 **API 경로만 보고 제공 서비스를 단정**, 2차는 문맥을 보강하자 **정책 관계가 누락** — 트레이드오프. 검토 후 엔티티 15·관계 20·근거 29. "LLM이 20개를 자동으로 정확히 추출했다고 주장하지 않는다" |
 | do-dop | — | — | 추출 미시작 | LLM 호출 모듈·프롬프트를 추출에 재사용 예정 |
 
 - **다섯 명 모두 전체 코퍼스 추출을 완주하지 않았다**(kdyann은 39문서 전체를 돌렸지만 자동화 미완). dldusgh318: "20개 표본은 최종 결과가 아니라 파이프라인을 검증하기 위한 PoC. 잘못된 추출 규칙 × 1,562개 청크 = 훨씬 큰 정리 비용. 다음 작업자는 전체 추출부터 시작하면 안 된다."
 - 검색 임베딩은 개인 데이터를 다루는 멤버 전원이 로컬이었는데([[임베딩-모델-선택]]), **추출은 다섯 명 모두 외부 API**(OpenAI 넷, Gemini 하나)를 썼다. e0ng·dldusgh318의 데이터는 개인 활동 기록이다 → [[개인-데이터-가명화와-공개-범위]] 열린 질문.
+
+- **sunghyun** (5주차, PR #46): 원문 청크 + 고정 엔티티 ID + 허용 술어 + few-shot으로 후보를 받고, 근거가 원문 부분 문자열인지와 방향·클래스를 검사했다. **LLM 후보 14개 중 5개를 채택하고 9개를 제외**했다. 방향이 뒤집힌 것, 같은 댓글에 나온 테스트와 커밋을 근거 없이 이은 것이 제외 사유였다. 전체 그래프를 LLM이 자동 추출한 것은 아니다. API에서 확인한 명시적 참조와 함께 썼다.
+- **6주차에 드러난 추출 품질의 하류 비용**: 잘못 넣은 관계는 GraphRAG 답변과 Text2Cypher 집계에 그대로 섞였다(heebindev). 그래서 `predicate: null` 검토 대기열로 격리했다. kungbi는 근거가 없으면 관계를 아예 만들지 않는다 → [[GraphRAG]], [[폐쇄-스키마-설계]].
 
 ## 함정 · 주의 (dldusgh318 실측)
 
@@ -61,15 +64,16 @@ weeks: [5]
 
 ## 관련
 
-- [[폐쇄-스키마-설계]] · [[엔티티-신원해소]] · [[그래프-적재-Postgres와-Neo4j]] · [[RDF와-트리플]] · [[RAG-루프와-근거-인용]] · [[RAG-실패-유형]] · [[데이터-수집과-출처-추적]] · [[지식그래프와-온톨로지]]
+- [[폐쇄-스키마-설계]] · [[엔티티-신원해소]] · [[그래프-적재-Postgres와-Neo4j]] · [[RDF와-트리플]] · [[RAG-루프와-근거-인용]] · [[RAG-실패-유형]] · [[데이터-수집과-출처-추적]] · [[지식그래프와-온톨로지]] · [[GraphRAG]]
 
 ## 출처
 
 - dldusgh318 · W5-2 LLM 정보 추출 — [members/dldusgh318/notes/week5/02-llm-information-extract.md](../../members/dldusgh318/notes/week5/02-llm-information-extract.md); 인수인계 (§3 추출 품질, §4 문제) — [labs/01-three-generations/WEEK5_HANDOFF.md](../../members/dldusgh318/labs/01-three-generations/WEEK5_HANDOFF.md); 결과 보고 — [WEEK5_result.md](../../members/dldusgh318/labs/01-three-generations/WEEK5_result.md); 실행 절차 (§통계 해석 규칙) — [README.md](../../members/dldusgh318/labs/01-three-generations/README.md); W5-3 RDF 형식 (§스키마 진화) — [notes/week5/03-rdf-format.md](../../members/dldusgh318/notes/week5/03-rdf-format.md)
 - heebindev · 문서에서 지식 그래프 만들기 — [members/heebindev/labs/03-triple-extraction-kg/README.md](../../members/heebindev/labs/03-triple-extraction-kg/README.md); 데이터 파이프라인 노트 (§4 보조장치) — [notes/05-rdf-owl-data-pipeline.md](../../members/heebindev/notes/05-rdf-owl-data-pipeline.md)
-- e0ng · LLM 정보 추출 — [members/e0ng/notes/05-2-llm-information-extraction.md](../../members/e0ng/notes/05-2-llm-information-extraction.md) (PR #34 미머지); 지식그래프 적재 — [labs/05-graph-store/README.md](../../members/e0ng/labs/05-graph-store/README.md) (PR #36 미머지)
+- e0ng · LLM 정보 추출 — [members/e0ng/notes/05-2-llm-information-extraction.md](../../members/e0ng/notes/05-2-llm-information-extraction.md); 지식그래프 적재 — [labs/05-graph-store/README.md](../../members/e0ng/labs/05-graph-store/README.md)
 - kdyann · RDF·OWL 데이터 파이프라인, 캡션 지식 그래프 — [members/kdyann/notes/05-rdf-owl-data-pipeline.md](../../members/kdyann/notes/05-rdf-owl-data-pipeline.md), [labs/05-content-graph/README.md](../../members/kdyann/labs/05-content-graph/README.md)
 - Yeongeunn · 엔티티 추출 모델, 미니 온톨로지와 트리플 추출 (§5–8), 트리플 추출 실습 — [members/Yeongeunn/notes/06-entity-extraction-models.md](../../members/Yeongeunn/notes/06-entity-extraction-models.md), [notes/10-week5-triple-pipeline.md](../../members/Yeongeunn/notes/10-week5-triple-pipeline.md), [labs/05-triple-extraction/README.md](../../members/Yeongeunn/labs/05-triple-extraction/README.md)
-- yujeong430 · RDF 데이터 파이프라인 개념 (§2–7) — [members/yujeong430/notes/11-rdf-data-pipeline-concepts.md](../../members/yujeong430/notes/11-rdf-data-pipeline-concepts.md) (PR #19 미머지)
+- yujeong430 · RDF 데이터 파이프라인 개념 (§2–7) — [members/yujeong430/notes/11-rdf-data-pipeline-concepts.md](../../members/yujeong430/notes/11-rdf-data-pipeline-concepts.md)
 - 외부: KLUE https://arxiv.org/abs/2105.09680 · CoNLL-2003 https://aclanthology.org/W03-0419/ · Gemini structured output https://ai.google.dev/gemini-api/docs/structured-output (Yeongeunn)
 - 외부: OpenAI Structured Outputs https://developers.openai.com/api/docs/guides/structured-outputs (heebindev)
+- sunghyun · 문서에서 근거 있는 트리플로 (§LLM이 추출한 사실은 어떻게 확인했나) — [members/sunghyun/notes/05-rdf-ontology-pipeline.md](../../members/sunghyun/notes/05-rdf-ontology-pipeline.md)

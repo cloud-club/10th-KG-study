@@ -46,7 +46,7 @@ weeks: [2]
 
 - lys0611 · 역색인과 BM25 노트, GUIDE §2·§트러블슈팅, RUNBOOK §Colima 문제 — [members/lys0611/notes/01-inverted-index-bm25.md](../../members/lys0611/notes/01-inverted-index-bm25.md), [labs/01-ingest/GUIDE.md](../../members/lys0611/labs/01-ingest/GUIDE.md), [RUNBOOK_mac_colima.md](../../members/lys0611/labs/01-ingest/RUNBOOK_mac_colima.md)
 - do-dop · 카카오톡 검색 비교 (§nori와 2-gram, §BM25 점수) — [members/do-dop/labs/02-kakaotalk-search/README.md](../../members/do-dop/labs/02-kakaotalk-search/README.md)
-- ur2e · 검색 방식 비교 실험 (실험 2), 실습 README — [members/ur2e/notes/01-search-methods-comparison.md](../../members/ur2e/notes/01-search-methods-comparison.md), [labs/01-worklog-search/README.md](../../members/ur2e/labs/01-worklog-search/README.md) (PR #11 미머지)
+- ur2e · 검색 방식 비교 실험 (실험 2), 실습 README — [members/ur2e/notes/01-search-methods-comparison.md](../../members/ur2e/notes/01-search-methods-comparison.md), [labs/01-worklog-search/README.md](../../members/ur2e/labs/01-worklog-search/README.md)
 - dldusgh318 · 1세대 노트 (§4), WEEK2 — [members/dldusgh318/notes/week2/02-inverted-index-bm25.md](../../members/dldusgh318/notes/week2/02-inverted-index-bm25.md), [labs/01-three-generations/WEEK2.md](../../members/dldusgh318/labs/01-three-generations/WEEK2.md)
 - e0ng · 실습 — [members/e0ng/labs/02-search-generations/README.md](../../members/e0ng/labs/02-search-generations/README.md); yujeong430 · 실습 — [members/yujeong430/labs/01-kakaotalk-search/README.md](../../members/yujeong430/labs/01-kakaotalk-search/README.md); heebindev · 실습 — [members/heebindev/labs/01-notion-search/README.md](../../members/heebindev/labs/01-notion-search/README.md)
 - sese2204 · infra/README.md (§문제 해결) — [infra/README.md](../../infra/README.md) (PR #6 미머지)

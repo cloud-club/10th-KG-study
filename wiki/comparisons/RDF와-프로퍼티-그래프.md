@@ -66,5 +66,5 @@ weeks: [1, 4]
 - lys0611 · 지식 그래프의 배경 (§5) — [members/lys0611/notes/06-knowledge-graph-foundations.md](../../members/lys0611/notes/06-knowledge-graph-foundations.md)
 - e0ng · RDF·OWL·SPARQL과 그래프 모델 (§Property Graph vs RDF) — [members/e0ng/notes/04-2-knowledge-graph-basics.md](../../members/e0ng/notes/04-2-knowledge-graph-basics.md)
 - heebindev · 지식 그래프의 배경과 기업 사례 (§7) — [members/heebindev/notes/04-knowledge-graph-background.md](../../members/heebindev/notes/04-knowledge-graph-background.md)
-- sunghyun · RAG, 지식 그래프와 온톨로지 기초 — [members/sunghyun/note/01-knowledge-graph-and-ontology.md](../../members/sunghyun/note/01-knowledge-graph-and-ontology.md)
+- sunghyun · 지식 그래프와 온톨로지 기초 — [members/sunghyun/notes/01-knowledge-graph-and-ontology.md](../../members/sunghyun/notes/01-knowledge-graph-and-ontology.md)
 - 외부 (do-dop readings): Neo4j, RDF vs. property graphs (2024) https://neo4j.com/blog/knowledge-graph/rdf-vs-property-graphs-knowledge-graphs/ · Neo4j Graph database concepts https://neo4j.com/docs/getting-started/appendix/graphdb-concepts/ · Cypher Manual https://neo4j.com/docs/cypher-manual/current/ · PostgreSQL Recursive Queries https://www.postgresql.org/docs/current/queries-with.html#QUERIES-WITH-RECURSIVE · DDIA Ch.2 https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/ch02.html

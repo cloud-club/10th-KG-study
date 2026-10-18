@@ -4,9 +4,9 @@ type: comparison
 tags: [concept, comparison]
 status: maintained
 created: 2026-09-16
-updated: 2026-10-02
-members: [sese2204, kdyann, dldusgh318, do-dop, yujeong430, Yeongeunn]
-weeks: [2, 3]
+updated: 2026-10-18
+members: [sese2204, kdyann, dldusgh318, do-dop, yujeong430, Yeongeunn, heebindev, sunghyun]
+weeks: [2, 3, 6]
 ---
 
 > 2019년 DPR·원조 RAG에서 2026년 Agentic RAG까지의 계보. sese2204와 kdyann이 같은 논문 집합을 각각 4기와 6기로 나눠 정리했고, 이 페이지는 두 연표를 나란히 놓고 갈리는 지점을 표시한다.
@@ -46,11 +46,11 @@ weeks: [2, 3]
 - dldusgh318은 실습을 거쳐 "지금까지의 발전은 대체가 아니라 누적이다. grep → BM25 → Vector → Hybrid RAG → Relation/Graph"라고 정리했다. [[검색의-세-세대]]와 [[멀티홉-질문과-Bridge-Entity]]가 이 누적의 앞뒤다.
 - sese2204는 『AI 에이전트 엔지니어링』(마이클 알바다 저, 강민혁 역, 한빛미디어 2026.01)과의 매핑표를 붙였다. 그 책에서 RAG는 6.2.3 한 절이고, 책이 주는 것은 "RAG를 에이전트 안에 어떻게 배치할 것인가"(검색을 도구로 볼지 메모리로 볼지)다. [[OpenViking-컨텍스트-데이터베이스]]가 그 "메모리" 쪽 설계안이다.
 - kdyann의 열린 질문 "복잡한 기법을 추가하기 전에 현재 검색 품질이 충분한지 어떤 지표로 판단할까"의 답 후보가 [[RAG-평가-지표]]다. 평가 도구 생태계(RAGAS 지표 표준화, 관측 플랫폼·CI 러너로 이동)는 [[RAGAS]], 평가 층위·심판은 [[챗봇-평가-층위와-심판]].
-- 2026년 스터디 실측으로 본 변천사의 자리: 1기(BM25 vs dense)는 열한 개 평가셋에서 양쪽으로 갈렸고, 2기 Naive RAG의 실패는 lys0611 12건·do-dop 4사례로 기록됐고, 5기(GraphRAG)는 다섯 멤버가 그래프를 만들었지만 리트리버로 연결(GraphRAG 본래 의미)한 멤버는 아직 없다.
+- 2026년 스터디 실측으로 본 변천사의 자리: 1기(BM25 vs dense)는 열한 개 평가셋에서 양쪽으로 갈렸고, 2기 Naive RAG의 실패는 lys0611 12건·do-dop 4사례로 기록됐고, 5기(GraphRAG)는 5주차에 다섯 멤버가 그래프를 만들었고, **6주차에 네 멤버가 리트리버로 연결해 같은 질문으로 v1/v2를 비교했다**(kdyann·sunghyun·heebindev·dldusgh318) → [[GraphRAG]]. 결론은 "그래프가 청크 검색을 대체하지 않고, 관계·다중 홉·집계 질문에서 맞는 경로를 골랐을 때만 이긴다"였다. Agentic RAG(모델이 검색·조회·종료를 고름)는 sunghyun의 실측에서 그래프 도구를 줘도 4/9 → 3/9로 떨어져, 6기의 자리도 아직 단정할 수 없다.
 
 ## 관련
 
-- [[검색의-세-세대]] · [[하이브리드-검색과-RRF]] · [[청킹-전략]] · [[리랭커]] · [[쿼리-재작성]] · [[RAG-평가-지표]] · [[지식그래프와-온톨로지]] · [[멀티홉-질문과-Bridge-Entity]]
+- [[검색의-세-세대]] · [[하이브리드-검색과-RRF]] · [[청킹-전략]] · [[리랭커]] · [[쿼리-재작성]] · [[RAG-평가-지표]] · [[지식그래프와-온톨로지]] · [[멀티홉-질문과-Bridge-Entity]] · [[GraphRAG]]
 
 ## 출처
 
@@ -60,4 +60,5 @@ weeks: [2, 3]
 - 외부(kdyann 노트의 링크): Lewis et al. 2020 https://papers.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html · Karpukhin et al. DPR 2020 https://aclanthology.org/2020.emnlp-main.550/ · Thakur et al. BEIR 2021 https://arxiv.org/abs/2104.08663 · Gao et al. Survey 2023 https://arxiv.org/abs/2312.10997 · Asai et al. Self-RAG https://openreview.net/forum?id=hSyW5go0v8 · Yan et al. CRAG https://arxiv.org/abs/2401.15884 · Sarthi et al. RAPTOR (ICLR 2024) · Jeong et al. Adaptive-RAG https://aclanthology.org/2024.naacl-long.389/ · Edge et al. GraphRAG https://arxiv.org/abs/2404.16130 · Anthropic Contextual Retrieval https://www.anthropic.com/engineering/contextual-retrieval · Günther et al. Late Chunking https://arxiv.org/abs/2409.04701
 - 외부(sese2204): Khattab & Zaharia ColBERT https://arxiv.org/abs/2004.12832 · 『AI 에이전트 엔지니어링』(한빛미디어, 2026.01) · arXiv 2504.19754 · arXiv 2506.10408
 - do-dop · BEIR 벤치마크 — [members/do-dop/notes/03-beir-benchmark.md](../../members/do-dop/notes/03-beir-benchmark.md); 시맨틱 웹에서 지식그래프까지 (§11 GraphRAG) — [notes/04-semantic-web-to-knowledge-graph.md](../../members/do-dop/notes/04-semantic-web-to-knowledge-graph.md)
-- yujeong430 · 고급 RAG 패턴 — [members/yujeong430/notes/09-advanced-rag-patterns.md](../../members/yujeong430/notes/09-advanced-rag-patterns.md) (PR #19 미머지); Yeongeunn · 지식 그래프와 온톨로지 (§GraphRAG) — [members/Yeongeunn/notes/09-week4-ontology-background.md](../../members/Yeongeunn/notes/09-week4-ontology-background.md)
+- yujeong430 · 고급 RAG 패턴 — [members/yujeong430/notes/09-advanced-rag-patterns.md](../../members/yujeong430/notes/09-advanced-rag-patterns.md); Yeongeunn · 지식 그래프와 온톨로지 (§GraphRAG) — [members/Yeongeunn/notes/09-week4-ontology-background.md](../../members/Yeongeunn/notes/09-week4-ontology-background.md)
+- 6주차 실측: [[GraphRAG]] 페이지의 출처 참조 (kdyann·sunghyun·heebindev labs, dldusgh318 PR #45 미머지)

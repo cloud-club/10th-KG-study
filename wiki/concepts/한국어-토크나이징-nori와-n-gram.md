@@ -59,7 +59,7 @@ weeks: [2]
 - do-dop · 노트 (§n-gram), 실습 (§nori와 2-gram) — [members/do-dop/notes/02-search-generations.md](../../members/do-dop/notes/02-search-generations.md), [labs/02-kakaotalk-search/README.md](../../members/do-dop/labs/02-kakaotalk-search/README.md)
 - kdyann · 검색의 세 세대 (§형태소 분석: Nori) — [members/kdyann/notes/02-search-generations.md](../../members/kdyann/notes/02-search-generations.md)
 - e0ng · 검색의 세 세대를 직접 만든다 (§형태소 분석과 n-gram 비교) — [members/e0ng/notes/02-search-generations.md](../../members/e0ng/notes/02-search-generations.md)
-- ur2e · 검색 방식 비교 실험 (실험 2) — [members/ur2e/notes/01-search-methods-comparison.md](../../members/ur2e/notes/01-search-methods-comparison.md) (PR #11 미머지)
+- ur2e · 검색 방식 비교 실험 (실험 2) — [members/ur2e/notes/01-search-methods-comparison.md](../../members/ur2e/notes/01-search-methods-comparison.md)
 - lys0611 · 역색인과 BM25 (§한국어에서는 분석기가 먼저다) — [members/lys0611/notes/01-inverted-index-bm25.md](../../members/lys0611/notes/01-inverted-index-bm25.md); 카톡 대화 적재 — [labs/01-ingest/README.md](../../members/lys0611/labs/01-ingest/README.md)
 - jjinthung · 결과 — [members/jjinthung/notes/01_results.md](../../members/jjinthung/notes/01_results.md)
 - sunghyun · grep, BM25, 벡터 검색과 HNSW (§Nori) — [members/sunghyun/notes/02-search-methods.md](../../members/sunghyun/notes/02-search-methods.md); Yeongeunn · 2주차 검색 세대 (§nori·n-gram), 지식 그래프와 온톨로지 (§BM25의 자리) — [members/Yeongeunn/notes/02-week2-search-generations.md](../../members/Yeongeunn/notes/02-week2-search-generations.md), [notes/09-week4-ontology-background.md](../../members/Yeongeunn/notes/09-week4-ontology-background.md)

@@ -4,9 +4,9 @@ type: concept
 tags: [concept]
 status: maintained
 created: 2026-09-16
-updated: 2026-10-02
+updated: 2026-10-18
 members: [dldusgh318, e0ng, lys0611, heebindev, sunghyun, sese2204, do-dop, kungbi, Yeongeunn, yujeong430, kdyann]
-weeks: [1, 3, 4, 5]
+weeks: [1, 3, 4, 5, 6]
 ---
 
 > 두 개 이상의 정보를 순서대로 연결해야 답이 나오는 질문. 기본 RAG가 막히는 이유는 LLM이 추론을 못해서가 아니라 **한 번의 검색으로 필요한 정보를 다 가져오기 어렵기** 때문이다. 첫 검색 결과가 두 번째 검색어를 결정하는데, 청크에는 관계가 저장돼 있지 않다. 2026-09-23 dldusgh318의 **브릿지 숨김 실험 X01**이 이 정의를 그대로 재현했다 — 질문에 `Redis`가 없고, 첫 검색은 됐지만 두 번째가 안 됐고, Oracle Context로는 답했다.
@@ -44,7 +44,7 @@ weeks: [1, 3, 4, 5]
 
 ## 멤버들이 확인한 것
 
-- dldusgh318: 위 S01/M01/A01/H01과 X01–X03. e0ng은 3주차에는 실측 없이 누락 시나리오 두 방향을 제시했고, **5주차에 실제 그래프로 풀었다** — 3주차 RAG가 "역량검사" 청크와 기업명 청크를 따로 검색해 못 이은 질문을 `(Organization)<-[:RELATED_TO_ORGANIZATION]-(Activity)-[:HAS_DOCUMENT]->(Document)` 한 경로로 3행 반환(PR #36 미머지) → [[RAG-vs-그래프-질의]].
+- dldusgh318: 위 S01/M01/A01/H01과 X01–X03. e0ng은 3주차에는 실측 없이 누락 시나리오 두 방향을 제시했고, **5주차에 실제 그래프로 풀었다** — 3주차 RAG가 "역량검사" 청크와 기업명 청크를 따로 검색해 못 이은 질문을 `(Organization)<-[:RELATED_TO_ORGANIZATION]-(Activity)-[:HAS_DOCUMENT]->(Document)` 한 경로로 3행 반환 → [[RAG-vs-그래프-질의]].
 - **다중 홉이라고 그래프가 필요한 건 아니다**: Yeongeunn q10(서비스·메서드·경로)은 RRF가 정확히 답했다 — "이번 다중 홉 질문은 텍스트 RAG로도 답할 수 있었음", 그래프까지 만든 뒤에도 "'다중 홉은 RAG로 불가능하다'고 해석하지 않는다". kdyann 3주차 노트도 "반드시 그래프가 필요한 것은 아니다 — 질문 분해·추가 검색 같은 보완책이 있다". yujeong430·Yeongeunn 둘 다 평가셋의 `multi_evidence`·다중홉 문항이 "관계를 따라가는 다중 홉이 아니라 여러 근거 청크를 한 번에 회수하는지"를 잰다고 구분했고, do-dop도 q009가 같은 문서 안이라 검색 한 번으로 풀린다고 자인했다. **세 멤버가 독립적으로 "정답이 여러 청크에 있음" ≠ "여러 문서를 조인해야 함"에 도달했다.** 반대로 3주차에 다중 홉 실측에 도달한 멤버는 dldusgh318·lys0611·do-dop뿐이고 heebindev("답하지 못한 질문을 아직 찾지 못했다")·sunghyun("다중 홉 실패 실습은 아직")은 공백으로 남겼다.
 - **못 답한 질문을 그래프로 바꾸는 5칸 템플릿** (kungbi): 질문 / 필요한 대상(노드) / 필요한 관계(화살표) / 답하려면 필요한 근거 / 현재 빠진 사실 또는 불확실한 연결. "답을 먼저 만들지 말고 필요한 사실의 모양부터 그린다." 그래야 관계 부재 / 엔티티 식별 실패 / 데이터 미수집을 구별한다. lys0611의 명사=Node·동사=Relationship 절차, dldusgh318의 X01 그래프, kdyann의 "계약을 별도 대상으로 승격"(회사에 지급기한을 직접 붙이면 개정 계약을 구분 못 함 → 회사 → 계약 → 조건·근거문서)과 같은 처방이다.
 - 유형 분류 (yujeong430): 연결(bridge)·교집합·비교·시간 순서. 어려운 이유에 "'그 사람'·지시 표현이 섞이면 동일 대상 연결이 어렵다", "비어 있는 연결을 추측한다"를 추가. "상위 문서를 단순히 늘리는 것만으로 해결되지 않는다." MultiHop-RAG 벤치마크의 질의 4종은 Inference·Comparison·Temporal·Null (do-dop). HotpotQA의 핵심은 답뿐 아니라 **supporting facts**를 문장 단위로 제공하는 것 — `Fact A + Fact B → Answer`는 Claim → Evidence와 같은 모양 (do-dop).
@@ -54,9 +54,16 @@ weeks: [1, 3, 4, 5]
 - 시간 조건: "관계에 `valid_from/valid_to`가 없으면 '지금'에 답할 수 없다"(lys0611 G3)는 Wikidata 한정어와 같은 처방이고, Yeongeunn은 `review_status`·`valid_from/to`·`source_version`으로 번역했다. kdyann의 열린 질문 "계약이 개정되면 과거 조건과 현재 유효 조건을 어떻게 구분할까"도 같은 자리 → [[Wikidata와-DBpedia]].
 - 집계 질문은 그래프에서는 가능하되 비용이 든다 — e0ng이 Wikidata에서 돌린 `COUNT … GROUP BY` 질의가 단순 조회보다 체감상 오래 걸렸다(수치 없음) → [[SPARQL]]. 경로 길이는 관계 수로 세고, "경로가 없다 ≠ 관계가 없다"(열린 세계 가정, do-dop) → [[온톨로지와-추론]].
 
+## 6주차 — 그래프 리트리버로 건넌 다중 홉
+
+- **이긴 다중 홉은 "질문에 없는 중간 고리"를 건너는 질문이었다.** kdyann의 "내 오픈소스 기여와 같은 분야의 참고 글"은 내 글 → Topic → 관심 분야 ← Topic ← 참고 글 경로가 필요했고, Recall@5가 v1 0.33에서 v2 1.00이 됐다. dldusgh318 X01(브릿지 `Redis`가 질문에 없음)은 wrong → partial이었다. 다만 그래프를 거쳐 들어온 Gold 청크는 0건이었다(PR #45 미머지).
+- **브릿지를 따라가는 경로가 틀리면 그래프도 틀린다.** sunghyun의 에이전틱 검색은 Task→Issue→Test Case라는 2홉 경로를 Task→Test Case 1홉으로 줄여 조회했고, 오답 18개를 냈다(정답 13). 홉 수를 줄이면 브릿지(Issue)가 사라진다.
+- **경로의 방향과 실행 순서는 다르다.** Yeongeunn: `서비스 → exposesAPI → API`는 제공 관계이고 호출 순서가 아니다. sunghyun: 업무 순서는 Case Run → Test Run이지만, 저장된 조회 경로는 파일→Test Run←Case Run이다.
+- 자세한 결과는 → [[GraphRAG]], [[RAG-vs-그래프-질의]].
+
 ## 관련
 
-- [[RAG-실패-유형]] · [[RAG-루프와-근거-인용]] · [[지식그래프와-온톨로지]] · [[쿼리-재작성]] · [[하이브리드-검색과-RRF]] · [[RAG-평가-지표]] · [[SPARQL]] · [[RDF와-트리플]] · [[온톨로지와-추론]] · [[시맨틱-웹에서-지식그래프까지]]
+- [[RAG-실패-유형]] · [[RAG-루프와-근거-인용]] · [[지식그래프와-온톨로지]] · [[쿼리-재작성]] · [[하이브리드-검색과-RRF]] · [[RAG-평가-지표]] · [[SPARQL]] · [[RDF와-트리플]] · [[온톨로지와-추론]] · [[시맨틱-웹에서-지식그래프까지]] · [[GraphRAG]] · [[Text2Cypher]]
 
 ## 출처
 
@@ -66,12 +73,13 @@ weeks: [1, 3, 4, 5]
 - e0ng · RRF와 RAG 루프 (§Multi-hop Question) — [members/e0ng/notes/03-rrf.md](../../members/e0ng/notes/03-rrf.md)
 - lys0611 · RAG 루프와 근거 인용, 실패 기록 — [members/lys0611/notes/05-rag-loop-citation-multihop.md](../../members/lys0611/notes/05-rag-loop-citation-multihop.md), [labs/02-hybrid-rag-agent/results/failures.md](../../members/lys0611/labs/02-hybrid-rag-agent/results/failures.md)
 - heebindev · 지식 그래프 기초 용어 (§다중 홉 질문) — [members/heebindev/notes/01-knowledge-graph-glossary.md](../../members/heebindev/notes/01-knowledge-graph-glossary.md)
-- sunghyun · RAG, 지식 그래프와 온톨로지 기초 — [members/sunghyun/note/01-knowledge-graph-and-ontology.md](../../members/sunghyun/note/01-knowledge-graph-and-ontology.md)
+- sunghyun · 지식 그래프와 온톨로지 기초 — [members/sunghyun/notes/01-knowledge-graph-and-ontology.md](../../members/sunghyun/notes/01-knowledge-graph-and-ontology.md)
 - sese2204 · 쿼리 재작성 (쿼리 분해) — [members/sese2204/notes/06-query-rewriting.md](../../members/sese2204/notes/06-query-rewriting.md)
 - do-dop · 멀티홉에서 KG로, 못 답한 질문 — [members/do-dop/notes/03-multihop-to-kg.md](../../members/do-dop/notes/03-multihop-to-kg.md), [labs/03-company-analysis-kg/failed_questions.md](../../members/do-dop/labs/03-company-analysis-kg/failed_questions.md)
 - kungbi · W4 지식 그래프의 배경 (§7 템플릿) — [members/kungbi/notes/02-knowledge-graph-background.md](../../members/kungbi/notes/02-knowledge-graph-background.md)
 - Yeongeunn · 지식 그래프와 온톨로지 (§멀티홉), 평가 실습 (q10), 트리플 적재 실습 — [members/Yeongeunn/notes/09-week4-ontology-background.md](../../members/Yeongeunn/notes/09-week4-ontology-background.md), [labs/04-hybrid-evaluation/README.md](../../members/Yeongeunn/labs/04-hybrid-evaluation/README.md), [labs/05-triple-extraction/README.md](../../members/Yeongeunn/labs/05-triple-extraction/README.md)
-- yujeong430 · 다중 홉 질문 — [members/yujeong430/notes/08-multi-hop-questions.md](../../members/yujeong430/notes/08-multi-hop-questions.md) (PR #19 미머지)
+- yujeong430 · 다중 홉 질문 — [members/yujeong430/notes/08-multi-hop-questions.md](../../members/yujeong430/notes/08-multi-hop-questions.md)
 - kdyann · 하이브리드 검색과 RAG (§다중 홉), SPARQL·계약 모델링 실습 — [members/kdyann/notes/03-hybrid-search.md](../../members/kdyann/notes/03-hybrid-search.md), [labs/04-sparql-graph/README.md](../../members/kdyann/labs/04-sparql-graph/README.md)
-- e0ng · 지식그래프 적재와 Cypher 다중 홉 — [members/e0ng/labs/05-graph-store/README.md](../../members/e0ng/labs/05-graph-store/README.md) (PR #36 미머지)
+- e0ng · 지식그래프 적재와 Cypher 다중 홉 — [members/e0ng/labs/05-graph-store/README.md](../../members/e0ng/labs/05-graph-store/README.md)
 - 외부: Tang & Yang, MultiHop-RAG (2024) https://arxiv.org/abs/2401.15391 (lys0611·do-dop 인용) · When to use Graphs in RAG (ICLR 2026, lys0611 readings) · Yang et al., HotpotQA (EMNLP 2018) https://aclanthology.org/D18-1259/ · Trivedi et al., IRCoT (ACL 2023) https://aclanthology.org/2023.acl-long.557/ (do-dop readings — 재검색 처방의 논문 근거)
+- 6주차: kdyann · W6 실습 — [members/kdyann/labs/06-graphrag/README.md](../../members/kdyann/labs/06-graphrag/README.md); sunghyun · 06 노트 (§그래프 도구가 있어도 틀린 사례) — [members/sunghyun/notes/06-graphrag-and-agentic-search.md](../../members/sunghyun/notes/06-graphrag-and-agentic-search.md); Yeongeunn · 13 GraphRAG (§관계 방향과 조회 방향) — [members/Yeongeunn/notes/13-week6-graphrag.md](../../members/Yeongeunn/notes/13-week6-graphrag.md); dldusgh318 · `results/w6_compare.md` (PR #45 미머지)

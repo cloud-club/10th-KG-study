@@ -83,6 +83,6 @@ weeks: [3]
 - sunghyun · 3주차 하이브리드 검색, RAG와 Recall 평가 (§생성) — [members/sunghyun/notes/03-hybrid-rag-and-evaluation.md](../../members/sunghyun/notes/03-hybrid-rag-and-evaluation.md)
 - heebindev · 하이브리드 검색과 개인 데이터 에이전트 (§답변) — [members/heebindev/labs/02-hybrid-search-rag/README.md](../../members/heebindev/labs/02-hybrid-search-rag/README.md)
 - Yeongeunn · 평가 실습 (§생성 관찰), 생성 모델 노트 — [members/Yeongeunn/labs/04-hybrid-evaluation/README.md](../../members/Yeongeunn/labs/04-hybrid-evaluation/README.md), [notes/08-generative-models.md](../../members/Yeongeunn/notes/08-generative-models.md)
-- yujeong430 · RAG 루프와 인용·근거성 — [members/yujeong430/notes/06-rag-loop-and-citation-grounding.md](../../members/yujeong430/notes/06-rag-loop-and-citation-grounding.md) (PR #19 미머지)
+- yujeong430 · RAG 루프와 인용·근거성 — [members/yujeong430/notes/06-rag-loop-and-citation-grounding.md](../../members/yujeong430/notes/06-rag-loop-and-citation-grounding.md)
 - sdunge · 판례 검색 실습 (§RAG) — [members/sdunge/labs/readme.md](../../members/sdunge/labs/readme.md); jjinthung · BM25 + RRF + GPT — [members/jjinthung/notes/02_BM25.md](../../members/jjinthung/notes/02_BM25.md)
 - 외부: Lewis et al., RAG (2020) https://arxiv.org/abs/2005.11401 · Gao et al., ALCE — Enabling LLMs to Generate Text with Citations (EMNLP 2023) https://aclanthology.org/2023.emnlp-main.398/ (arXiv https://arxiv.org/abs/2305.14627, do-dop) · OWASP RAG Security Cheat Sheet https://cheatsheetseries.owasp.org/cheatsheets/RAG_Security_Cheat_Sheet.html · Ollama FAQ https://docs.ollama.com/faq

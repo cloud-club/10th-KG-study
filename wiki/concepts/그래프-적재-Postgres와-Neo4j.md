@@ -4,9 +4,9 @@ type: concept
 tags: [concept, runbook]
 status: maintained
 created: 2026-10-02
-updated: 2026-10-02
-members: [dldusgh318, e0ng, heebindev, kdyann, Yeongeunn]
-weeks: [5]
+updated: 2026-10-18
+members: [dldusgh318, e0ng, heebindev, kdyann, Yeongeunn, sunghyun, kungbi]
+weeks: [5, 6]
 ---
 
 > 5주차에 그래프를 실제로 만든 다섯 멤버는 전원 **Triplestore를 쓰지 않았다.** 중립적인 추출·검토 결과 하나에서 PostgreSQL(엔티티·엣지·근거 테이블), Turtle/JSON-LD(표준 산출물), Neo4j(탐색·시각화) 세 형태로 변환한다 — "각 저장소에서 따로 추출하면 같은 사실이 다른 형태로 저장될 수 있다"(dldusgh318, Yeongeunn). 멱등 재적재는 `MERGE`가 아니라 **안정 ID 규칙이 먼저**이고, 가변 길이 경로는 방향·술어·출처로 제한해야 의미가 있다. 저장·질의 비용 비교는 Cypher 17줄 vs SQL 33줄(X01) 같은 줄 수로만 남아 있다.
@@ -27,7 +27,7 @@ weeks: [5]
 | 멤버 | 테이블 | 특징 |
 |---|---|---|
 | dldusgh318 | `entities(entity_id, type, label, props JSONB)`, `edges(subject, predicate, object, props)` + 중복 방지 인덱스, `ON CONFLICT DO NOTHING` | 엣지 `props`에 `chunk_id`·`evidence`·`confidence`·`extraction_run`. 적재 75·157 |
-| e0ng (PR #36 미머지) | `kg_entities(id, types[], name)`, `kg_edges(subject_id, predicate, object_id \| object_literal)`, `kg_evidence(edge_id, source)` | `types` 배열(한 문서가 활동 전체를 대표하면 `{Activity, Document}`), 리터럴과 엔티티 참조를 컬럼으로 분기. 246·304·237 |
+| e0ng | `kg_entities(id, types[], name)`, `kg_edges(subject_id, predicate, object_id \| object_literal)`, `kg_evidence(edge_id, source)` | `types` 배열(한 문서가 활동 전체를 대표하면 `{Activity, Document}`), 리터럴과 엔티티 참조를 컬럼으로 분기. 246·304·237 |
 | heebindev | `kg_entities`, `kg_relations`, `kg_evidence` | 38·8·8. "트리플 저장은 되지만 여러 관계를 반복해 따라가는 질의는 조인이 계속 는다" |
 | kdyann | 문서·엔티티·엣지·근거 | 39·65·38·38. 근거는 `rdf:Statement` reification으로 `sourcePost`·`quote`·`start`·`end` |
 | Yeongeunn | `yeongeunn_kg.entities(id, class, label)`, `assertions(…, qualifiers, review_status)`, `evidence(assertion_id, chunk_id, quote, source_version)` | 15·20·29. 관계와 근거 분리, `review_status`·`source_version` 컬럼 → [[Wikidata와-DBpedia]] |
@@ -59,6 +59,13 @@ weeks: [5]
 - `--run-name`을 재사용하면 입력·후보를 덮어쓴다 (Yeongeunn). 재개 로직은 성공한 `chunk_id`를 건너뛰고 실패 행만 재시도 (dldusgh318).
 - 시각화가 보기 좋다고 추출한 사실이 정확하다는 뜻은 아니다 (heebindev). 발표 화면에서 전체 그래프·노드 확장 기능은 쓰지 않는다 (dldusgh318).
 
+## 6주차에 추가된 것
+
+- **sunghyun**: 안정적인 플랫폼 ID로 Postgres(엔티티·엣지·근거)와 Neo4j에 `MERGE`했다. 동기화 기록은 240노드 · 389관계 · 393근거 · 372청크다. 빌드 산출물은 파일명이 같아도 digest가 다르면 별개로 둔다. 파일명만으로 같은 빌드로 합치지 않는다. 공개 예제는 합성 8노드 · 8트리플이다.
+- **kungbi**: Neo4j 드라이버 호출을 mock으로 검증했다(실제 적재는 공개 범위 밖).
+- **dldusgh318** (PR #45 미머지): Postgres를 단일 트랜잭션 정본으로 두고 Neo4j는 `sync`로 따라오게 했다. Neo4j는 분산 트랜잭션이 아니라서 실패하면 재동기화한다 → [[엔티티-신원해소]].
+- 적재한 그래프를 리트리버로 쓰는 단계 → [[GraphRAG]], 자연어로 질의하는 단계 → [[Text2Cypher]].
+
 ## 열린 질문
 
 - SPARQL endpoint(Jena·Fuseki·GraphDB)를 띄워 Turtle 산출물을 실제로 질의한 멤버가 없다. Turtle은 아직 "내보내기"일 뿐이다 → [[SPARQL]].
@@ -66,13 +73,14 @@ weeks: [5]
 
 ## 관련
 
-- [[LLM-트리플-추출]] · [[엔티티-신원해소]] · [[폐쇄-스키마-설계]] · [[RDF와-트리플]] · [[RDF와-프로퍼티-그래프]] · [[로컬-인프라]] · [[PostgreSQL과-pgvector-함정]] · [[데이터-수집과-출처-추적]] · [[RAG-vs-그래프-질의]]
+- [[LLM-트리플-추출]] · [[엔티티-신원해소]] · [[폐쇄-스키마-설계]] · [[RDF와-트리플]] · [[RDF와-프로퍼티-그래프]] · [[로컬-인프라]] · [[PostgreSQL과-pgvector-함정]] · [[데이터-수집과-출처-추적]] · [[RAG-vs-그래프-질의]] · [[GraphRAG]] · [[Text2Cypher]]
 
 ## 출처
 
 - dldusgh318 · 인수인계 (§1-3 적재, §5 Neo4j), 질의 비교 — [members/dldusgh318/labs/01-three-generations/WEEK5_HANDOFF.md](../../members/dldusgh318/labs/01-three-generations/WEEK5_HANDOFF.md), [WEEK5_queries.md](../../members/dldusgh318/labs/01-three-generations/WEEK5_queries.md); 실행 절차 (§4 Neo4j 멱등, §통계 해석) — [README.md](../../members/dldusgh318/labs/01-three-generations/README.md); W5-3 RDF 형식 — [notes/week5/03-rdf-format.md](../../members/dldusgh318/notes/week5/03-rdf-format.md)
-- e0ng · 지식그래프 적재와 Cypher 다중 홉 — [members/e0ng/labs/05-graph-store/README.md](../../members/e0ng/labs/05-graph-store/README.md) (PR #36 미머지)
+- e0ng · 지식그래프 적재와 Cypher 다중 홉 — [members/e0ng/labs/05-graph-store/README.md](../../members/e0ng/labs/05-graph-store/README.md)
 - heebindev · 문서에서 지식 그래프 만들기 (§3–6) — [members/heebindev/labs/03-triple-extraction-kg/README.md](../../members/heebindev/labs/03-triple-extraction-kg/README.md); 데이터 파이프라인 (§6·§8·§9) — [notes/05-rdf-owl-data-pipeline.md](../../members/heebindev/notes/05-rdf-owl-data-pipeline.md)
 - kdyann · 내 인스타그램 캡션에서 지식 그래프 만들기 — [members/kdyann/labs/05-content-graph/README.md](../../members/kdyann/labs/05-content-graph/README.md); RDF·OWL 데이터 파이프라인 — [notes/05-rdf-owl-data-pipeline.md](../../members/kdyann/notes/05-rdf-owl-data-pipeline.md)
 - Yeongeunn · 트리플 추출·적재 실습 — [members/Yeongeunn/labs/05-triple-extraction/README.md](../../members/Yeongeunn/labs/05-triple-extraction/README.md); 미니 온톨로지와 트리플 추출 (§9–11) — [notes/10-week5-triple-pipeline.md](../../members/Yeongeunn/notes/10-week5-triple-pipeline.md)
 - 외부: Neo4j Cypher MERGE https://neo4j.com/docs/cypher-manual/current/clauses/merge/ · Variable-length paths https://neo4j.com/docs/cypher-manual/current/patterns/variable-length-paths/ · W3C Turtle https://www.w3.org/TR/turtle/ · JSON-LD 1.1 https://www.w3.org/TR/json-ld11/
+- sunghyun · 문서에서 근거 있는 트리플로 (§어디에 저장했고) — [members/sunghyun/notes/05-rdf-ontology-pipeline.md](../../members/sunghyun/notes/05-rdf-ontology-pipeline.md)

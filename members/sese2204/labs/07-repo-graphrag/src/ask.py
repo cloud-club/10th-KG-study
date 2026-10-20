@@ -40,6 +40,14 @@ def chat(messages, json_mode=False, model=CHAT_MODEL):
     return out
 
 
+def loads_json(text):
+    """JSON 모드라도 모델이 코드 펜스나 설명을 붙여 보낼 때가 있다(claude 심판) — 첫 { 부터 마지막 } 까지만 읽는다."""
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return json.loads(text[text.index("{") : text.rindex("}") + 1])
+
+
 def hybrid(index, q, k=8, pool=50, extra_fields=()):
     """BM25 top-pool 과 kNN top-pool 을 RRF 로 합친다."""
     client = es()
@@ -138,7 +146,7 @@ def text2cypher(q):
     msgs = [{"role": "system", "content": T2C_SYS}, {"role": "user", "content": q}]
     trace = []
     for attempt in range(2):
-        gen = json.loads(chat(msgs, json_mode=True))
+        gen = loads_json(chat(msgs, json_mode=True))
         cy = gen["cypher"].strip().rstrip(";")
         if WRITE_CLAUSE.search(cy) or V3_ONLY.search(cy):
             err = "쓰기 구문 또는 v2 범위 밖 라벨 사용 — 거절"
@@ -230,7 +238,7 @@ def v2_global(q, show=False):
     points = []
     for c in comms:  # Map
         body = f"[{c['id']}] {c['title']} (멤버 {', '.join(c['members'])})\n{c['summary']}\n" + "\n".join(f"- {p}" for p in c["kp"])
-        out = json.loads(chat([{"role": "system", "content": MAP_SYS}, {"role": "user", "content": f"질문: {q}\n\n{body}"}], json_mode=True))
+        out = loads_json(chat([{"role": "system", "content": MAP_SYS}, {"role": "user", "content": f"질문: {q}\n\n{body}"}], json_mode=True))
         points += [dict(p, community=c["id"], title=c["title"]) for p in out.get("points", []) if p.get("score", 0) >= 30]
     points.sort(key=lambda p: -p["score"])
     blocks = [f"[S{i+1}] ({p['community']} {p['title']}) {p['text']}" for i, p in enumerate(points[:20])]  # Reduce
@@ -240,7 +248,7 @@ def v2_global(q, show=False):
 
 def v2(q, show=False, route=None):
     if not route:
-        r = json.loads(chat([{"role": "system", "content": ROUTE_SYS}, {"role": "user", "content": q}], json_mode=True))
+        r = loads_json(chat([{"role": "system", "content": ROUTE_SYS}, {"role": "user", "content": q}], json_mode=True))
         route = r["route"]
     return {"local": v2_local, "aggregate": v2_aggregate, "global": v2_global}[route](q, show)
 
@@ -251,7 +259,7 @@ def v3(q, show=False):
     pages = list(dict.fromkeys(h["page"] for h in hits))
     nbrs = run_read(
         "MATCH (p:WikiPage)-[:LINKS_TO]->(n:WikiPage) WHERE p.name IN $pages AND NOT n.name IN $pages AND n.summary <> '' "
-        "RETURN n.name AS name, n.summary AS summary, count(*) AS deg ORDER BY deg DESC LIMIT 5", {"pages": pages})
+        "RETURN n.name AS name, n.summary AS summary, count(*) AS deg ORDER BY deg DESC, name LIMIT 5", {"pages": pages})
     blocks = [f"[W{i+1}] 위키 {h['page']} · {h['heading']}\n{h['text'][:1200]}" for i, h in enumerate(hits)]
     blocks += [f"[W{len(hits)+i+1}] 위키 {n['name']} (이웃 요약)\n{n['summary']}" for i, n in enumerate(nbrs)]
     return {"mode": "v3", "answer": answer(q, blocks), "context": blocks if show else len(blocks), "pages": pages}

@@ -8,10 +8,12 @@ LLM 이 정하지 않는 것:
 검증: evidence 가 해당 청크 원문에 실제로 있어야 채택한다(공백 정규화 후 부분 문자열).
 스키마에 안 맞는 사실은 억지로 넣지 말고 review_queue 로 (5주차 heebindev 처방).
 
-실행: python extract.py --sample 6   (표본)   /   python extract.py   (전체, note·lab 문서)
+실행: python extract.py --sample 7   (표본)   /   python extract.py   (전체, note·lab 문서, terra)
+     GRAPHRAG_EXTRACT_MODEL=gpt-5.4-mini python extract.py   → outputs/extract_gpt-5.4-mini.json (비교용)
 """
 import argparse
 import json
+import os
 import re
 from concurrent.futures import ThreadPoolExecutor
 
@@ -22,6 +24,12 @@ from common import CHAT_MODEL, LAB, OUT, JsonCache, llm
 ENTS = yaml.safe_load((LAB / "src/entities.yaml").read_text())
 TECHNIQUES = list(ENTS["Technique"])
 TOOLS = list(ENTS["Tool"])
+# 추출은 추론 모델 gpt-5.6-terra 가 기본이다. gpt-5.4-mini 는 승패 방향 정확도 13% (terra 90%) — README '추출 모델 비교'
+DEFAULT_EXTRACT_MODEL = "gpt-5.6-terra"
+EXTRACT_MODEL = os.getenv("GRAPHRAG_EXTRACT_MODEL", DEFAULT_EXTRACT_MODEL)
+EXTRACT_EFFORT = os.getenv("GRAPHRAG_EXTRACT_EFFORT")  # 추론 모델의 effort (none·low·medium·high), 없으면 모델 기본값
+SUFFIX = "" if EXTRACT_MODEL == DEFAULT_EXTRACT_MODEL and not EXTRACT_EFFORT else f"_{EXTRACT_MODEL}{'_' + EXTRACT_EFFORT if EXTRACT_EFFORT else ''}"
+REASONING = EXTRACT_MODEL != "gpt-5.4-mini"  # 추론 모델은 temperature 를 받지 않고 출력 한도를 넉넉히 줘야 한다
 BATCH_CHARS = 3500
 PROMPT_VERSION = "v2"
 METRIC_LIKE = {"Recall@k", "MRR", "nDCG", "RAG 평가"}  # about 이 이것뿐이면 평가 대상이 빠진 것
@@ -83,21 +91,26 @@ def call(doc, chunks, cache):
     user = f"문서: {doc['title']} ({doc['kind']}, 작성자 id 는 그래프가 따로 관리하므로 무시)\n\n" + "\n\n".join(
         f"<chunk id=\"{c['id']}\">\n{c['text']}\n</chunk>" for c in chunks
     )
-    k = JsonCache.key(PROMPT_VERSION, CHAT_MODEL, SYSTEM, user)
+    k = JsonCache.key(PROMPT_VERSION, EXTRACT_MODEL, SYSTEM, user, *([EXTRACT_EFFORT] if EXTRACT_EFFORT else []))
     hit = cache.get(k)
     if hit is not None:
         return hit
+    kw = {"max_completion_tokens": 32000} if REASONING else {"temperature": 0}
+    if EXTRACT_EFFORT:
+        kw["reasoning_effort"] = EXTRACT_EFFORT
     resp = llm().chat.completions.create(
-        model=CHAT_MODEL,
+        model=EXTRACT_MODEL,
         messages=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
         response_format={"type": "json_object"},
-        temperature=0,
+        **kw,
     )
     try:
         out = json.loads(resp.choices[0].message.content)
-    except json.JSONDecodeError:
-        out = {"error": resp.choices[0].message.content[:500]}
-    out["_usage"] = [resp.usage.prompt_tokens, resp.usage.completion_tokens]
+    except (json.JSONDecodeError, TypeError):
+        out = {"error": (resp.choices[0].message.content or "")[:500]}
+    details = getattr(resp.usage, "completion_tokens_details", None)
+    out["_usage"] = [resp.usage.prompt_tokens, resp.usage.completion_tokens,
+                     getattr(details, "reasoning_tokens", 0) or 0, resp.choices[0].finish_reason]
     cache.put(k, out)
     return out
 
@@ -173,13 +186,16 @@ def run(docs, workers=8):
     jobs = [(d, b) for d in docs for b in batches(d)]
     with ThreadPoolExecutor(workers) as pool:
         raws = list(pool.map(lambda j: call(j[0], j[1], cache), jobs))
-    result = {"findings": [], "pitfalls": [], "review_queue": [], "dropped": [], "usage": [0, 0], "errors": 0}
+    result = {"findings": [], "pitfalls": [], "review_queue": [], "dropped": [], "usage": [0, 0, 0], "errors": 0}
     for (d, b), raw in zip(jobs, raws):
         if "error" in raw:
             result["errors"] += 1
             continue
         result["usage"][0] += raw["_usage"][0]
         result["usage"][1] += raw["_usage"][1]
+        result["usage"][2] += raw["_usage"][2] if len(raw["_usage"]) > 2 else 0
+        if len(raw["_usage"]) > 3 and raw["_usage"][3] != "stop":
+            result["truncated"] = result.get("truncated", 0) + 1
         kept, dropped = validate(raw, b)
         for kind in ("findings", "pitfalls", "review_queue"):
             result[kind].extend(kept[kind])
@@ -196,16 +212,18 @@ if __name__ == "__main__":
         picks = ["members/kdyann/labs/06-graphrag/README.md", "members/heebindev/labs/03-triple-extraction-kg/README.md",
                  "members/e0ng/notes/03-rrf.md", "members/lys0611/labs/02-hybrid-rag-agent/README.md",
                  "members/dldusgh318/labs/01-three-generations/WEEK3_hybrid_search_rrf.md",
-                 "members/sunghyun/labs/06-graphrag/README.md"]
+                 "members/sunghyun/labs/06-graphrag/README.md",
+                 "members/dldusgh318/notes/week2/03-embedding-vector-search.md"]
         by_path = {d["path"]: d for d in docs}
         docs = [by_path[p] for p in picks if p in by_path][: args.sample]
         print("sample:", [d["path"] for d in docs])
     result, n_calls = run(docs)
-    name = "extract_sample.json" if args.sample else "extract.json"
+    name = ("extract_sample" if args.sample else "extract") + SUFFIX + ".json"
     (OUT / name).write_text(json.dumps(result, ensure_ascii=False, indent=1))
     from collections import Counter
 
-    print(f"calls {n_calls}, errors {result['errors']}, tokens in/out {result['usage']}")
+    print(f"model {EXTRACT_MODEL} effort {EXTRACT_EFFORT or 'default'} → {name}")
+    print(f"calls {n_calls}, errors {result['errors']}, truncated {result.get('truncated', 0)}, tokens in/out/reasoning {result['usage']}")
     print(f"findings {len(result['findings'])} (measured {sum(f.get('kind') == 'measured' for f in result['findings'])}), "
           f"pitfalls {len(result['pitfalls'])}, review_queue {len(result['review_queue'])}, dropped {len(result['dropped'])}")
     print("dropped reasons", Counter(d["reason"] for d in result["dropped"]))

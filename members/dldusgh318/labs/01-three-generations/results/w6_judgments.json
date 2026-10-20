@@ -1,0 +1,302 @@
+{
+  "policy": "expected 핵심 사실 의미 비교; 인용 검증은 별도 지표. A1/A2는 20개 청크 표본 expected.",
+  "notes": [
+    "X03 v2 2회차는 경계 사례다. 직행 캐시 제안을 언급했지만 다른 프로젝트 적용 관계를 부정하는 듯한 결론이 있어 보수적으로 partial. 이를 correct로 바꾸면 v2 X03 다수결이 correct로 달라지므로 채점 민감도를 숨기지 않는다."
+  ],
+  "judgments": [
+    {
+      "id": "S01",
+      "variant": "v1",
+      "round": 1,
+      "grade": "correct",
+      "reason": "self-invocation이 프록시를 우회해 @Transactional이 적용되지 않는 핵심 원인을 설명했다."
+    },
+    {
+      "id": "S01",
+      "variant": "v2",
+      "round": 1,
+      "grade": "correct",
+      "reason": "self-invocation이 프록시를 우회해 @Transactional이 적용되지 않는 핵심 원인을 설명했다."
+    },
+    {
+      "id": "M01",
+      "variant": "v1",
+      "round": 1,
+      "grade": "correct",
+      "reason": "저장·커밋 후 AFTER_COMMIT 비동기 호출·FastAPI Redis/RQ 적재·워커 처리의 핵심 단계를 모두 포함했다."
+    },
+    {
+      "id": "M01",
+      "variant": "v2",
+      "round": 1,
+      "grade": "correct",
+      "reason": "저장·커밋 후 AFTER_COMMIT 비동기 호출·FastAPI Redis/RQ 적재·워커 처리의 핵심 단계를 모두 포함했다."
+    },
+    {
+      "id": "X01",
+      "variant": "v1",
+      "round": 1,
+      "grade": "wrong",
+      "reason": "기록에서 찾을 수 없다고 답해 Redis 브릿지와 TEAMFICIAL 용도를 제시하지 못했다."
+    },
+    {
+      "id": "X01",
+      "variant": "v2",
+      "round": 1,
+      "grade": "partial",
+      "reason": "공통 기술 Redis와 TEAMFICIAL 캐싱 용도는 찾았으나 지원자 수 집계 목적 및 INCR·MGET·DB 폴백 핵심 세부는 빠졌다."
+    },
+    {
+      "id": "X03",
+      "variant": "v1",
+      "round": 1,
+      "grade": "partial",
+      "reason": "TEAMFICIAL Redis 캐시 구현은 설명했지만, 직행의 동일 출발지–도착지 통근시간 캐시 제안을 실제 필터링 순서 재설계 설명으로 대체해 expected의 핵심 구분을 누락했다."
+    },
+    {
+      "id": "X03",
+      "variant": "v2",
+      "round": 1,
+      "grade": "correct",
+      "reason": "동일 출발지–도착지 통근시간 Redis 캐시의 제안 상태와 TEAMFICIAL Redis 지원자 수 캐시의 구현 상태를 명시적으로 구분했다."
+    },
+    {
+      "id": "H01",
+      "variant": "v1",
+      "round": 1,
+      "grade": "partial",
+      "reason": "CD 재실행과 헬스 체크 200은 포함했으나 prod 설정의 과거 비밀번호 참조 원인과 환경변수 참조 수정 내용을 회수하지 못했다."
+    },
+    {
+      "id": "H01",
+      "variant": "v2",
+      "round": 1,
+      "grade": "partial",
+      "reason": "CD 재실행과 헬스 체크 200은 포함했으나 prod 설정의 과거 비밀번호 참조 원인과 환경변수 참조 수정 내용을 회수하지 못했다."
+    },
+    {
+      "id": "A1",
+      "variant": "v1",
+      "round": 1,
+      "grade": "wrong",
+      "reason": "모른다는 답변으로 20개 표본 기준 Redis와 3개 프로젝트라는 기대 답을 제시하지 못했다."
+    },
+    {
+      "id": "A1",
+      "variant": "v2",
+      "round": 1,
+      "grade": "wrong",
+      "reason": "모른다는 답변으로 20개 표본 기준 Redis와 3개 프로젝트라는 기대 답을 제시하지 못했다."
+    },
+    {
+      "id": "A2",
+      "variant": "v1",
+      "round": 1,
+      "grade": "wrong",
+      "reason": "20개 표본 expected(직행 Redis, SeCause 메시지 큐·outbox 패턴) 대신 Alloy/OpenTelemetry를 답했다. 전체 문서의 검토 의향과 표본 DB 사이 범위 불일치 사례다."
+    },
+    {
+      "id": "A2",
+      "variant": "v2",
+      "round": 1,
+      "grade": "wrong",
+      "reason": "20개 표본 expected(직행 Redis, SeCause 메시지 큐·outbox 패턴) 대신 Alloy/OpenTelemetry를 답했다. 전체 문서의 검토 의향과 표본 DB 사이 범위 불일치 사례다."
+    },
+    {
+      "id": "S01",
+      "variant": "v2",
+      "round": 2,
+      "grade": "correct",
+      "reason": "self-invocation이 프록시를 우회해 @Transactional이 적용되지 않는 핵심 원인을 설명했다."
+    },
+    {
+      "id": "S01",
+      "variant": "v1",
+      "round": 2,
+      "grade": "correct",
+      "reason": "self-invocation이 프록시를 우회해 @Transactional이 적용되지 않는 핵심 원인을 설명했다."
+    },
+    {
+      "id": "M01",
+      "variant": "v2",
+      "round": 2,
+      "grade": "correct",
+      "reason": "저장·커밋 후 AFTER_COMMIT 비동기 호출·FastAPI Redis/RQ 적재·워커 처리의 핵심 단계를 모두 포함했다."
+    },
+    {
+      "id": "M01",
+      "variant": "v1",
+      "round": 2,
+      "grade": "correct",
+      "reason": "저장·커밋 후 AFTER_COMMIT 비동기 호출·FastAPI Redis/RQ 적재·워커 처리의 핵심 단계를 모두 포함했다."
+    },
+    {
+      "id": "X01",
+      "variant": "v2",
+      "round": 2,
+      "grade": "partial",
+      "reason": "공통 기술 Redis와 TEAMFICIAL 캐싱 용도는 찾았으나 지원자 수 집계 목적 및 INCR·MGET·DB 폴백 핵심 세부는 빠졌다."
+    },
+    {
+      "id": "X01",
+      "variant": "v1",
+      "round": 2,
+      "grade": "wrong",
+      "reason": "기록에서 찾을 수 없다고 답해 Redis 브릿지와 TEAMFICIAL 용도를 제시하지 못했다."
+    },
+    {
+      "id": "X03",
+      "variant": "v2",
+      "round": 2,
+      "grade": "partial",
+      "reason": "TEAMFICIAL Redis 집계와 직행 캐시 제안은 언급했으나, 실제 필터링 최적화를 중심으로 답하고 마지막에 그대로 적용한 기록이 없다고 끝내 공통 방법과 서로 다른 목적의 연결을 명확히 답하지 못했다."
+    },
+    {
+      "id": "X03",
+      "variant": "v1",
+      "round": 2,
+      "grade": "partial",
+      "reason": "TEAMFICIAL 실제 Redis 집계와 직행 캐싱 제안은 구분했으나 직행 캐시의 동일 출발지–도착지 통근시간 저장 목적을 빠뜨리고 필터링 순서 재설계로 대체 설명했다."
+    },
+    {
+      "id": "H01",
+      "variant": "v2",
+      "round": 2,
+      "grade": "partial",
+      "reason": "CD 재실행과 헬스 체크 200은 포함했으나 prod 설정의 과거 비밀번호 참조 원인과 환경변수 참조 수정 내용을 회수하지 못했다."
+    },
+    {
+      "id": "H01",
+      "variant": "v1",
+      "round": 2,
+      "grade": "partial",
+      "reason": "CD 재실행과 헬스 체크 200은 포함했으나 prod 설정의 과거 비밀번호 참조 원인과 환경변수 참조 수정 내용을 회수하지 못했다."
+    },
+    {
+      "id": "A1",
+      "variant": "v2",
+      "round": 2,
+      "grade": "wrong",
+      "reason": "모른다는 답변으로 20개 표본 기준 Redis와 3개 프로젝트라는 기대 답을 제시하지 못했다."
+    },
+    {
+      "id": "A1",
+      "variant": "v1",
+      "round": 2,
+      "grade": "wrong",
+      "reason": "모른다는 답변으로 20개 표본 기준 Redis와 3개 프로젝트라는 기대 답을 제시하지 못했다."
+    },
+    {
+      "id": "A2",
+      "variant": "v2",
+      "round": 2,
+      "grade": "wrong",
+      "reason": "20개 표본 expected(직행 Redis, SeCause 메시지 큐·outbox 패턴) 대신 Alloy/OpenTelemetry를 답했다. 전체 문서의 검토 의향과 표본 DB 사이 범위 불일치 사례다."
+    },
+    {
+      "id": "A2",
+      "variant": "v1",
+      "round": 2,
+      "grade": "wrong",
+      "reason": "20개 표본 expected(직행 Redis, SeCause 메시지 큐·outbox 패턴) 대신 Alloy/OpenTelemetry를 답했다. 전체 문서의 검토 의향과 표본 DB 사이 범위 불일치 사례다."
+    },
+    {
+      "id": "S01",
+      "variant": "v1",
+      "round": 3,
+      "grade": "correct",
+      "reason": "self-invocation이 프록시를 우회해 @Transactional이 적용되지 않는 핵심 원인을 설명했다."
+    },
+    {
+      "id": "S01",
+      "variant": "v2",
+      "round": 3,
+      "grade": "correct",
+      "reason": "self-invocation이 프록시를 우회해 @Transactional이 적용되지 않는 핵심 원인을 설명했다."
+    },
+    {
+      "id": "M01",
+      "variant": "v1",
+      "round": 3,
+      "grade": "correct",
+      "reason": "저장·커밋 후 AFTER_COMMIT 비동기 호출·FastAPI Redis/RQ 적재·워커 처리의 핵심 단계를 모두 포함했다."
+    },
+    {
+      "id": "M01",
+      "variant": "v2",
+      "round": 3,
+      "grade": "correct",
+      "reason": "저장·커밋 후 AFTER_COMMIT 비동기 호출·FastAPI Redis/RQ 적재·워커 처리의 핵심 단계를 모두 포함했다."
+    },
+    {
+      "id": "X01",
+      "variant": "v1",
+      "round": 3,
+      "grade": "wrong",
+      "reason": "기록에서 찾을 수 없다고 답해 Redis 브릿지와 TEAMFICIAL 용도를 제시하지 못했다."
+    },
+    {
+      "id": "X01",
+      "variant": "v2",
+      "round": 3,
+      "grade": "partial",
+      "reason": "공통 기술 Redis와 TEAMFICIAL 캐싱 용도는 찾았으나 지원자 수 집계 목적 및 INCR·MGET·DB 폴백 핵심 세부는 빠졌다."
+    },
+    {
+      "id": "X03",
+      "variant": "v1",
+      "round": 3,
+      "grade": "partial",
+      "reason": "TEAMFICIAL Redis 캐시 구현은 설명했지만, 직행의 동일 출발지–도착지 통근시간 캐시 제안을 실제 필터링 순서 재설계 설명으로 대체해 expected의 핵심 구분을 누락했다."
+    },
+    {
+      "id": "X03",
+      "variant": "v2",
+      "round": 3,
+      "grade": "partial",
+      "reason": "TEAMFICIAL Redis 캐시 구현은 설명했지만, 직행의 동일 출발지–도착지 통근시간 캐시 제안을 실제 필터링 순서 재설계 설명으로 대체해 expected의 핵심 구분을 누락했다."
+    },
+    {
+      "id": "H01",
+      "variant": "v1",
+      "round": 3,
+      "grade": "partial",
+      "reason": "CD 재실행과 헬스 체크 200은 포함했으나 prod 설정의 과거 비밀번호 참조 원인과 환경변수 참조 수정 내용을 회수하지 못했다."
+    },
+    {
+      "id": "H01",
+      "variant": "v2",
+      "round": 3,
+      "grade": "partial",
+      "reason": "CD 재실행과 헬스 체크 200은 포함했으나 prod 설정의 과거 비밀번호 참조 원인과 환경변수 참조 수정 내용을 회수하지 못했다."
+    },
+    {
+      "id": "A1",
+      "variant": "v1",
+      "round": 3,
+      "grade": "wrong",
+      "reason": "모른다는 답변으로 20개 표본 기준 Redis와 3개 프로젝트라는 기대 답을 제시하지 못했다."
+    },
+    {
+      "id": "A1",
+      "variant": "v2",
+      "round": 3,
+      "grade": "wrong",
+      "reason": "모른다는 답변으로 20개 표본 기준 Redis와 3개 프로젝트라는 기대 답을 제시하지 못했다."
+    },
+    {
+      "id": "A2",
+      "variant": "v1",
+      "round": 3,
+      "grade": "wrong",
+      "reason": "20개 표본 expected(직행 Redis, SeCause 메시지 큐·outbox 패턴) 대신 Alloy/OpenTelemetry를 답했다. 전체 문서의 검토 의향과 표본 DB 사이 범위 불일치 사례다."
+    },
+    {
+      "id": "A2",
+      "variant": "v2",
+      "round": 3,
+      "grade": "wrong",
+      "reason": "20개 표본 expected(직행 Redis, SeCause 메시지 큐·outbox 패턴) 대신 Alloy/OpenTelemetry를 답했다. 전체 문서의 검토 의향과 표본 DB 사이 범위 불일치 사례다."
+    }
+  ]
+}

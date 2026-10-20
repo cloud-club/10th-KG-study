@@ -1,0 +1,218 @@
+{
+  "scope": "20개 청크 표본 Neo4j 현재 상태",
+  "policy": "결과 집합과 쿼리 의미를 검토. 관측 오류와 향후 데이터 확장 시 과소제약 위험을 분리.",
+  "judgments": [
+    {
+      "id": "A1",
+      "round": 1,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "프로젝트 DISTINCT로 집계해 Redis와 프로젝트 수 3을 반환했다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "A2",
+      "round": 1,
+      "judgment": "partial",
+      "failure_type": "semantic_wrong",
+      "failure_types": [
+        "semantic_wrong"
+      ],
+      "reason": "다른 사용례 중 implemented가 하나라도 있으면 기술 전체를 제외했다. 직행의 통근시간 캐시 proposed를 다른 목적/프로젝트의 implemented Redis와 혼동해 누락했다. 기대 기술 3개 중 2개만 반환.",
+      "semantic_risks": []
+    },
+    {
+      "id": "X01",
+      "round": 1,
+      "judgment": "wrong",
+      "failure_type": "wrong_value",
+      "failure_types": [
+        "wrong_value",
+        "zero_rows"
+      ],
+      "reason": "purpose의 실제 표현과 다른 '분석 작업 큐' 또는 '분석' AND '큐'를 요구해 0건. 실제 Redis 사용례는 '큐 기반 비동기 처리'와 '분석 작업을 백그라운드로 분리'로 나뉘어 저장돼 있다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "X03",
+      "round": 1,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "현재 표본에서 Redis, 직행 통근시간 저장 proposed, TEAMFICIAL 지원자 수 집계 implemented를 함께 반환했다.",
+      "semantic_risks": [
+        "purpose 조건을 쓰지 않고 프로젝트와 상태만 비교한다. 현재 표본 결과는 맞지만 다른 목적의 proposed/implemented 사용례가 추가되면 오답 행이 섞일 수 있는 과소제약 쿼리다. 현재 관측 오답으로는 집계하지 않음."
+      ]
+    },
+    {
+      "id": "T01",
+      "round": 1,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "공통 기술 4개(Redis, Docker, GitHub Actions, Spring Boot)를 DISTINCT로 반환했다. status 미기재를 임의 배제하지 않았다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "T02",
+      "round": 1,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "Redis에 proposed 사용례가 있는 프로젝트 jikhaeng을 반환했다.",
+      "semantic_risks": [
+        "'제안만'은 해당 사용례의 상태로 해석했다. 직행에는 별도 목적의 implemented Redis 사용례도 있으므로 프로젝트 전체에서 Redis를 한 번도 구현하지 않았다는 뜻으로 읽으면 안 된다."
+      ]
+    },
+    {
+      "id": "T03",
+      "round": 1,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "관계 조인으로 근거 행을 세지 않고 TechnologyUse 식별자를 DISTINCT 집계해 목적 결측 18개를 반환했다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "A1",
+      "round": 2,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "프로젝트 DISTINCT로 집계해 Redis와 프로젝트 수 3을 반환했다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "A2",
+      "round": 2,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "사용례의 proposed 상태만 조회해 Redis·메시지 큐·outbox 패턴을 모두 반환했다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "X01",
+      "round": 2,
+      "judgment": "wrong",
+      "failure_type": "wrong_value",
+      "failure_types": [
+        "wrong_value",
+        "zero_rows"
+      ],
+      "reason": "purpose의 실제 표현과 다른 '분석 작업 큐' 또는 '분석' AND '큐'를 요구해 0건. 실제 Redis 사용례는 '큐 기반 비동기 처리'와 '분석 작업을 백그라운드로 분리'로 나뉘어 저장돼 있다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "X03",
+      "round": 2,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "현재 표본에서 Redis, 직행 통근시간 저장 proposed, TEAMFICIAL 지원자 수 집계 implemented를 함께 반환했다.",
+      "semantic_risks": [
+        "purpose 조건을 쓰지 않고 프로젝트와 상태만 비교한다. 현재 표본 결과는 맞지만 다른 목적의 proposed/implemented 사용례가 추가되면 오답 행이 섞일 수 있는 과소제약 쿼리다. 현재 관측 오답으로는 집계하지 않음."
+      ]
+    },
+    {
+      "id": "T01",
+      "round": 2,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "공통 기술 4개(Redis, Docker, GitHub Actions, Spring Boot)를 DISTINCT로 반환했다. status 미기재를 임의 배제하지 않았다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "T02",
+      "round": 2,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "Redis에 proposed 사용례가 있는 프로젝트 jikhaeng을 반환했다.",
+      "semantic_risks": [
+        "'제안만'은 해당 사용례의 상태로 해석했다. 직행에는 별도 목적의 implemented Redis 사용례도 있으므로 프로젝트 전체에서 Redis를 한 번도 구현하지 않았다는 뜻으로 읽으면 안 된다."
+      ]
+    },
+    {
+      "id": "T03",
+      "round": 2,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "관계 조인으로 근거 행을 세지 않고 TechnologyUse 식별자를 DISTINCT 집계해 목적 결측 18개를 반환했다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "A1",
+      "round": 3,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "프로젝트 DISTINCT로 집계해 Redis와 프로젝트 수 3을 반환했다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "A2",
+      "round": 3,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "사용례의 proposed 상태만 조회해 Redis·메시지 큐·outbox 패턴을 모두 반환했다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "X01",
+      "round": 3,
+      "judgment": "wrong",
+      "failure_type": "wrong_value",
+      "failure_types": [
+        "wrong_value",
+        "zero_rows"
+      ],
+      "reason": "purpose의 실제 표현과 다른 '분석 작업 큐' 또는 '분석' AND '큐'를 요구해 0건. 실제 Redis 사용례는 '큐 기반 비동기 처리'와 '분석 작업을 백그라운드로 분리'로 나뉘어 저장돼 있다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "X03",
+      "round": 3,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "현재 표본에서 Redis, 직행 통근시간 저장 proposed, TEAMFICIAL 지원자 수 집계 implemented를 함께 반환했다.",
+      "semantic_risks": [
+        "purpose 조건을 쓰지 않고 프로젝트와 상태만 비교한다. 현재 표본 결과는 맞지만 다른 목적의 proposed/implemented 사용례가 추가되면 오답 행이 섞일 수 있는 과소제약 쿼리다. 현재 관측 오답으로는 집계하지 않음."
+      ]
+    },
+    {
+      "id": "T01",
+      "round": 3,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "공통 기술 4개(Redis, Docker, GitHub Actions, Spring Boot)를 DISTINCT로 반환했다. status 미기재를 임의 배제하지 않았다.",
+      "semantic_risks": []
+    },
+    {
+      "id": "T02",
+      "round": 3,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "Redis에 proposed 사용례가 있는 프로젝트 jikhaeng을 반환했다.",
+      "semantic_risks": [
+        "'제안만'은 해당 사용례의 상태로 해석했다. 직행에는 별도 목적의 implemented Redis 사용례도 있으므로 프로젝트 전체에서 Redis를 한 번도 구현하지 않았다는 뜻으로 읽으면 안 된다."
+      ]
+    },
+    {
+      "id": "T03",
+      "round": 3,
+      "judgment": "correct",
+      "failure_type": null,
+      "failure_types": [],
+      "reason": "관계 조인으로 근거 행을 세지 않고 TechnologyUse 식별자를 DISTINCT 집계해 목적 결측 18개를 반환했다.",
+      "semantic_risks": []
+    }
+  ]
+}

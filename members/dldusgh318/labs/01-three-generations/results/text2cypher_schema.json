@@ -1,0 +1,2426 @@
+{
+  "schema": {
+    "Project": {
+      "count": 3,
+      "properties": [
+        "entity_id",
+        "id",
+        "ingested_from",
+        "label"
+      ]
+    },
+    "Technology": {
+      "count": 25,
+      "properties": [
+        "entity_id",
+        "id",
+        "ingested_from",
+        "label"
+      ]
+    },
+    "TechnologyUse": {
+      "count": 41,
+      "properties": [
+        "entity_id",
+        "id",
+        "ingested_from",
+        "label",
+        "purpose",
+        "status"
+      ]
+    }
+  },
+  "relationships": [
+    [
+      [
+        "TechnologyUse"
+      ],
+      "PART_OF",
+      [
+        "Project"
+      ]
+    ],
+    [
+      [
+        "TechnologyUse"
+      ],
+      "USES_TECHNOLOGY",
+      [
+        "Technology"
+      ]
+    ]
+  ],
+  "projects": [
+    {
+      "id": "kg:jikhaeng",
+      "label": "jikhaeng",
+      "entity_id": "kg:jikhaeng",
+      "ingested_from": "postgres"
+    },
+    {
+      "id": "kg:secause",
+      "label": "secause",
+      "entity_id": "kg:secause",
+      "ingested_from": "postgres"
+    },
+    {
+      "id": "kg:teamficial",
+      "label": "teamficial",
+      "entity_id": "kg:teamficial",
+      "ingested_from": "postgres"
+    }
+  ],
+  "status_counts": {
+    "implemented": 22,
+    "NULL": 16,
+    "proposed": 3
+  },
+  "snapshot_hash": "29e37abbf01e1d8d699cc88029da4ea99da638da2b2a8013d161c65aff97fb2e",
+  "nodes": [
+    {
+      "labels": [
+        "Project"
+      ],
+      "props": {
+        "id": "kg:jikhaeng",
+        "label": "jikhaeng",
+        "entity_id": "kg:jikhaeng",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Project"
+      ],
+      "props": {
+        "id": "kg:secause",
+        "label": "secause",
+        "entity_id": "kg:secause",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Project"
+      ],
+      "props": {
+        "id": "kg:teamficial",
+        "label": "teamficial",
+        "entity_id": "kg:teamficial",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-ai",
+        "label": "ai",
+        "entity_id": "kg:tech-ai",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-aws-ec2",
+        "label": "aws ec2",
+        "entity_id": "kg:tech-aws-ec2",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-aws-s3",
+        "label": "aws s3",
+        "entity_id": "kg:tech-aws-s3",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-coderabbit",
+        "label": "coderabbit",
+        "entity_id": "kg:tech-coderabbit",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-db",
+        "label": "db",
+        "entity_id": "kg:tech-db",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-docker",
+        "label": "docker",
+        "entity_id": "kg:tech-docker",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-fastapi",
+        "label": "fastapi",
+        "entity_id": "kg:tech-fastapi",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-github-actions",
+        "label": "github actions",
+        "entity_id": "kg:tech-github-actions",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-github-api",
+        "label": "github api",
+        "entity_id": "kg:tech-github-api",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-java-17",
+        "label": "java 17",
+        "entity_id": "kg:tech-java-17",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-jwt",
+        "label": "jwt",
+        "entity_id": "kg:tech-jwt",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-kakao",
+        "label": "카카오",
+        "entity_id": "kg:tech-kakao",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-mesiji-kyu",
+        "label": "메시지 큐",
+        "entity_id": "kg:tech-mesiji-kyu",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-mysql",
+        "label": "mysql",
+        "entity_id": "kg:tech-mysql",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-opensearch",
+        "label": "opensearch",
+        "entity_id": "kg:tech-opensearch",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-outbox-paeteon",
+        "label": "outbox 패턴",
+        "entity_id": "kg:tech-outbox-paeteon",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-querydsl",
+        "label": "querydsl",
+        "entity_id": "kg:tech-querydsl",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-redis",
+        "label": "redis",
+        "entity_id": "kg:tech-redis",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-spring-application-event",
+        "label": "spring application event",
+        "entity_id": "kg:tech-spring-application-event",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-spring-boot",
+        "label": "spring boot",
+        "entity_id": "kg:tech-spring-boot",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-spring-data-jpa",
+        "label": "spring data jpa",
+        "entity_id": "kg:tech-spring-data-jpa",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-spring-security",
+        "label": "spring security",
+        "entity_id": "kg:tech-spring-security",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-threadpooltaskexecutor",
+        "label": "threadpooltaskexecutor",
+        "entity_id": "kg:tech-threadpooltaskexecutor",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-tmap-api",
+        "label": "tmap api",
+        "entity_id": "kg:tech-tmap-api",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "Technology"
+      ],
+      "props": {
+        "id": "kg:tech-webclient",
+        "label": "webclient",
+        "entity_id": "kg:tech-webclient",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "나머지 공고 저장",
+        "id": "kg:use-jikhaeng-db-1",
+        "label": "jikhaeng db use",
+        "entity_id": "kg:use-jikhaeng-db-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "로그인",
+        "id": "kg:use-jikhaeng-kakao-1",
+        "label": "jikhaeng kakao use",
+        "entity_id": "kg:use-jikhaeng-kakao-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "공고 필터링",
+        "id": "kg:use-jikhaeng-opensearch-1",
+        "label": "jikhaeng opensearch use",
+        "entity_id": "kg:use-jikhaeng-opensearch-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "동일한 출발지 - 도착지의 통근 시간 저장",
+        "id": "kg:use-jikhaeng-redis-1",
+        "label": "jikhaeng redis use",
+        "entity_id": "kg:use-jikhaeng-redis-1",
+        "ingested_from": "postgres",
+        "status": "proposed"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "테스트 결과 저장",
+        "id": "kg:use-jikhaeng-redis-2",
+        "label": "jikhaeng redis use",
+        "entity_id": "kg:use-jikhaeng-redis-2",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "최대 통근 시간 필터링",
+        "id": "kg:use-jikhaeng-tmap-api-1",
+        "label": "jikhaeng tmap-api use",
+        "entity_id": "kg:use-jikhaeng-tmap-api-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "통근 시간 계산",
+        "id": "kg:use-jikhaeng-tmap-api-2",
+        "label": "jikhaeng tmap-api use",
+        "entity_id": "kg:use-jikhaeng-tmap-api-2",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "코드 및 인프라 보안 취약점 탐지",
+        "id": "kg:use-secause-ai-1",
+        "label": "secause ai use",
+        "entity_id": "kg:use-secause-ai-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "CI/CD 환경 구축",
+        "id": "kg:use-secause-docker-1",
+        "label": "secause docker use",
+        "entity_id": "kg:use-secause-docker-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "FastAPI 호출을 비동기로 분리",
+        "id": "kg:use-secause-fastapi-1",
+        "label": "secause fastapi use",
+        "entity_id": "kg:use-secause-fastapi-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "분석 서버",
+        "id": "kg:use-secause-fastapi-2",
+        "label": "secause fastapi use",
+        "entity_id": "kg:use-secause-fastapi-2",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "분석 작업을 백그라운드로 분리",
+        "id": "kg:use-secause-fastapi-3",
+        "label": "secause fastapi use",
+        "entity_id": "kg:use-secause-fastapi-3",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-secause-github-actions-1",
+        "label": "secause github-actions use",
+        "entity_id": "kg:use-secause-github-actions-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-secause-github-api-1",
+        "label": "secause github-api use",
+        "entity_id": "kg:use-secause-github-api-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "GitHub 저장소·조직·브랜치 연동",
+        "id": "kg:use-secause-github-api-2",
+        "label": "secause github-api use",
+        "entity_id": "kg:use-secause-github-api-2",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-secause-mesiji-kyu-1",
+        "label": "secause mesiji-kyu use",
+        "entity_id": "kg:use-secause-mesiji-kyu-1",
+        "ingested_from": "postgres",
+        "status": "proposed"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-secause-outbox-paeteon-1",
+        "label": "secause outbox-paeteon use",
+        "entity_id": "kg:use-secause-outbox-paeteon-1",
+        "ingested_from": "postgres",
+        "status": "proposed"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-secause-redis-1",
+        "label": "secause redis use",
+        "entity_id": "kg:use-secause-redis-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "큐 기반 비동기 처리",
+        "id": "kg:use-secause-redis-2",
+        "label": "secause redis use",
+        "entity_id": "kg:use-secause-redis-2",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "분석 작업을 백그라운드로 분리",
+        "id": "kg:use-secause-redis-rq-1",
+        "label": "secause redis-rq use",
+        "entity_id": "kg:use-secause-redis-rq-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "큐 기반 비동기 처리",
+        "id": "kg:use-secause-rq-redis-queue-1",
+        "label": "secause rq-redis-queue use",
+        "entity_id": "kg:use-secause-rq-redis-queue-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "인메모리 처리",
+        "id": "kg:use-secause-spring-application-event-1",
+        "label": "secause spring-application-event use",
+        "entity_id": "kg:use-secause-spring-application-event-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "비동기 분석 요청 구조",
+        "id": "kg:use-secause-spring-boot-1",
+        "label": "secause spring-boot use",
+        "entity_id": "kg:use-secause-spring-boot-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "서버",
+        "id": "kg:use-secause-spring-boot-2",
+        "label": "secause spring-boot use",
+        "entity_id": "kg:use-secause-spring-boot-2",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "FastAPI 호출을 비동기로 분리",
+        "id": "kg:use-secause-threadpooltaskexecutor-1",
+        "label": "secause threadpooltaskexecutor use",
+        "entity_id": "kg:use-secause-threadpooltaskexecutor-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "GitHub 저장소·조직·브랜치 연동",
+        "id": "kg:use-secause-webclient-1",
+        "label": "secause webclient use",
+        "entity_id": "kg:use-secause-webclient-1",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-aws-ec2-1",
+        "label": "teamficial aws-ec2 use",
+        "entity_id": "kg:use-teamficial-aws-ec2-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-aws-s3-1",
+        "label": "teamficial aws-s3 use",
+        "entity_id": "kg:use-teamficial-aws-s3-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-coderabbit-1",
+        "label": "teamficial coderabbit use",
+        "entity_id": "kg:use-teamficial-coderabbit-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-docker-1",
+        "label": "teamficial docker use",
+        "entity_id": "kg:use-teamficial-docker-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-github-actions-1",
+        "label": "teamficial github-actions use",
+        "entity_id": "kg:use-teamficial-github-actions-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-java-17-1",
+        "label": "teamficial java-17 use",
+        "entity_id": "kg:use-teamficial-java-17-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-jwt-1",
+        "label": "teamficial jwt use",
+        "entity_id": "kg:use-teamficial-jwt-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-mysql-1",
+        "label": "teamficial mysql use",
+        "entity_id": "kg:use-teamficial-mysql-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-querydsl-1",
+        "label": "teamficial querydsl use",
+        "entity_id": "kg:use-teamficial-querydsl-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-redis-1",
+        "label": "teamficial redis use",
+        "entity_id": "kg:use-teamficial-redis-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "지원자 수 집계 성능 개선",
+        "id": "kg:use-teamficial-redis-2",
+        "label": "teamficial redis use",
+        "entity_id": "kg:use-teamficial-redis-2",
+        "ingested_from": "postgres",
+        "status": "implemented"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "purpose": "Redis 캐싱 인프라",
+        "id": "kg:use-teamficial-redis-3",
+        "label": "teamficial redis use",
+        "entity_id": "kg:use-teamficial-redis-3",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-spring-boot-1",
+        "label": "teamficial spring-boot use",
+        "entity_id": "kg:use-teamficial-spring-boot-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-spring-data-jpa-1",
+        "label": "teamficial spring-data-jpa use",
+        "entity_id": "kg:use-teamficial-spring-data-jpa-1",
+        "ingested_from": "postgres"
+      }
+    },
+    {
+      "labels": [
+        "TechnologyUse"
+      ],
+      "props": {
+        "id": "kg:use-teamficial-spring-security-1",
+        "label": "teamficial spring-security use",
+        "entity_id": "kg:use-teamficial-spring-security-1",
+        "ingested_from": "postgres"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "subject": "kg:use-jikhaeng-db-1",
+      "type": "PART_OF",
+      "object": "kg:jikhaeng",
+      "props": {
+        "evidence": "KUSITMS X 직행 기업과제 > KUSITMS X 직행 기업과제 > 기능별 사용 기술",
+        "evidence_originals": [
+          "KUSITMS X 직행 기업과제 > KUSITMS X 직행 기업과제 > 기능별 사용 기술"
+        ],
+        "confidence": 0.97,
+        "edge_key": "02ce45a90b44ba722e2b63122be562121429699d5fd5fa5a1554d41e83107954",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#170"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-db-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-db",
+      "props": {
+        "evidence": "나머지 공고들은 비동기로 처리하여 db에 저장한다.",
+        "evidence_originals": [
+          "나머지 공고들은 비동기로 처리하여 db에 저장한다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "c6456f9eec981deea991567c4a68a03a38bcb8c06c92c03b35f48423ba6e68e1",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#170"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-kakao-1",
+      "type": "PART_OF",
+      "object": "kg:jikhaeng",
+      "props": {
+        "evidence_originals": [
+          "1. 카카오 로그인"
+        ],
+        "evidence": "1. 카카오 로그인",
+        "confidence": 0.98,
+        "edge_key": "525bb748a3cbdd34b01e21ecc4bbd4c266928669b5c4080a0fc2f44aacbcec10",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#169"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-kakao-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-kakao",
+      "props": {
+        "evidence_originals": [
+          "1. 카카오 로그인"
+        ],
+        "evidence": "1. 카카오 로그인",
+        "confidence": 0.95,
+        "edge_key": "9e26b71a414a80f63ce110e6053bf821c9c65c3d5729d8841ab43b114d1adceb",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#169"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-opensearch-1",
+      "type": "PART_OF",
+      "object": "kg:jikhaeng",
+      "props": {
+        "evidence": "KUSITMS X 직행 기업과제 > KUSITMS X 직행 기업과제 > 기능별 사용 기술",
+        "evidence_originals": [
+          "KUSITMS X 직행 기업과제 > KUSITMS X 직행 기업과제 > 기능별 사용 기술"
+        ],
+        "confidence": 0.98,
+        "edge_key": "40f3744b0cc5524f50444bd9d690607fe3069c47f6875995d5175beb5e57fc3b",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#170"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-opensearch-1",
+      "type": "PART_OF",
+      "object": "kg:jikhaeng",
+      "props": {
+        "evidence": "직군, 직무, 학력, 경력으로 필터링(오픈서치 이용) → 테스트 결과 기반 필터링(오픈서치 이용)",
+        "evidence_originals": [
+          "직군, 직무, 학력, 경력으로 필터링(오픈서치 이용) → 테스트 결과 기반 필터링(오픈서치 이용)"
+        ],
+        "confidence": 0.99,
+        "edge_key": "921f501806a6b512725b54abb75bb57fb1c2b274adad6521fe9a541fead0beca",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#169"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-opensearch-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-opensearch",
+      "props": {
+        "evidence": "직군, 직무, 학력, 경력으로 필터링(오픈서치 이용) → 테스트 결과 기반 필터링(오픈서치 이용)",
+        "evidence_originals": [
+          "직군, 직무, 학력, 경력으로 필터링(오픈서치 이용) → 테스트 결과 기반 필터링(오픈서치 이용)"
+        ],
+        "confidence": 0.99,
+        "edge_key": "066116be2890b0c1149673e6f6dd30b57e94ec01afddd1d140f720322841c54d",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#170"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-opensearch-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-opensearch",
+      "props": {
+        "evidence": "직군, 직무, 학력, 경력으로 필터링(오픈서치 이용) → 테스트 결과 기반 필터링(오픈서치 이용)",
+        "evidence_originals": [
+          "직군, 직무, 학력, 경력으로 필터링(오픈서치 이용) → 테스트 결과 기반 필터링(오픈서치 이용)"
+        ],
+        "confidence": 0.99,
+        "edge_key": "824bd0f42381cbf5e1058b63c80db40804ef726e33b38ffbd18434c2507244bb",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#169"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-redis-1",
+      "type": "PART_OF",
+      "object": "kg:jikhaeng",
+      "props": {
+        "evidence": "해당 프로젝트에서는 최적화에 대해 많이 생각해볼 수 있었습니다.",
+        "evidence_originals": [
+          "해당 프로젝트에서는 최적화에 대해 많이 생각해볼 수 있었습니다."
+        ],
+        "confidence": 0.82,
+        "edge_key": "d0b707ca4b30622359142b37d394613901895ddb3e4dad425cd5bb93de21a5d1",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#180"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-redis-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-redis",
+      "props": {
+        "evidence": "동일한 출발지 - 도착지에 대해 이미 계산된 통근 시간은 redis 등의 캐시에 저장해두기",
+        "evidence_originals": [
+          "동일한 출발지 - 도착지에 대해 이미 계산된 통근 시간은 redis 등의 캐시에 저장해두기"
+        ],
+        "confidence": 0.99,
+        "edge_key": "e3a32326d7d22e87604050784a95bcceb99dae925ef22f63dc24e0edea63b251",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#180"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-redis-2",
+      "type": "PART_OF",
+      "object": "kg:jikhaeng",
+      "props": {
+        "evidence": "(이후 온보딩 진행 시에, 결과를 같이 저장하므로 redis에 저장)",
+        "evidence_originals": [
+          "(이후 온보딩 진행 시에, 결과를 같이 저장하므로 redis에 저장)"
+        ],
+        "confidence": 0.99,
+        "edge_key": "61ed8b47019cb802084df2ae22077f1b8e40fddfa7da7794e7c52b8d93a20a7a",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#169"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-redis-2",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-redis",
+      "props": {
+        "evidence": "(이후 온보딩 진행 시에, 결과를 같이 저장하므로 redis에 저장)",
+        "evidence_originals": [
+          "(이후 온보딩 진행 시에, 결과를 같이 저장하므로 redis에 저장)"
+        ],
+        "confidence": 0.99,
+        "edge_key": "b8270e1474366df770f4f84dc8fa63bf36d1b5c739f572b5b2a5bf257a8207bf",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#169"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-tmap-api-1",
+      "type": "PART_OF",
+      "object": "kg:jikhaeng",
+      "props": {
+        "evidence": "최대 통근 시간 필터링 (Tmap API이용)",
+        "evidence_originals": [
+          "최대 통근 시간 필터링 (Tmap API이용)"
+        ],
+        "confidence": 0.99,
+        "edge_key": "a3d35c16fa22a95b040c0d0ddea83c646ccb0583845bd15d155f7b8067e76639",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#169"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-tmap-api-1",
+      "type": "PART_OF",
+      "object": "kg:jikhaeng",
+      "props": {
+        "evidence": "KUSITMS X 직행 기업과제 > KUSITMS X 직행 기업과제 > 기능별 사용 기술",
+        "evidence_originals": [
+          "KUSITMS X 직행 기업과제 > KUSITMS X 직행 기업과제 > 기능별 사용 기술"
+        ],
+        "confidence": 0.98,
+        "edge_key": "d34e08e1669c4a46f52eba753c867946f771bba326895c78d1f6a5d7c41c6156",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#170"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-tmap-api-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-tmap-api",
+      "props": {
+        "evidence": "최대 통근 시간 필터링 (Tmap API이용)",
+        "evidence_originals": [
+          "최대 통근 시간 필터링 (Tmap API이용)"
+        ],
+        "confidence": 0.99,
+        "edge_key": "213fccacf470cde9865e6b72f7c2c4e21d25f2c3779d43c4be877767036f24f6",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#170"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-tmap-api-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-tmap-api",
+      "props": {
+        "evidence": "최대 통근 시간 필터링 (Tmap API이용)",
+        "evidence_originals": [
+          "최대 통근 시간 필터링 (Tmap API이용)"
+        ],
+        "confidence": 0.99,
+        "edge_key": "9b7b3555522579f8c9940c8f311f146c830bdd39dc29f514cb73ea10c3b6d5f6",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#169"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-tmap-api-2",
+      "type": "PART_OF",
+      "object": "kg:jikhaeng",
+      "props": {
+        "evidence": "KUSITMS X 직행 기업과제 > 📝해당 활동에서 느낀 점 > **Tmap API를 활용한 통근 시간 계산 로직**",
+        "evidence_originals": [
+          "KUSITMS X 직행 기업과제 > 📝해당 활동에서 느낀 점 > **Tmap API를 활용한 통근 시간 계산 로직**"
+        ],
+        "confidence": 0.98,
+        "edge_key": "b69d25e9e3312f8aa85f2ffca6b851dde6ec5e82020e9aa5a3b83965b940d67b",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#180"
+      }
+    },
+    {
+      "subject": "kg:use-jikhaeng-tmap-api-2",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-tmap-api",
+      "props": {
+        "evidence": "**Tmap API를 활용한 통근 시간 계산 로직**",
+        "evidence_originals": [
+          "**Tmap API를 활용한 통근 시간 계산 로직**"
+        ],
+        "confidence": 0.99,
+        "edge_key": "55cb46a8b7554bdbc6804fe5fe1eeb56a6bd2ae2d762cb0b1ad29e8dcb4bcc54",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "KUSITMS_X_직행_기업과제#180"
+      }
+    },
+    {
+      "subject": "kg:use-secause-ai-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "사용자의 GitHub 저장소를 AI가 분석하여 코드 및 인프라 보안 취약점을 탐지하고, 취약 파일·심각도·보안 근거·수정 가이드를 제공하는 서비스입니다.",
+        "evidence_originals": [
+          "사용자의 GitHub 저장소를 AI가 분석하여 코드 및 인프라 보안 취약점을 탐지하고, 취약 파일·심각도·보안 근거·수정 가이드를 제공하는 서비스입니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "ac37a86337d7e571145cba3430f6ac5963c842bc9885f31bc14c650ad8a60078",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#213"
+      }
+    },
+    {
+      "subject": "kg:use-secause-ai-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-ai",
+      "props": {
+        "evidence": "사용자의 GitHub 저장소를 AI가 분석하여 코드 및 인프라 보안 취약점을 탐지하고, 취약 파일·심각도·보안 근거·수정 가이드를 제공하는 서비스입니다.",
+        "evidence_originals": [
+          "사용자의 GitHub 저장소를 AI가 분석하여 코드 및 인프라 보안 취약점을 탐지하고, 취약 파일·심각도·보안 근거·수정 가이드를 제공하는 서비스입니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "b2e34f7b93b39d45d2d1e1478b3c01cb3cbf47a661c1218bd67a94b6813999b8",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#213"
+      }
+    },
+    {
+      "subject": "kg:use-secause-docker-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다.",
+        "evidence_originals": [
+          "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "0f2f53fa95d50a890c5a21ac6453352b8020ad02ae1e071f87bd287bce0bdc94",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#213"
+      }
+    },
+    {
+      "subject": "kg:use-secause-docker-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence_originals": [
+          "경력기술서 > 경력기술서 > 프로젝트 경험 > 4. SeCause — AI 기반 코드 보안 취약점 분석 서비스 (졸업 프로젝트)"
+        ],
+        "evidence": "경력기술서 > 경력기술서 > 프로젝트 경험 > 4. SeCause — AI 기반 코드 보안 취약점 분석 서비스 (졸업 프로젝트)",
+        "confidence": 0.99,
+        "edge_key": "b454d90fd13c13f6107f573bbff57f97dc42dbc948528e01a0f9ac75901ad282",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "경력기술서#326"
+      }
+    },
+    {
+      "subject": "kg:use-secause-docker-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-docker",
+      "props": {
+        "evidence_originals": [
+          "**기술** Spring Boot / FastAPI / Redis(RQ) / Docker / GitHub Actions / GitHub API"
+        ],
+        "evidence": "**기술** Spring Boot / FastAPI / Redis(RQ) / Docker / GitHub Actions / GitHub API",
+        "confidence": 0.99,
+        "edge_key": "55e866e77343f901da47dfbbcd25e9e2cf8644835ba43c9038ade36c724c428c",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "경력기술서#326"
+      }
+    },
+    {
+      "subject": "kg:use-secause-docker-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-docker",
+      "props": {
+        "evidence": "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다.",
+        "evidence_originals": [
+          "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "f64f3fc6efbf6adfc8efea17b07380a8072e02abab57e0dd9aaaca2073a69ec7",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#213"
+      }
+    },
+    {
+      "subject": "kg:use-secause-fastapi-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "01. AI 기반 코드 보안 취약점 분석 서비스: SeCause",
+        "evidence_originals": [
+          "01. AI 기반 코드 보안 취약점 분석 서비스: SeCause"
+        ],
+        "confidence": 0.99,
+        "edge_key": "09eaf9a88e98bc369aa796a5117970e2d9d5d0226b7f0037123ce214cb01d3d6",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#214"
+      }
+    },
+    {
+      "subject": "kg:use-secause-fastapi-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-fastapi",
+      "props": {
+        "evidence": "분석 요청 정보를 먼저 저장하고, `@TransactionalEventListener(AFTER_COMMIT)`와 전용 `ThreadPoolTaskExecutor`를 통해 FastAPI 호출을 비동기로 분리",
+        "evidence_originals": [
+          "분석 요청 정보를 먼저 저장하고, `@TransactionalEventListener(AFTER_COMMIT)`와 전용 `ThreadPoolTaskExecutor`를 통해 FastAPI 호출을 비동기로 분리"
+        ],
+        "confidence": 0.99,
+        "edge_key": "1e3172364d74e5a9bdbc58914e8d99d41428211acf33ac37618ef7ff4aff3ba4",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#214"
+      }
+    },
+    {
+      "subject": "kg:use-secause-fastapi-2",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다.",
+        "evidence_originals": [
+          "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "4d2c11afb9c7cec9f8c4301633e4e1687c6d36cbba202cdd452247f873f300a7",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#213"
+      }
+    },
+    {
+      "subject": "kg:use-secause-fastapi-2",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-fastapi",
+      "props": {
+        "evidence": "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다.",
+        "evidence_originals": [
+          "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "2945a15b46f6a926ddf3253add2eb56d924daf3c8127430bd2682fd6828add10",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#213"
+      }
+    },
+    {
+      "subject": "kg:use-secause-fastapi-3",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence_originals": [
+          "경력기술서 > 경력기술서 > 프로젝트 경험 > 4. SeCause — AI 기반 코드 보안 취약점 분석 서비스 (졸업 프로젝트)"
+        ],
+        "evidence": "경력기술서 > 경력기술서 > 프로젝트 경험 > 4. SeCause — AI 기반 코드 보안 취약점 분석 서비스 (졸업 프로젝트)",
+        "confidence": 0.99,
+        "edge_key": "074ffaf434360e9f62f3aa022c8c1f2b402ab68813f45d82f8ea217f90202b05",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "경력기술서#326"
+      }
+    },
+    {
+      "subject": "kg:use-secause-fastapi-3",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-fastapi",
+      "props": {
+        "evidence_originals": [
+          "**기술** Spring Boot / FastAPI / Redis(RQ) / Docker / GitHub Actions / GitHub API"
+        ],
+        "evidence": "**기술** Spring Boot / FastAPI / Redis(RQ) / Docker / GitHub Actions / GitHub API",
+        "confidence": 0.99,
+        "edge_key": "cc69b0df3becde7408c36d5f739acda034928f9258cd18014b5c05723eea1127",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "경력기술서#326"
+      }
+    },
+    {
+      "subject": "kg:use-secause-github-actions-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence_originals": [
+          "경력기술서 > 경력기술서 > 프로젝트 경험 > 4. SeCause — AI 기반 코드 보안 취약점 분석 서비스 (졸업 프로젝트)"
+        ],
+        "evidence": "경력기술서 > 경력기술서 > 프로젝트 경험 > 4. SeCause — AI 기반 코드 보안 취약점 분석 서비스 (졸업 프로젝트)",
+        "confidence": 0.99,
+        "edge_key": "3fca576fa857f35e0fec798110cd79ec44762ae00146eae51a8535b29b3c515b",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "경력기술서#326"
+      }
+    },
+    {
+      "subject": "kg:use-secause-github-actions-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-github-actions",
+      "props": {
+        "evidence_originals": [
+          "**기술** Spring Boot / FastAPI / Redis(RQ) / Docker / GitHub Actions / GitHub API"
+        ],
+        "evidence": "**기술** Spring Boot / FastAPI / Redis(RQ) / Docker / GitHub Actions / GitHub API",
+        "confidence": 0.99,
+        "edge_key": "3a095045fb2d83b4c9fcbc58ed38bfcf6a63a1c49a2ab0fce46b1aaecbd19173",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "경력기술서#326"
+      }
+    },
+    {
+      "subject": "kg:use-secause-github-api-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다.",
+        "evidence_originals": [
+          "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "7dbdb72cb2c9ede19602bbb8530fa1a9d2b9c7bfb928a9a5e1472cd41dfe986a",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#213"
+      }
+    },
+    {
+      "subject": "kg:use-secause-github-api-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-github-api",
+      "props": {
+        "evidence": "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다.",
+        "evidence_originals": [
+          "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "9593cab3dc3998a4708db2d13819c5dad1922a3d25650998988506a002dfb685",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#213"
+      }
+    },
+    {
+      "subject": "kg:use-secause-github-api-2",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence_originals": [
+          "경력기술서 > 경력기술서 > 프로젝트 경험 > 4. SeCause — AI 기반 코드 보안 취약점 분석 서비스 (졸업 프로젝트)"
+        ],
+        "evidence": "경력기술서 > 경력기술서 > 프로젝트 경험 > 4. SeCause — AI 기반 코드 보안 취약점 분석 서비스 (졸업 프로젝트)",
+        "confidence": 0.99,
+        "edge_key": "94d9cd5d5c0e577c59029882883032cb33d1dab3a1a6eff98efbb3ed2a48b16d",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "경력기술서#326"
+      }
+    },
+    {
+      "subject": "kg:use-secause-github-api-2",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "WebClient 기반 GitHub API 클라이언트를 구현하고, 개인 계정·소속 조직·저장소·브랜치 조회와 키워드 검색 기능을 제공.",
+        "evidence_originals": [
+          "WebClient 기반 GitHub API 클라이언트를 구현하고, 개인 계정·소속 조직·저장소·브랜치 조회와 키워드 검색 기능을 제공."
+        ],
+        "confidence": 0.98,
+        "edge_key": "b80c85b935edd94b0d5a53396ed31af1df0774310d18e45ea7c1320d20add03a",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#216"
+      }
+    },
+    {
+      "subject": "kg:use-secause-github-api-2",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-github-api",
+      "props": {
+        "evidence": "WebClient 기반 GitHub API 클라이언트를 구현하고, 개인 계정·소속 조직·저장소·브랜치 조회와 키워드 검색 기능을 제공.",
+        "evidence_originals": [
+          "WebClient 기반 GitHub API 클라이언트를 구현하고, 개인 계정·소속 조직·저장소·브랜치 조회와 키워드 검색 기능을 제공."
+        ],
+        "confidence": 0.99,
+        "edge_key": "187dd057514838925e5e9384223aa49a193009fc7c2d161ab8fa77f28097691f",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#216"
+      }
+    },
+    {
+      "subject": "kg:use-secause-github-api-2",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-github-api",
+      "props": {
+        "evidence_originals": [
+          "**기술** Spring Boot / FastAPI / Redis(RQ) / Docker / GitHub Actions / GitHub API"
+        ],
+        "evidence": "**기술** Spring Boot / FastAPI / Redis(RQ) / Docker / GitHub Actions / GitHub API",
+        "confidence": 0.99,
+        "edge_key": "c9e758a622e0e7889d941684e87131559ac0f8d772b8f5e16bed121b63841bf3",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "경력기술서#326"
+      }
+    },
+    {
+      "subject": "kg:use-secause-mesiji-kyu-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "01. AI 기반 코드 보안 취약점 분석 서비스: SeCause",
+        "evidence_originals": [
+          "01. AI 기반 코드 보안 취약점 분석 서비스: SeCause"
+        ],
+        "confidence": 0.99,
+        "edge_key": "349944409c07cf28c4da5cb0d44cc144860588bb108c152122bc03fb6e941fb5",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#214"
+      }
+    },
+    {
+      "subject": "kg:use-secause-mesiji-kyu-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-mesiji-kyu",
+      "props": {
+        "evidence": "향후 메시지 큐 또는 Outbox 패턴 도입 검토",
+        "evidence_originals": [
+          "향후 메시지 큐 또는 Outbox 패턴 도입 검토"
+        ],
+        "confidence": 0.99,
+        "edge_key": "4fb88096d1fe0a3f101dae2407cfaf7c262e3b71f83145e4fa4fb78394024d35",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#214"
+      }
+    },
+    {
+      "subject": "kg:use-secause-outbox-paeteon-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "01. AI 기반 코드 보안 취약점 분석 서비스: SeCause",
+        "evidence_originals": [
+          "01. AI 기반 코드 보안 취약점 분석 서비스: SeCause"
+        ],
+        "confidence": 0.99,
+        "edge_key": "03cee66d5fa6d86b2b1aea368bcd3329c1c59501051ca20a8b3af7188c192521",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#214"
+      }
+    },
+    {
+      "subject": "kg:use-secause-outbox-paeteon-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-outbox-paeteon",
+      "props": {
+        "evidence": "향후 메시지 큐 또는 Outbox 패턴 도입 검토",
+        "evidence_originals": [
+          "향후 메시지 큐 또는 Outbox 패턴 도입 검토"
+        ],
+        "confidence": 0.99,
+        "edge_key": "6ca10fd0d90b43830136de20dde12722319f73326d16f9126a0b408f59a19cd9",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#214"
+      }
+    },
+    {
+      "subject": "kg:use-secause-redis-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "Redis 장애 시 503을 명확히 반환하도록 처리",
+        "evidence_originals": [
+          "Redis 장애 시 503을 명확히 반환하도록 처리"
+        ],
+        "confidence": 0.86,
+        "edge_key": "4143bcf290eb21845d33d5992dc17e6b1771022155fb83c26380f6a755946699",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#216"
+      }
+    },
+    {
+      "subject": "kg:use-secause-redis-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-redis",
+      "props": {
+        "evidence": "Redis 장애 시 503을 명확히 반환하도록 처리",
+        "evidence_originals": [
+          "Redis 장애 시 503을 명확히 반환하도록 처리"
+        ],
+        "confidence": 0.95,
+        "edge_key": "715fe990aad726984e374be221f9548f29ec5c0530fb80a9f185722a5d9181e0",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#216"
+      }
+    },
+    {
+      "subject": "kg:use-secause-redis-2",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "Redis와 RQ(Redis Queue)를 도입해 `/api/internal/analyze` 요청을 큐에 적재하고 `202 Accepted`와 job ID만 즉시 반환하도록 변경.",
+        "evidence_originals": [
+          "Redis와 RQ(Redis Queue)를 도입해 `/api/internal/analyze` 요청을 큐에 적재하고 `202 Accepted`와 job ID만 즉시 반환하도록 변경."
+        ],
+        "confidence": 0.99,
+        "edge_key": "8e4a4e0dccb3068fdf5c94a954b91efa44498515b86683fe03d9128918c9b33e",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#215"
+      }
+    },
+    {
+      "subject": "kg:use-secause-redis-2",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-redis",
+      "props": {
+        "evidence": "Redis와 RQ(Redis Queue)를 도입해 `/api/internal/analyze` 요청을 큐에 적재하고 `202 Accepted`와 job ID만 즉시 반환하도록 변경.",
+        "evidence_originals": [
+          "Redis와 RQ(Redis Queue)를 도입해 `/api/internal/analyze` 요청을 큐에 적재하고 `202 Accepted`와 job ID만 즉시 반환하도록 변경."
+        ],
+        "confidence": 0.99,
+        "edge_key": "6421a2ee95cde53f7004c3e908d560f3a95860c46f3d94b45020b7c34408fb50",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#215"
+      }
+    },
+    {
+      "subject": "kg:use-secause-redis-rq-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence_originals": [
+          "경력기술서 > 경력기술서 > 프로젝트 경험 > 4. SeCause — AI 기반 코드 보안 취약점 분석 서비스 (졸업 프로젝트)"
+        ],
+        "evidence": "경력기술서 > 경력기술서 > 프로젝트 경험 > 4. SeCause — AI 기반 코드 보안 취약점 분석 서비스 (졸업 프로젝트)",
+        "confidence": 0.99,
+        "edge_key": "c3f9c63768e6e976bf71434765e73a0becf95796d20adffe96b8e9d8d299ad92",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "경력기술서#326"
+      }
+    },
+    {
+      "subject": "kg:use-secause-redis-rq-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-redis",
+      "props": {
+        "evidence_originals": [
+          "**기술** Spring Boot / FastAPI / Redis(RQ) / Docker / GitHub Actions / GitHub API"
+        ],
+        "evidence": "**기술** Spring Boot / FastAPI / Redis(RQ) / Docker / GitHub Actions / GitHub API",
+        "confidence": 0.99,
+        "edge_key": "6a89601e83104c622bf36022276f7b1be7635ba5e7e0658f02f0ca967f5458eb",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "경력기술서#326"
+      }
+    },
+    {
+      "subject": "kg:use-secause-rq-redis-queue-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "Redis와 RQ(Redis Queue)를 도입해 `/api/internal/analyze` 요청을 큐에 적재하고 `202 Accepted`와 job ID만 즉시 반환하도록 변경.",
+        "evidence_originals": [
+          "Redis와 RQ(Redis Queue)를 도입해 `/api/internal/analyze` 요청을 큐에 적재하고 `202 Accepted`와 job ID만 즉시 반환하도록 변경."
+        ],
+        "confidence": 0.99,
+        "edge_key": "e71983ab17675ead95e8733cd17a5c5d18431442d48f2640a94cdb26db28f8ea",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#215"
+      }
+    },
+    {
+      "subject": "kg:use-secause-rq-redis-queue-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-redis",
+      "props": {
+        "evidence": "Redis와 RQ(Redis Queue)를 도입해 `/api/internal/analyze` 요청을 큐에 적재하고 `202 Accepted`와 job ID만 즉시 반환하도록 변경.",
+        "evidence_originals": [
+          "Redis와 RQ(Redis Queue)를 도입해 `/api/internal/analyze` 요청을 큐에 적재하고 `202 Accepted`와 job ID만 즉시 반환하도록 변경."
+        ],
+        "confidence": 0.99,
+        "edge_key": "f0e85f726bc6d7de47390f8a87087a334d0a722926cd6f7c3926deb48b3b5c07",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#215"
+      }
+    },
+    {
+      "subject": "kg:use-secause-spring-application-event-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "01. AI 기반 코드 보안 취약점 분석 서비스: SeCause",
+        "evidence_originals": [
+          "01. AI 기반 코드 보안 취약점 분석 서비스: SeCause"
+        ],
+        "confidence": 0.99,
+        "edge_key": "5aad3110a03e9aeca225e69a6e571383e29129ae26514af494b7ffe912be7145",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#214"
+      }
+    },
+    {
+      "subject": "kg:use-secause-spring-application-event-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-spring-application-event",
+      "props": {
+        "evidence": "Spring Application Event 기반 인메모리 처리라 애플리케이션 종료 시 이벤트가 유실될 수 있어",
+        "evidence_originals": [
+          "Spring Application Event 기반 인메모리 처리라 애플리케이션 종료 시 이벤트가 유실될 수 있어"
+        ],
+        "confidence": 0.98,
+        "edge_key": "88f9d983625cda66952ed17202fa969c9e6b1e9d9f54a2672fe7079293b364ab",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#214"
+      }
+    },
+    {
+      "subject": "kg:use-secause-spring-boot-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence_originals": [
+          "경력기술서 > 경력기술서 > 프로젝트 경험 > 4. SeCause — AI 기반 코드 보안 취약점 분석 서비스 (졸업 프로젝트)"
+        ],
+        "evidence": "경력기술서 > 경력기술서 > 프로젝트 경험 > 4. SeCause — AI 기반 코드 보안 취약점 분석 서비스 (졸업 프로젝트)",
+        "confidence": 0.99,
+        "edge_key": "07060003f1061d3edcbcf6be1568f80789097b29aa15a96bda64ee37ed3b7b47",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "경력기술서#326"
+      }
+    },
+    {
+      "subject": "kg:use-secause-spring-boot-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-spring-boot",
+      "props": {
+        "evidence_originals": [
+          "**기술** Spring Boot / FastAPI / Redis(RQ) / Docker / GitHub Actions / GitHub API"
+        ],
+        "evidence": "**기술** Spring Boot / FastAPI / Redis(RQ) / Docker / GitHub Actions / GitHub API",
+        "confidence": 0.99,
+        "edge_key": "7c19e5c7c72ce9fe78226863ad94834d7345043e8a6806773461916e960441c1",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "경력기술서#326"
+      }
+    },
+    {
+      "subject": "kg:use-secause-spring-boot-2",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다.",
+        "evidence_originals": [
+          "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "12928b99b1f3321b509256e1df2fbfe77fd8e90cdcecf01379139c0574a09841",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#213"
+      }
+    },
+    {
+      "subject": "kg:use-secause-spring-boot-2",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-spring-boot",
+      "props": {
+        "evidence": "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다.",
+        "evidence_originals": [
+          "프로젝트 초기 설정과 공통 구조 설계부터 GitHub API 연동, Spring Boot 서버와 FastAPI 분석 서버 간 비동기 통신 파이프라인 설계, Docker 기반 CI/CD 환경 구축까지 담당했습니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "b170fb26b89edc2ac3c19a1402d26c5f3571de8150ce0a59c29a112febdbe40b",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#213"
+      }
+    },
+    {
+      "subject": "kg:use-secause-threadpooltaskexecutor-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "01. AI 기반 코드 보안 취약점 분석 서비스: SeCause",
+        "evidence_originals": [
+          "01. AI 기반 코드 보안 취약점 분석 서비스: SeCause"
+        ],
+        "confidence": 0.99,
+        "edge_key": "32bdd989125d406ffe4e44a9deff3ba9512e69033d9b9320d0e07accc033039f",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#214"
+      }
+    },
+    {
+      "subject": "kg:use-secause-threadpooltaskexecutor-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-threadpooltaskexecutor",
+      "props": {
+        "evidence": "분석 요청 정보를 먼저 저장하고, `@TransactionalEventListener(AFTER_COMMIT)`와 전용 `ThreadPoolTaskExecutor`를 통해 FastAPI 호출을 비동기로 분리",
+        "evidence_originals": [
+          "분석 요청 정보를 먼저 저장하고, `@TransactionalEventListener(AFTER_COMMIT)`와 전용 `ThreadPoolTaskExecutor`를 통해 FastAPI 호출을 비동기로 분리"
+        ],
+        "confidence": 0.99,
+        "edge_key": "e1dd6e64c36f1f3102698258c518eafaf78b077dc614d86ed4e875f6871aed19",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#214"
+      }
+    },
+    {
+      "subject": "kg:use-secause-webclient-1",
+      "type": "PART_OF",
+      "object": "kg:secause",
+      "props": {
+        "evidence": "WebClient 기반 GitHub API 클라이언트를 구현하고, 개인 계정·소속 조직·저장소·브랜치 조회와 키워드 검색 기능을 제공.",
+        "evidence_originals": [
+          "WebClient 기반 GitHub API 클라이언트를 구현하고, 개인 계정·소속 조직·저장소·브랜치 조회와 키워드 검색 기능을 제공."
+        ],
+        "confidence": 0.98,
+        "edge_key": "446e281d64fd5793bccd1bbbbdbdb05a4bd355dd1d086931baf5424953a6a9a9",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#216"
+      }
+    },
+    {
+      "subject": "kg:use-secause-webclient-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-webclient",
+      "props": {
+        "evidence": "WebClient 기반 GitHub API 클라이언트를 구현하고, 개인 계정·소속 조직·저장소·브랜치 조회와 키워드 검색 기능을 제공.",
+        "evidence_originals": [
+          "WebClient 기반 GitHub API 클라이언트를 구현하고, 개인 계정·소속 조직·저장소·브랜치 조회와 키워드 검색 기능을 제공."
+        ],
+        "confidence": 0.99,
+        "edge_key": "d37a75dac336d02c0348739ae433cb6d0780262e9a85a6215d2f583857260651",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#216"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-aws-ec2-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "81c503ccb6024bcc082bd3e46ed6ecc5eb1bae9d175c4497d61d576b63e01cfb",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-aws-ec2-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-aws-ec2",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "72260e07410b293b90e133760ad145870e7a2f256895966579c5dc6713d7ac08",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-aws-s3-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "69a28f625d706b954c9215e184d99b8410be7f6a33a7f747a71d16b7aa23ac56",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-aws-s3-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-aws-s3",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "afea0ee2118a010e77bcf133469095748ef994f349c7ba357e5e7e9f20692960",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-coderabbit-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "273bc832746dcc7e710ff71801b9eb3ed1ed542201b8dbf880d8b2dae009b76a",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-coderabbit-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-coderabbit",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "a6a845382eddd8c35e7f1f1659dcc4c4a591d4588f110fb325a0c38b8812ebd9",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-docker-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "2175d63e9fe0426462ba2f6c8da7525305316c18f120505f6d8f4a37a6e4df33",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-docker-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-docker",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "726b287427f2edb624856a0cfa1ac0f28a95d23f8d4726b15a4ba2e4e284583f",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-github-actions-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "9864132abdcdd9f483c42a3b2d3db1c43c43a1fc1365947d52f358fe0c809ad3",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-github-actions-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-github-actions",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "0d12fdaf014318ca0f7fdad18495497a11d7468e38d47bd992c73bf92018727d",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-java-17-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "8c8c2a8c6627620738851fbc9b90f510dcb90f4d3c298fc8d5ae1ede590071c2",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-java-17-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-java-17",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "03d171eae375332691569756296d87079be47fa6b834a3ab1107063d282c0e18",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-jwt-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "0929a028476eb94874902226df2d4e2db5fa781c376cdfa5c310d1686f2d69cd",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-jwt-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-jwt",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "85466d1240f06c5f2f048a7459bd2ab0d6bc42c99e58d300bd60c845165bc73f",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-mysql-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "537ecc87d3464ef0edc1381c469a27023b4c1c12b5574c6751546381416dfff8",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-mysql-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-mysql",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "48c4eac8c5d65ae14d9560c14449e68ec31d741bb7c01ae1c528bab4ab5c8003",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-querydsl-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "130c55fb007d690af2da51cca377d9272e638624a970fb554da2d22f2015fc67",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-querydsl-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-querydsl",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "856041239f33d7d1a776a14cd5f2ac649c2335a9cff5965a8450a0a3768fafa1",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-redis-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "f490aab17347cded58cb7bec994cba07c274507db22cf5d4f37ddd52b26a6bd7",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-redis-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-redis",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "9a1d5c1a6ffc7d18ab718212819fba964fcc843093efcc6e60aad574cfaab9e2",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-redis-2",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence_originals": [
+          "팀피셜 > 팀피셜 > 사용 기술 > 트러블슈팅 > PR #81 - 지원자 수 집계 쿼리 성능 개선"
+        ],
+        "evidence": "팀피셜 > 팀피셜 > 사용 기술 > 트러블슈팅 > PR #81 - 지원자 수 집계 쿼리 성능 개선",
+        "confidence": 0.96,
+        "edge_key": "27fc8e9574e94a971523a33a246690515adb283067dcae458ade44aa8a921ed9",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "팀피셜#1063"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-redis-2",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence_originals": [
+          "팀피셜 > 팀피셜 > 사용 기술 > 트러블슈팅 > PR #81 - 지원자 수 집계 쿼리 성능 개선"
+        ],
+        "evidence": "팀피셜 > 팀피셜 > 사용 기술 > 트러블슈팅 > PR #81 - 지원자 수 집계 쿼리 성능 개선",
+        "confidence": 0.9,
+        "edge_key": "77fd1eed15819dbc8ad0992ccdcd2c94d30cfa512cb259c1f2f98c3bcace5616",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "팀피셜#1062"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-redis-2",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "Redis 캐시 아키텍처로 지원자 수 집계 성능 개선",
+        "evidence_originals": [
+          "Redis 캐시 아키텍처로 지원자 수 집계 성능 개선"
+        ],
+        "confidence": 0.98,
+        "edge_key": "e36476b866d373dd712bba8fda1a8997c9825642d6175b9e3cfd1957a0639658",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#231"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-redis-2",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "NHN 지원자 테스트 엔지니어 이연호 포트폴리오 > NHN 지원자 테스트 엔지니어 이연호 포트폴리오 > 📽️ Projects > 04. 소프트스킬 기반 팀빌딩 서비스: TEAMFICIAL",
+        "evidence_originals": [
+          "NHN 지원자 테스트 엔지니어 이연호 포트폴리오 > NHN 지원자 테스트 엔지니어 이연호 포트폴리오 > 📽️ Projects > 04. 소프트스킬 기반 팀빌딩 서비스: TEAMFICIAL"
+        ],
+        "confidence": 0.99,
+        "edge_key": "fdd71c0124421a3119c8bf39e0bbeaffa00a3f2d9d86ca1ecc3340faad4425ca",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#232"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-redis-2",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-redis",
+      "props": {
+        "evidence_originals": [
+          "**문제 2. 캐시 도입 이후 Redis 타입 불일치**"
+        ],
+        "evidence": "**문제 2. 캐시 도입 이후 Redis 타입 불일치**",
+        "confidence": 0.98,
+        "edge_key": "40bc3433fa056591f918790784315ab5322fde0972410abc86468730e2fcd813",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "팀피셜#1062"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-redis-2",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-redis",
+      "props": {
+        "evidence": "`getApplicantCountsBatch`)에는 `MGET`으로 여러 모집글의 캐시를 한 번에 조회한 뒤, 캐시가 없는 postId만 골라 DB 배치 쿼리로 채우고 `MSET`으로 캐시에 다시 채워 넣는 부분 캐시 히트(partial cache hit) 구조로 만들었습니다.",
+        "evidence_originals": [
+          "`getApplicantCountsBatch`)에는 `MGET`으로 여러 모집글의 캐시를 한 번에 조회한 뒤, 캐시가 없는 postId만 골라 DB 배치 쿼리로 채우고 `MSET`으로 캐시에 다시 채워 넣는 부분 캐시 히트(partial cache hit) 구조로 만들었습니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "72be7e82d4b9edecf48224dbb7c3460f4ce518c66ee17ef0fa20a1202e707e51",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#232"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-redis-2",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-redis",
+      "props": {
+        "evidence": "Redis 기반 캐시 계층을 별도로 설계했습니다.",
+        "evidence_originals": [
+          "Redis 기반 캐시 계층을 별도로 설계했습니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "8bc548df257883b34255a2570a4221e3e580a505928033f0baf1588f6ce2687e",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#231"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-redis-2",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-redis",
+      "props": {
+        "evidence_originals": [
+          "단일 쿼리로 개선한 뒤에도 반복 조회 비용이 남아 있어 Redis 캐싱을 추가했는데"
+        ],
+        "evidence": "단일 쿼리로 개선한 뒤에도 반복 조회 비용이 남아 있어 Redis 캐싱을 추가했는데",
+        "confidence": 0.99,
+        "edge_key": "a873d10100a68af28eaaa150378509e93f9fc0fb258c66e249ac17c96914a3af",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "팀피셜#1063"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-redis-3",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "지원서·프로필·마이페이지 도메인과 Redis 캐싱 인프라를 담당했습니다.",
+        "evidence_originals": [
+          "지원서·프로필·마이페이지 도메인과 Redis 캐싱 인프라를 담당했습니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "b0178e2ae24a5c62cfd9247a1433ff35c3869a909d9b9fa04c36e16b2bbcdcb6",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#230"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-redis-3",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-redis",
+      "props": {
+        "evidence": "지원서·프로필·마이페이지 도메인과 Redis 캐싱 인프라를 담당했습니다.",
+        "evidence_originals": [
+          "지원서·프로필·마이페이지 도메인과 Redis 캐싱 인프라를 담당했습니다."
+        ],
+        "confidence": 0.99,
+        "edge_key": "586f51d05c5e7d83d4bce21756a1933b7a054515b9110b5e2e22aa8b085d50d7",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#230"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-spring-boot-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "77e05fea548df9d9d6a00061b42e1745da21f3c2430179cdba5b90ab1eb95c63",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-spring-boot-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-spring-boot",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "79ee8e57143ea14307345b5226a87c2c2751dfc10c7c6cf7d80b2ff8ecdee630",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-spring-data-jpa-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "f6bec76e5d373c75cfdd5e74c6325736bfbaadfcd4b0328dfc3d2dd6cc90b89c",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-spring-data-jpa-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-spring-data-jpa",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "13bc0ae75890b3438531b03abbfdef69b9379f39e0197748fc1b5fd55a10e315",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-spring-security-1",
+      "type": "PART_OF",
+      "object": "kg:teamficial",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "e7733d8da7dfb4417d208a237e1452381b43bdf7112036c8e7dd852923680218",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    },
+    {
+      "subject": "kg:use-teamficial-spring-security-1",
+      "type": "USES_TECHNOLOGY",
+      "object": "kg:tech-spring-security",
+      "props": {
+        "evidence": "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit",
+        "evidence_originals": [
+          "**Skill**: Java 17 / Spring Boot 3.x / Spring Data JPA / QueryDSL / MySQL / Redis / Spring Security / JWT / Docker / AWS EC2 & S3 / GitHub Actions / CodeRabbit"
+        ],
+        "confidence": 0.95,
+        "edge_key": "861d0d1d8ba77095138fc6c37edd67b56e75f1b34f9fd4331bfaeeda72e6de20",
+        "extraction_run": "v0-2026-09-28",
+        "ingested_from": "postgres",
+        "chunk_id": "NHN_지원자_테스트_엔지니어_이연호_포트폴리오#234"
+      }
+    }
+  ]
+}

@@ -11,7 +11,7 @@ import time
 
 import yaml
 
-from ask import chat, v1, v2, v3
+from ask import chat, loads_json, v1, v2, v3
 from common import LAB, OUT
 
 JUDGE_MODEL = "claude-sonnet-5-5"
@@ -29,7 +29,7 @@ def judge(item, ans):
          {"role": "user", "content": f"질문: {item['q']}\n\n정답(gold): {item['gold']}\n\n시스템 답:\n{ans}"}],
         json_mode=True, model=JUDGE_MODEL,
     )
-    return json.loads(out)
+    return loads_json(out)
 
 
 def main(only):
@@ -45,7 +45,8 @@ def main(only):
             j = judge(it, res["answer"])
             rows.append({"id": it["id"], "type": it["type"], "mode": res["mode"], "verdict": j["verdict"],
                          "unsupported": j["unsupported"], "reason": j["reason"], "answer": res["answer"],
-                         "cypher": res.get("cypher"), "entities": res.get("entities"), "sec": sec})
+                         "cypher": res.get("cypher"), "entities": res.get("entities"), "sources": res.get("sources"),
+                         "pages": res.get("pages"), "rows": res.get("rows"), "sec": sec})
             print(f"{it['id']} {res['mode']:<14} {j['verdict']:<8} {'⚠unsupported' if j['unsupported'] else '':<13} {sec}s")
     (OUT / "eval.json").write_text(json.dumps(rows, ensure_ascii=False, indent=1))
     pts = {"correct": 1, "partial": 0.5, "wrong": 0}

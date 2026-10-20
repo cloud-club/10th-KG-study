@@ -10,6 +10,7 @@
   (Member)-[:REPORTED]->(Finding), (Member)-[:HIT]->(Pitfall)   파생: Chunk→Document→Member 경로를 접은 것
 
 실행: python load_semantic.py   (load_structure.py · extract.py 다음)
+     GRAPHRAG_EXTRACT_MODEL=gpt-5.4-mini python load_semantic.py   → outputs/extract_gpt-5.4-mini.json 을 쓴다 (비교용)
 """
 import hashlib
 import json
@@ -66,7 +67,10 @@ def fid(prefix, item):
 
 def main():
     docs = json.loads((OUT / "corpus.json").read_text())
-    ext = json.loads((OUT / "extract.json").read_text())
+    from extract import SUFFIX
+
+    ext = json.loads((OUT / f"extract{SUFFIX}.json").read_text())
+    print("extract file:", f"extract{SUFFIX}.json")
     pats = alias_patterns()
     mentions = [
         {"chunk": c["id"], "entity": name}

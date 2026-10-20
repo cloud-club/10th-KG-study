@@ -1,0 +1,62 @@
+[
+ {
+  "file": "extract_sample.json",
+  "n": 0,
+  "cw_only": false,
+  "finding_faithful": "17/19 (89%)",
+  "finding_kind_ok": "19/19 (100%)",
+  "direction_ok": "7/8 (88%)",
+  "pitfall_faithful": "20/20 (100%)",
+  "pitfall_ok": "18/20 (90%)"
+ },
+ {
+  "file": "extract_sample_gpt-5.4-mini.json",
+  "n": 0,
+  "cw_only": false,
+  "finding_faithful": "42/50 (84%)",
+  "finding_kind_ok": "31/50 (62%)",
+  "direction_ok": "1/10 (10%)",
+  "pitfall_faithful": "23/30 (77%)",
+  "pitfall_ok": "18/30 (60%)"
+ },
+ {
+  "file": "extract_gpt-5.4-mini.json",
+  "n": 60,
+  "cw_only": false,
+  "finding_faithful": "49/60 (82%)",
+  "finding_kind_ok": "35/60 (58%)",
+  "direction_ok": "0/3 (0%)",
+  "pitfall_faithful": "34/40 (85%)",
+  "pitfall_ok": "14/40 (35%)"
+ },
+ {
+  "file": "extract.json",
+  "n": 60,
+  "cw_only": false,
+  "finding_faithful": "53/60 (88%)",
+  "finding_kind_ok": "60/60 (100%)",
+  "direction_ok": "19/20 (95%)",
+  "pitfall_faithful": "38/40 (95%)",
+  "pitfall_ok": "35/40 (88%)"
+ },
+ {
+  "file": "extract_gpt-5.4-mini.json",
+  "n": 30,
+  "cw_only": true,
+  "finding_faithful": "17/30 (57%)",
+  "finding_kind_ok": "15/30 (50%)",
+  "direction_ok": "4/30 (13%)",
+  "pitfall_faithful": "0/0",
+  "pitfall_ok": "0/0"
+ },
+ {
+  "file": "extract.json",
+  "n": 30,
+  "cw_only": true,
+  "finding_faithful": "24/30 (80%)",
+  "finding_kind_ok": "30/30 (100%)",
+  "direction_ok": "27/30 (90%)",
+  "pitfall_faithful": "0/0",
+  "pitfall_ok": "0/0"
+ }
+]

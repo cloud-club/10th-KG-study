@@ -2,7 +2,7 @@
 
   snapshot/graph.json.gz   Neo4j 노드·관계 전체 (임베딩 제외). LLM 키 없이 load 로 불러와 demo.cypher 를 돌린다
   snapshot/cache/*.jsonl   추출·커뮤니티 요약·Dataset 매핑·답변/채점 LLM 캐시. outputs/ 로 복사하면 재빌드 때 LLM 을 다시 부르지 않는다
-  snapshot/results/*.json  채점 결과 (1·2회차), 커뮤니티 요약, Dataset 매핑
+  snapshot/results/*.json  채점 결과 (1~4회차), 추출 정확도 비교, 커뮤니티 요약, Dataset 매핑
 
 임베딩 캐시(outputs/embeddings.jsonl, 약 200MB)는 GitHub 파일 한도(100MB)를 넘어 넣지 않는다.
 
@@ -18,7 +18,8 @@ from common import LAB, OUT, neo4j_driver
 
 SNAP = LAB / "snapshot"
 CACHES = ["extract.jsonl", "community_summaries.jsonl", "datasets.jsonl", "answers.jsonl"]
-RESULTS = ["eval.json", "eval_run1.json", "communities.json", "datasets.json"]
+RESULTS = ["eval_run1.json", "eval_run2.json", "eval_run3_terra.json", "eval_run4_terra.json", "communities.json",
+           "datasets.json", "judge_extract.json"]
 DROP_PROPS = {"embedding"}
 CONSTRAINTS = {  # 라벨 → 고유 키 (load_structure · load_semantic 과 같다)
     "Member": "id", "Document": "path", "Chunk": "id", "Tag": "name", "Week": "n", "WikiPage": "name",

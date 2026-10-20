@@ -4,7 +4,7 @@ type: comparison
 tags: [comparison]
 status: maintained
 created: 2026-10-02
-updated: 2026-10-18
+updated: 2026-10-20
 members: [dldusgh318, e0ng, do-dop, Yeongeunn, heebindev, kdyann, sunghyun]
 weeks: [3, 4, 5, 6]
 ---
@@ -48,7 +48,7 @@ weeks: [3, 4, 5, 6]
 | **kdyann** | 캡션 17건 · 8문항 | 다중 홉·추천 Recall@5 0.00~0.50 → **1.00**, 단순은 1.00 = 1.00, 집계는 v1 보류 → v2 응답 | 규칙 라우터가 질문 유형별 경로를 고른다 |
 | **sunghyun** | 회사 플랫폼 그래프 · 9 사실 항목 | 고정 v2 Qwen 3/9 → 9/9, GLM 2/9 → 9/9 (일부 템플릿 답변) / **에이전틱: 그래프 없이 4/9, 그래프 도구 추가 3/9** | 경로를 코드가 정하면 이기고 모델이 고르면 틀린 경로로 집계 |
 | **heebindev** | OS 노트 소규모 · 4문항 | 관계 1 같음(근거 추가) · 설명 2 같음 · 집계 둘 다 실패 → Text2Cypher로 풀림 | "답변 자체가 크게 좋아지지는 않았다" |
-| **dldusgh318** (PR #45 미머지) | 20청크 표본 · 7문항 × 3회 | X01만 wrong → partial, 나머지 같음, 그래프 경유 Gold 0건 | 집계는 v2가 아니라 Text2Cypher가 이겼다(17/21 correct) |
+| **dldusgh318** | 20청크 표본 · 7문항 × 3회 | X01만 wrong → partial, 나머지 같음, 그래프 경유 Gold 0건 | 집계는 v2가 아니라 Text2Cypher가 이겼다(17/21 correct) |
 
 - 집계는 **Top-k 검색의 구조적 한계**라는 데 네 명 모두 동의한다. 그래프 쪽에서도 로컬 확장(v2)이 아니라 전체 범위 Cypher가 필요했다 → [[Text2Cypher]].
 - 3~5주차의 "다중 홉이면 그래프가 아니다"는 6주차 실측으로 다듬어졌다. 이긴 질문은 **질문에 없는 중간 고리**를 건너는 질문이었다(kdyann 내 글 → Topic → 관심 분야 ← 참고 글, dldusgh318 X01) → [[멀티홉-질문과-Bridge-Entity]].
@@ -72,4 +72,4 @@ weeks: [3, 4, 5, 6]
 - Yeongeunn · 하이브리드 평가 (§생성 관찰 q10) — [members/Yeongeunn/labs/04-hybrid-evaluation/README.md](../../members/Yeongeunn/labs/04-hybrid-evaluation/README.md); 트리플 추출·적재 (§그래프 vs 검색) — [labs/05-triple-extraction/README.md](../../members/Yeongeunn/labs/05-triple-extraction/README.md)
 - heebindev · 데이터 파이프라인 (§9 다중 홉) — [members/heebindev/notes/05-rdf-owl-data-pipeline.md](../../members/heebindev/notes/05-rdf-owl-data-pipeline.md)
 - kdyann · 캡션 지식 그래프 (§공통 Topic) — [members/kdyann/labs/05-content-graph/README.md](../../members/kdyann/labs/05-content-graph/README.md); 하이브리드 검색과 RAG (§다중 홉) — [notes/03-hybrid-search.md](../../members/kdyann/notes/03-hybrid-search.md)
-- 6주차: kdyann · W6 실습 — [members/kdyann/labs/06-graphrag/README.md](../../members/kdyann/labs/06-graphrag/README.md); sunghyun · 그래프를 붙이고 같은 질문으로 비교하기 — [members/sunghyun/notes/06-graphrag-and-agentic-search.md](../../members/sunghyun/notes/06-graphrag-and-agentic-search.md); heebindev · GraphRAG 에이전트 v2 — [members/heebindev/labs/04-graphrag-agent/README.md](../../members/heebindev/labs/04-graphrag-agent/README.md); dldusgh318 · `results/w6_compare.md`, `labs/WEEK6_result.md` (PR #45 미머지)
+- 6주차: kdyann · W6 실습 — [members/kdyann/labs/06-graphrag/README.md](../../members/kdyann/labs/06-graphrag/README.md); sunghyun · 그래프를 붙이고 같은 질문으로 비교하기 — [members/sunghyun/notes/06-graphrag-and-agentic-search.md](../../members/sunghyun/notes/06-graphrag-and-agentic-search.md); heebindev · GraphRAG 에이전트 v2 — [members/heebindev/labs/04-graphrag-agent/README.md](../../members/heebindev/labs/04-graphrag-agent/README.md); dldusgh318 · [w6_compare.md](../../members/dldusgh318/labs/01-three-generations/results/w6_compare.md), [WEEK6_result.md](../../members/dldusgh318/labs/WEEK6_result.md)

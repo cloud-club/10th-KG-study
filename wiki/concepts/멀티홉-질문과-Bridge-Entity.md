@@ -4,7 +4,7 @@ type: concept
 tags: [concept]
 status: maintained
 created: 2026-09-16
-updated: 2026-10-18
+updated: 2026-10-20
 members: [dldusgh318, e0ng, lys0611, heebindev, sunghyun, sese2204, do-dop, kungbi, Yeongeunn, yujeong430, kdyann]
 weeks: [1, 3, 4, 5, 6]
 ---
@@ -56,7 +56,7 @@ weeks: [1, 3, 4, 5, 6]
 
 ## 6주차 — 그래프 리트리버로 건넌 다중 홉
 
-- **이긴 다중 홉은 "질문에 없는 중간 고리"를 건너는 질문이었다.** kdyann의 "내 오픈소스 기여와 같은 분야의 참고 글"은 내 글 → Topic → 관심 분야 ← Topic ← 참고 글 경로가 필요했고, Recall@5가 v1 0.33에서 v2 1.00이 됐다. dldusgh318 X01(브릿지 `Redis`가 질문에 없음)은 wrong → partial이었다. 다만 그래프를 거쳐 들어온 Gold 청크는 0건이었다(PR #45 미머지).
+- **이긴 다중 홉은 "질문에 없는 중간 고리"를 건너는 질문이었다.** kdyann의 "내 오픈소스 기여와 같은 분야의 참고 글"은 내 글 → Topic → 관심 분야 ← Topic ← 참고 글 경로가 필요했고, Recall@5가 v1 0.33에서 v2 1.00이 됐다. dldusgh318 X01(브릿지 `Redis`가 질문에 없음)은 wrong → partial이었다. 다만 그래프를 거쳐 들어온 Gold 청크는 0건이었다.
 - **브릿지를 따라가는 경로가 틀리면 그래프도 틀린다.** sunghyun의 에이전틱 검색은 Task→Issue→Test Case라는 2홉 경로를 Task→Test Case 1홉으로 줄여 조회했고, 오답 18개를 냈다(정답 13). 홉 수를 줄이면 브릿지(Issue)가 사라진다.
 - **경로의 방향과 실행 순서는 다르다.** Yeongeunn: `서비스 → exposesAPI → API`는 제공 관계이고 호출 순서가 아니다. sunghyun: 업무 순서는 Case Run → Test Run이지만, 저장된 조회 경로는 파일→Test Run←Case Run이다.
 - 자세한 결과는 → [[GraphRAG]], [[RAG-vs-그래프-질의]].
@@ -82,4 +82,4 @@ weeks: [1, 3, 4, 5, 6]
 - kdyann · 하이브리드 검색과 RAG (§다중 홉), SPARQL·계약 모델링 실습 — [members/kdyann/notes/03-hybrid-search.md](../../members/kdyann/notes/03-hybrid-search.md), [labs/04-sparql-graph/README.md](../../members/kdyann/labs/04-sparql-graph/README.md)
 - e0ng · 지식그래프 적재와 Cypher 다중 홉 — [members/e0ng/labs/05-graph-store/README.md](../../members/e0ng/labs/05-graph-store/README.md)
 - 외부: Tang & Yang, MultiHop-RAG (2024) https://arxiv.org/abs/2401.15391 (lys0611·do-dop 인용) · When to use Graphs in RAG (ICLR 2026, lys0611 readings) · Yang et al., HotpotQA (EMNLP 2018) https://aclanthology.org/D18-1259/ · Trivedi et al., IRCoT (ACL 2023) https://aclanthology.org/2023.acl-long.557/ (do-dop readings — 재검색 처방의 논문 근거)
-- 6주차: kdyann · W6 실습 — [members/kdyann/labs/06-graphrag/README.md](../../members/kdyann/labs/06-graphrag/README.md); sunghyun · 06 노트 (§그래프 도구가 있어도 틀린 사례) — [members/sunghyun/notes/06-graphrag-and-agentic-search.md](../../members/sunghyun/notes/06-graphrag-and-agentic-search.md); Yeongeunn · 13 GraphRAG (§관계 방향과 조회 방향) — [members/Yeongeunn/notes/13-week6-graphrag.md](../../members/Yeongeunn/notes/13-week6-graphrag.md); dldusgh318 · `results/w6_compare.md` (PR #45 미머지)
+- 6주차: kdyann · W6 실습 — [members/kdyann/labs/06-graphrag/README.md](../../members/kdyann/labs/06-graphrag/README.md); sunghyun · 06 노트 (§그래프 도구가 있어도 틀린 사례) — [members/sunghyun/notes/06-graphrag-and-agentic-search.md](../../members/sunghyun/notes/06-graphrag-and-agentic-search.md); Yeongeunn · 13 GraphRAG (§관계 방향과 조회 방향) — [members/Yeongeunn/notes/13-week6-graphrag.md](../../members/Yeongeunn/notes/13-week6-graphrag.md); dldusgh318 · [w6_compare.md](../../members/dldusgh318/labs/01-three-generations/results/w6_compare.md)

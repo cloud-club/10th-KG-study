@@ -4,7 +4,7 @@ type: comparison
 tags: [concept, comparison]
 status: maintained
 created: 2026-09-16
-updated: 2026-10-18
+updated: 2026-10-20
 members: [sese2204, kdyann, dldusgh318, do-dop, yujeong430, Yeongeunn, heebindev, sunghyun]
 weeks: [2, 3, 6]
 ---
@@ -61,4 +61,4 @@ weeks: [2, 3, 6]
 - 외부(sese2204): Khattab & Zaharia ColBERT https://arxiv.org/abs/2004.12832 · 『AI 에이전트 엔지니어링』(한빛미디어, 2026.01) · arXiv 2504.19754 · arXiv 2506.10408
 - do-dop · BEIR 벤치마크 — [members/do-dop/notes/03-beir-benchmark.md](../../members/do-dop/notes/03-beir-benchmark.md); 시맨틱 웹에서 지식그래프까지 (§11 GraphRAG) — [notes/04-semantic-web-to-knowledge-graph.md](../../members/do-dop/notes/04-semantic-web-to-knowledge-graph.md)
 - yujeong430 · 고급 RAG 패턴 — [members/yujeong430/notes/09-advanced-rag-patterns.md](../../members/yujeong430/notes/09-advanced-rag-patterns.md); Yeongeunn · 지식 그래프와 온톨로지 (§GraphRAG) — [members/Yeongeunn/notes/09-week4-ontology-background.md](../../members/Yeongeunn/notes/09-week4-ontology-background.md)
-- 6주차 실측: [[GraphRAG]] 페이지의 출처 참조 (kdyann·sunghyun·heebindev labs, dldusgh318 PR #45 미머지)
+- 6주차 실측: [[GraphRAG]] 페이지의 출처 참조 (kdyann·sunghyun·heebindev·dldusgh318 labs)

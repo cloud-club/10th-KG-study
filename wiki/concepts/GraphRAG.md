@@ -4,7 +4,7 @@ type: concept
 tags: [concept, methodology]
 status: draft
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-20
 members: [e0ng, heebindev, kdyann, sunghyun, Yeongeunn, dldusgh318, kungbi]
 weeks: [6]
 ---
@@ -68,7 +68,7 @@ weeks: [6]
 | **kdyann** | 검토한 인스타그램 캡션 17건(내 글 14 · 참고 글 3), 질문 8 | v1: nori BM25 + multilingual-e5-small + RRF. v2: 같은 검색 결과에서 규칙 기반 라우터가 경로 선택(단순·다중 홉·추천·집계). 2026-10-08 실행 | 단순 2문항: Recall@5 1.00 / 1.00. 다중 홉·추천 4문항: v1 0.33 · 0.50 · 0.00 · 0.00 → v2 전부 1.00. 집계 2문항: v1은 보류, v2는 야구 게시물 7개 · 최다 주제 야구 7개. v2 답변 상태 answered 5 · partial 3 |
 | **sunghyun** | 회사 업무·개발·테스트 플랫폼 API 스냅샷 그래프(동기화 기록 240노드 · 389관계 · 372청크, 비교 실험은 346청크 시점) | ① v1/v2 모델 비교 ② 릴리즈 집계 ③ 에이전틱 비교(GLM-5.2, 질문 4, 조회 예산 5회) | ① 사실 항목 점수 Qwen v1 3/9 → v2 9/9, GLM v1 2/9 → v2 9/9. **단 v2 일부는 Neo4j 행으로 만든 템플릿이라 "모델의 자율 추론으로 해석하지 않는다"**, 프롬프트·출력 한도도 완전히 같지 않았다. ② v2는 v0.1.0·v0.2.0 각각 Test Run 2개 · 통과 4 · 실패 0을 집계했고, v1은 검색된 6청크에 있는 일부만 보고 답했다. ③ 아래 |
 | **heebindev** | 운영체제 Notion 노트 그래프(5주차, 소규모), 질문 4 | v1: BM25+벡터+RRF. v2: 진입 엔티티 + 주변 관계, 검토 대기(`review_queue`) 관계는 제외 | 관계 1문항은 둘 다 정답이고 v2가 관계를 근거로 덧붙였다. 설명 2문항은 v1로 충분했다. 집계 1문항은 둘 다 답하지 못했다. 결론은 "답변 자체가 크게 좋아지지는 않았다" |
-| **dldusgh318** (PR #45 미머지) | 20청크 표본 그래프(Project 3 · Technology 25 · TechnologyUse 41), 질문 7, v1/v2 각 3회 다수결 | v1: BM25·벡터 각 top-50 + RRF k=60, top-5. v2: top-5 청크의 chunk_id로 진입, 최대 2홉, 허브 제외 | v2가 v1보다 나아진 것은 **X01 하나(wrong → partial)**뿐이다. 서술형 S01·M01·H01은 같았다. 집계 A1·A2는 둘 다 wrong. **그래프를 거쳐 컨텍스트에 들어온 정답 청크는 전 문항 0건.** 실험 전 가설은 "X01·X03은 v2가 맞힌다"였지만 X03은 둘 다 partial이었다 |
+| **dldusgh318** | 20청크 표본 그래프(Project 3 · Technology 25 · TechnologyUse 41), 질문 7, v1/v2 각 3회 다수결 | v1: BM25·벡터 각 top-50 + RRF k=60, top-5. v2: top-5 청크의 chunk_id로 진입, 최대 2홉, 허브 제외 | v2가 v1보다 나아진 것은 **X01 하나(wrong → partial)**뿐이다. 서술형 S01·M01·H01은 같았다. 집계 A1·A2는 둘 다 wrong. **그래프를 거쳐 컨텍스트에 들어온 정답 청크는 전 문항 0건.** 실험 전 가설은 "X01·X03은 v2가 맞힌다"였지만 X03은 둘 다 partial이었다 |
 | **Yeongeunn** | 팀 서비스 Notion 소규모 그래프 | 질문 유형 5종(단일 사실·다중 홉·집계·설명·근거 없음)으로 비교 설계, 고정 입력 비교 코드 | **수치 없음.** 결과는 저장소 밖 `data/`에만 있다 |
 | **e0ng** | 가상 예시 그래프 | 이론 정리(로컬·글로벌·Text2Cypher·하이브리드·인덱싱) | 측정 없음 |
 
@@ -117,7 +117,7 @@ weeks: [6]
 - kdyann · GraphRAG — 검색과 그래프의 결합 (§토스증권 사례) — [members/kdyann/notes/06-graphrag.md](../../members/kdyann/notes/06-graphrag.md); W6 실습 — [labs/06-graphrag/README.md](../../members/kdyann/labs/06-graphrag/README.md)
 - sunghyun · 검색에 그래프를 붙이고 같은 질문으로 비교하기 — [members/sunghyun/notes/06-graphrag-and-agentic-search.md](../../members/sunghyun/notes/06-graphrag-and-agentic-search.md); GraphRAG와 에이전틱 검색 비교 — [labs/06-graphrag/README.md](../../members/sunghyun/labs/06-graphrag/README.md) (수치 원본 `measured-summary.json`)
 - Yeongeunn · GraphRAG — 검색과 그래프의 결합 — [members/Yeongeunn/notes/13-week6-graphrag.md](../../members/Yeongeunn/notes/13-week6-graphrag.md)
-- dldusgh318 · 6주차 GraphRAG·하이브리드 리트리버·그래프 인덱싱 노트, `WEEK6_V2.md`, `results/w6_compare.md`·`v1_w6_score.md`·`v21_x01_report.md`, `labs/WEEK6_result.md` — `members/dldusgh318/` (PR #45 미머지)
+- dldusgh318 · 6주차 노트 — [01-graphRAG.md](../../members/dldusgh318/notes/week6/01-graphRAG.md), [02-hybrid-retriever.md](../../members/dldusgh318/notes/week6/02-hybrid-retriever.md), [03-graph-indexing.md](../../members/dldusgh318/notes/week6/03-graph-indexing.md); v2 설계 — [WEEK6_V2.md](../../members/dldusgh318/labs/01-three-generations/WEEK6_V2.md); 결과 — [w6_compare.md](../../members/dldusgh318/labs/01-three-generations/results/w6_compare.md), [v1_w6_score.md](../../members/dldusgh318/labs/01-three-generations/results/v1_w6_score.md), [v21_x01_report.md](../../members/dldusgh318/labs/01-three-generations/results/v21_x01_report.md), [WEEK6_result.md](../../members/dldusgh318/labs/WEEK6_result.md)
 - kungbi · 근거 기반 Knowledge Graph 구축 방법과 합성 예제 — [members/kungbi/labs/02-evidence-grounded-knowledge-graph/README.md](../../members/kungbi/labs/02-evidence-grounded-knowledge-graph/README.md)
 - Microsoft GraphRAG Query Engine — https://microsoft.github.io/graphrag/query/overview/ · Local Search — https://microsoft.github.io/graphrag/query/local_search/ · Global Search — https://microsoft.github.io/graphrag/query/global_search/ · Indexing — https://microsoft.github.io/graphrag/index/overview/
 - 토스증권 추천과 검색은 어떻게 진화하고 있을까? (kdyann 인용) — https://toss.tech/article/tech_talk_talk_3

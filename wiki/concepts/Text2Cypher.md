@@ -4,7 +4,7 @@ type: concept
 tags: [concept, pitfall]
 status: draft
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-20
 members: [heebindev, kdyann, sunghyun, dldusgh318, Yeongeunn, e0ng]
 weeks: [6]
 ---
@@ -27,7 +27,7 @@ weeks: [6]
 
 | 멤버 | 조건 | 결과 |
 |---|---|---|
-| **dldusgh318** (PR #45 미머지) | 7문항 × 3회 = 21회. 생성문을 고치지 않고 재생성도 없이 실행. 그래프 노드 69개(Project 3 · Technology 25 · TechnologyUse 41) | 실행 에러 0. correct 17 · partial 1 · wrong 3. A1·X03·T01~T03은 3/3, A2는 2/3. 실패는 X01 3회(값 불일치로 0건)와 A2 1회(의미 오류) |
+| **dldusgh318** | 7문항 × 3회 = 21회. 생성문을 고치지 않고 재생성도 없이 실행. 그래프 노드 69개(Project 3 · Technology 25 · TechnologyUse 41) | 실행 에러 0. correct 17 · partial 1 · wrong 3. A1·X03·T01~T03은 3/3, A2는 2/3. 실패는 X01 3회(값 불일치로 0건)와 A2 1회(의미 오류) |
 | **kdyann** | 8문항, `gpt-4.1-mini` 자유 생성 → 허용 문법 검증 → 매개변수 질의로 변환해 실행 | 실행 성공 2(집계) · 검증 거절 4(다중 홉·추천) · 지원 불가 2(단순 이름 질문). "rejected가 전부 문법 오류라는 뜻은 아니다", "실행에 성공했다고 의미를 정확히 반영한다고 볼 수도 없다" |
 | **heebindev** | 3문항, `MATCH`로 시작하고 `RETURN`이 있는 읽기 질의만 허용 | 집계 1문항 성공(검토 대상 관계 포함). 1-hop 질의는 방향 없는 `-[r]-` 때문에 방향을 오해할 수 있었다. 수치 질문은 답할 수 없었다 |
 | **sunghyun** | 실제 클래스·관계·속성 예시와 few-shot을 주고 생성문과 결과를 정답과 대조. Qwen 7B | "관련 커밋이 있으니 수정 완료인가?" → `answerable:false`로 생성 보류(15.1초, 입력 1,999 · 출력 58토큰). "v0.2.0 실패 Case Run 수"는 생성됐지만 오류 5개(아래), `execution:null` |
@@ -70,7 +70,7 @@ weeks: [6]
 - heebindev · GraphRAG 에이전트 v2 실습 (§4 Text2Cypher) — [members/heebindev/labs/04-graphrag-agent/README.md](../../members/heebindev/labs/04-graphrag-agent/README.md); GraphRAG 노트 (§3) — [notes/06-graphrag.md](../../members/heebindev/notes/06-graphrag.md)
 - kdyann · W6 실습 (§Text2Cypher 결과) — [members/kdyann/labs/06-graphrag/README.md](../../members/kdyann/labs/06-graphrag/README.md)
 - sunghyun · 검색에 그래프를 붙이고 같은 질문으로 비교하기 (§Text2Cypher는 실행만 되면 성공인가) — [members/sunghyun/notes/06-graphrag-and-agentic-search.md](../../members/sunghyun/notes/06-graphrag-and-agentic-search.md); 실습 — [labs/06-graphrag/README.md](../../members/sunghyun/labs/06-graphrag/README.md)
-- dldusgh318 · `labs/01-three-generations/results/text2cypher_report.md`, 6주차 노트 `notes/week6/01-graphRAG.md` — `members/dldusgh318/` (PR #45 미머지)
+- dldusgh318 · Text2Cypher 리포트 — [text2cypher_report.md](../../members/dldusgh318/labs/01-three-generations/results/text2cypher_report.md); 6주차 노트 — [01-graphRAG.md](../../members/dldusgh318/notes/week6/01-graphRAG.md)
 - Yeongeunn · GraphRAG (§6 Text2Cypher) — [members/Yeongeunn/notes/13-week6-graphrag.md](../../members/Yeongeunn/notes/13-week6-graphrag.md)
 - e0ng · GraphRAG 패턴 (§Text2Cypher) — [members/e0ng/notes/06-1-graphrag-patterns.md](../../members/e0ng/notes/06-1-graphrag-patterns.md)
 - Neo4j GraphRAG Python 사용자 가이드 — https://neo4j.com/docs/neo4j-graphrag-python/current/user_guide_rag.html

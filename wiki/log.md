@@ -79,3 +79,7 @@ Append-only, 최신이 아래. 항목은 `## [YYYY-MM-DD] verb | title` 로 시�
 
 ## [2026-10-18] refactor | 멤버 수 정정 — 15명 (저장소 폴더 14명)
 - updated: entities/10기-KG-스터디 (전체 15명, 스터디장 확인), index
+
+## [2026-10-20] lint | PR #45 머지 — 미머지 표시 제거, 출처 링크화
+- updated: concepts/GraphRAG · Text2Cypher · 리랭커 · 폐쇄-스키마-설계 · 엔티티-신원해소 · 그래프-적재-Postgres와-Neo4j · 데이터-수집과-출처-추적 · 멀티홉-질문과-Bridge-Entity, comparisons/RAG-vs-그래프-질의 · 실습-비교표 · RAG-변천사 (`(PR #45 미머지)` 제거, dldusgh318 6주차 출처를 경로 표기에서 상대경로 링크로), sources/스터디-노트-지도 (기준 `162b822`, dldusgh318 절 제목), entities/10기-KG-스터디 (타임라인 상태 칸, 멤버 표, 남은 일, PR 51건 중 머지 49), index (머지 대기 소재)
+- note: PR #50·#51(sese2204 `labs/07-repo-graphrag`, `notes/11-repo-graphrag-insights.md`)도 2026-10-20 머지됐다. 아직 ingest하지 않았다 — 다음 ingest 대상

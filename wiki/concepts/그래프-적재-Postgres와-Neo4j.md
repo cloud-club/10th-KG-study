@@ -4,7 +4,7 @@ type: concept
 tags: [concept, runbook]
 status: maintained
 created: 2026-10-02
-updated: 2026-10-18
+updated: 2026-10-20
 members: [dldusgh318, e0ng, heebindev, kdyann, Yeongeunn, sunghyun, kungbi]
 weeks: [5, 6]
 ---
@@ -63,7 +63,7 @@ weeks: [5, 6]
 
 - **sunghyun**: 안정적인 플랫폼 ID로 Postgres(엔티티·엣지·근거)와 Neo4j에 `MERGE`했다. 동기화 기록은 240노드 · 389관계 · 393근거 · 372청크다. 빌드 산출물은 파일명이 같아도 digest가 다르면 별개로 둔다. 파일명만으로 같은 빌드로 합치지 않는다. 공개 예제는 합성 8노드 · 8트리플이다.
 - **kungbi**: Neo4j 드라이버 호출을 mock으로 검증했다(실제 적재는 공개 범위 밖).
-- **dldusgh318** (PR #45 미머지): Postgres를 단일 트랜잭션 정본으로 두고 Neo4j는 `sync`로 따라오게 했다. Neo4j는 분산 트랜잭션이 아니라서 실패하면 재동기화한다 → [[엔티티-신원해소]].
+- **dldusgh318**: Postgres를 단일 트랜잭션 정본으로 두고 Neo4j는 `sync`로 따라오게 했다. Neo4j는 분산 트랜잭션이 아니라서 실패하면 재동기화한다 → [[엔티티-신원해소]].
 - 적재한 그래프를 리트리버로 쓰는 단계 → [[GraphRAG]], 자연어로 질의하는 단계 → [[Text2Cypher]].
 
 ## 열린 질문

@@ -1,6 +1,6 @@
 # 질의–답변 모음 (정성평가용)
 
-> `src/qa_report.py`가 `eval_run4_terra.json`에서 생성한다. 손으로 고치지 말고 다시 생성한다.
+> `src/qa_report.py`가 `eval_run5.json`에서 생성한다. 손으로 고치지 말고 다시 생성한다.
 > 생성 `gpt-5.4-mini` · 추출 `gpt-5.6-terra` · 판정 `claude-sonnet-5-5`(1회, 참고용).
 > 답변 속 `[C·G·S·W번호]`는 각 방식이 받은 근거 번호다. C 원문 청크, G 그래프 사실, S 커뮤니티 요약, W 위키.
 
@@ -15,16 +15,16 @@
 
 | # | 유형 | v1 | v2 | v3 |
 |---|---|---|---|---|
-| [Q01](#q01) | 단일 사실 | ✅ | ✅ | ✅ |
+| [Q01](#q01) | 단일 사실 | ❌⚠ | ❌ | ✅ |
 | [Q02](#q02) | 단일 사실 | △ | △⚠ | △ |
 | [Q03](#q03) | 교차 멤버 | ❌⚠ | △⚠ | △⚠ |
 | [Q04](#q04) | 교차 멤버 | △ | ❌⚠ | △⚠ |
 | [Q05](#q05) | 멀티홉 | ✅ | ✅ | ✅ |
 | [Q06](#q06) | 집계(구조) | ❌⚠ | ✅ | ❌ |
 | [Q07](#q07) | 집계(구조) | ❌ | ✅ | ❌ |
-| [Q08](#q08) | 집계(함정) | ✅ | △⚠ | ✅ |
-| [Q09](#q09) | 글로벌 | ❌⚠ | △ | △ |
-| [Q10](#q10) | 글로벌 | △⚠ | △⚠ | ✅⚠ |
+| [Q08](#q08) | 집계(함정) | ✅ | △ | ✅ |
+| [Q09](#q09) | 글로벌 | ❌⚠ | △ | ❌⚠ |
+| [Q10](#q10) | 글로벌 | ❌ | △⚠ | ✅⚠ |
 | [Q11](#q11) | 모순 | ✅ | △⚠ | △ |
 | [Q12](#q12) | 근거 없음 | ✅ | ✅ | ❌⚠ |
 
@@ -42,16 +42,17 @@
 
 ### v1 · 청크 하이브리드
 
-<sub>근거 청크의 문서: `labs/04-graphrag-agent/README.md` ×4, `labs/06-graphrag/README.md` ×4</sub>
+<sub>근거 청크의 문서: `labs/04-graphrag-agent/README.md` ×4, `labs/06-graphrag/README.md` ×3, `labs/01-three-generations/results/w6_compare.md`</sub>
 
-> kdyann가 확인했고, 6주차 GraphRAG 실습에서 다중 홉·추천 질문 4개의 Recall@5는 v1이 각각 0.33, 0.50, 0.00, 0.00이고 v2가 각각 1.00, 1.00, 1.00, 1.00이었다고 정리했다.[C4]  
-> 해당 4개 질문은 `내 오픈소스 기여와 같은 분야의 참고 글`, `내 AI 글과 연결되는 다른 주제 참고 글`, `내 게시물로 만들 만한 주제와 참고 글`, `아직 올리지 않은 AI 주제와 참고 글`이다.[C4]  
-> 집계 2개는 Recall을 계산하지 않는다고 명시되어 있어, 여기서는 제외했다.[C4]  
-> 근거는 `kdyann`의 실습 README에 있는 최종 검색 결과 표이다.[C4]
+> kdyann가 정리한 6주차 GraphRAG 실습 기준으로, 다중 홉·추천 질문 4개의 Recall@5는 v1과 v2가 각각 **0.500 / 0.500, 0.500 / 0.500, 0.333 / 0.333, null / null**입니다.[C7]  
+> 이는 표의 X01, X03, H01, A1(20개 표본) 행에 해당하며, 질문 범위가 다중 홉·추천 질문 4개로 해석되는 항목들입니다.[C7]  
+> 다만 이 근거는 **Recall@5를 직접 계산한 값**이 아니라, `recall` 열에 적힌 비교 결과를 **정리한 것**입니다.[C7]  
+> 확인한 멤버 github id는 **kdyann**입니다.[C7]  
+> 근거로는 4개 질문의 Recall@5를 모두 명시적으로 계산한 별도 수치가 없어, 질문이 의도한 4개를 다른 기준으로 묶은 해석은 **근거 없음**입니다.[C7]
 
-<details><summary>판정 ✅</summary>
+<details><summary>판정 ❌ ⚠</summary>
 
-v1 0.33·0.50·0.00·0.00, v2 네 문항 모두 1.00으로 gold 핵심 수치와 일치한다. 질문 목록과 집계 2개 제외는 gold에 없는 추가 정보지만 gold와 모순되지 않는다.
+정답은 v1이 0.33·0.50·0.00·0.00, v2가 네 문항 모두 1.00인데, 시스템 답은 v1/v2가 동일한 0.5/0.5, 0.5/0.5, 0.333/0.333, null/null이라고 했다. 수치와 결론이 모두 틀렸고 gold에 없는 행(X01, X03, H01, A1)을 확정적으로 주장했다.
 
 </details>
 
@@ -59,14 +60,14 @@ v1 0.33·0.50·0.00·0.00, v2 네 문항 모두 1.00으로 gold 핵심 수치와
 
 <sub>경로 `local` · 진입 엔티티 멀티홉 질의, Recall@k, GraphRAG</sub>
 
-> kdyann가 확인한 6주차 GraphRAG 실습 결과에서, 다중 홉·추천 질문 4개의 Recall@5는 v1이 각각 0.33, 0.50, 0.00, 0.00이고 v2가 각각 1.00, 1.00, 1.00, 1.00입니다.[C4]  
-> 이는 `내 오픈소스 기여와 같은 분야의 참고 글`, `내 AI 글과 연결되는 다른 주제 참고 글`, `내 게시물로 만들 만한 주제와 참고 글`, `아직 올리지 않은 AI 주제와 참고 글`의 값입니다.[C4]  
-> 정리한 사람은 kdyann이며, 측정한 사람도 kdyann입니다.[C4]  
-> v2는 비교 범위 전체를 조회해 집계와 연결을 더 잘 확보했고, v1은 상위 5개만으로는 일부 질문을 확정하지 못했습니다.[C3][C4]
+> 근거 없음입니다. [C2][C4]  
+> 제공된 근거에는 kdyann의 6주차 실습에서 v1/v2의 `answered`·`partial` 개수와 질문별 답변 상태는 있지만, 다중 홉·추천 질문 4개의 Recall@5 수치 자체는 없습니다. [C2][C4]  
+> 확인한 멤버 github id는 `kdyann`입니다. [C2][C4]  
+> Recall@5를 답하려면 해당 4개 질문의 정답 포함 여부를 기준으로 계산한 표나 로그가 추가로 필요합니다. [C2][C4]
 
-<details><summary>판정 ✅</summary>
+<details><summary>판정 ❌</summary>
 
-v1 0.33·0.50·0.00·0.00, v2 네 문항 모두 1.00으로 gold의 핵심 수치를 정확히 맞혔다. 질문 제목, 측정자, v2/v1 설명 등 추가 정보는 gold와 모순되지 않는다.
+gold에는 v1과 v2의 Recall@5 수치가 명시되어 있는데, 시스템은 답할 수 있는 질문에 '근거 없음'이라고 답했고 수치를 하나도 제시하지 못했다.
 
 </details>
 
@@ -74,13 +75,13 @@ v1 0.33·0.50·0.00·0.00, v2 네 문항 모두 1.00으로 gold의 핵심 수치
 
 <sub>검색된 위키 페이지: [[실습-비교표]], [[멀티홉-질문과-Bridge-Entity]], [[RAG-vs-그래프-질의]], [[GraphRAG]], [[지식그래프와-온톨로지]], [[index]]</sub>
 
-> kdyann의 6주차 GraphRAG 실습에서 다중 홉·추천 질문 4개의 Recall@5는 v1이 0.33·0.50·0.00·0.00, v2가 전부 1.00이었다고 확인했다. [W4]  
-> 이 수치는 멤버 github id `kdyann`이 확인한 실습 결과다. [W4]  
-> 여기서 나는 결과를 **정리했다**고 말할 수 있고, 직접 **측정했다**고는 말할 수 없다. [W4]
+> kdyann의 6주차 GraphRAG 실습에서 다중 홉·추천 질문 4개의 Recall@5는 v1이 0.00~0.50, v2가 1.00이었다고 **kdyann이 확인한 실습 결과**로 정리되어 있다. [W1]  
+> 같은 내용이 위키 본문에서도 반복되며, 다중 홉·추천 4문항에서 v1 0.33·0.50·0.00·0.00 → v2 전부 1.00으로 적혀 있다. [W4]  
+> 즉, **측정한 멤버 github id는 kdyann**이다. [W1][W4]
 
 <details><summary>판정 ✅</summary>
 
-v1 0.33·0.50·0.00·0.00, v2 네 문항 모두 1.00으로 gold의 핵심 수치를 정확히 맞혔다. 단순 질문 2개 언급은 없지만 질문 범위가 다중 홉·추천 4개이므로 핵심에는 영향이 없고, '정리했다/측정했다' 부연은 gold와 모순되지 않는다.
+시스템 답이 v1 0.33·0.50·0.00·0.00, v2 네 문항 모두 1.00을 정확히 제시했다. 첫 문장의 'v1 0.00~0.50'은 범위 요약일 뿐 틀린 내용이 아니며, 단순 질문 2개 언급이 빠진 것은 질문의 핵심이 아니다.
 
 </details>
 
@@ -129,13 +130,13 @@ v1 0.33·0.50·0.00·0.00, v2 네 문항 모두 1.00으로 gold의 핵심 수치
 
 <sub>검색된 위키 페이지: [[GraphRAG]], [[RAG-vs-그래프-질의]]</sub>
 
-> sunghyun이 **측정한** 에이전틱 검색 비교에서는 그래프 조회 도구를 추가하자 사실 항목 점수가 **4/9에서 3/9로 떨어졌다**고 기록돼 있다. [W1][W4][W6]  
-> 즉, 그래프 도구를 넣었는데도 성능이 좋아지지 않았고 오히려 1점 낮아졌다. [W1][W2]  
-> 이 비교는 sunghyun이 확인한 것이며, 모델이 경로를 고르게 한 에이전틱 조건에서 나온 결과다. [W1][W6]
+> sunghyun이 **측정한** 에이전틱 비교에서는 그래프 조회 도구를 추가했을 때 사실 항목 점수가 **4/9에서 3/9로 떨어졌다**고 기록돼 있다. [W1][W4][W6]  
+> 즉, 그래프 도구를 넣었지만 점수는 개선되지 않았고 오히려 1점 감소했다. [W1][W2]  
+> 이 결과는 sunghyun이 확인한 것이며, 그는 경로 선택을 모델에 맡긴 것이 틀린 집계로 이어졌다고 정리했다. [W1][W6]
 
 <details><summary>판정 △</summary>
 
-4/9에서 3/9로 떨어졌다는 핵심 수치는 맞혔지만, 경로를 잘못 골라(Task→Test Case 직접 연결) 13개를 18개로 센 원인이 빠졌다. 추가 설명은 gold와 모순되지 않는다.
+4/9에서 3/9로 떨어졌다는 핵심 수치는 맞혔다. 그러나 gold가 밝힌 구체적 원인(Task→Test Case 직접 연결 경로를 골라 13개를 18개로 셌다)은 빠졌고, '경로 선택을 모델에 맡긴 것이 틀린 집계로 이어졌다'는 일반적 설명만 있다. 이 설명은 gold와 모순되지 않는다.
 
 </details>
 
@@ -292,16 +293,16 @@ BM25 우세 중 dldusgh318, lys0611, jjinthung은 맞혔지만 kdyann을 벡터 
 
 ### v1 · 청크 하이브리드
 
-<sub>근거 청크의 문서: `labs/04-graphrag-agent/README.md` ×4, `notes/06-1-graphrag-patterns.md`, `notes/06-graphrag.md`, `labs/06-graphrag/README.md`, `notes/06-graphrag-and-agentic-search.md`</sub>
+<sub>근거 청크의 문서: `labs/01-three-generations/results/text2cypher_report.md` ×5, `notes/06-1-graphrag-patterns.md`, `labs/04-graphrag-agent/README.md` ×2</sub>
 
-> heebindev가 확인했다. [C1]  
-> 그는 `members/heebindev/labs/04-graphrag-agent/README.md`에서 review_queue에 넣어 둔 관계가 GraphRAG v2 검색기에서는 제외되지만, Text2Cypher가 Neo4j 원본을 직접 조회해 집계에 포함된다고 정리했다. [C1][C3]  
-> 즉, 이 문제는 heebindev가 직접 실행 결과로 확인한 사례다. [C1]  
-> 다만 이 답은 “정리했다”는 기록이며, 별도의 수치 측정이나 비교 실험을 추가로 측정했다는 근거는 없다. [C1][C3]
+> 검토한 멤버는 **heebindev**와 **dldusgh318**입니다. [C5][C6][C1]  
+> 이 문제를 직접 겪었다고 확인되는 사람은 **heebindev**입니다. [C5][C6]  
+> heebindev는 Text2Cypher가 Neo4j 원본 관계를 직접 세어 `review_queue.json`에 넣어 둔 관계까지 포함됐다고 적었고, 리트리버는 그 관계들을 제외하지만 Text2Cypher는 자동으로 제외하지 않는다고 정리했습니다. [C5][C6]  
+> dldusgh318의 기록은 Text2Cypher 실행 결과와 실패 유형을 정리한 것이지만, review_queue 제외 문제를 직접 언급한 근거는 없습니다. [C1][C2][C7][C8]
 
 <details><summary>판정 ✅</summary>
 
-heebindev를 정확히 지목했고, review_queue 관계가 v2 검색기에서는 제외되지만 Text2Cypher는 Neo4j를 직접 조회해 집계에 포함된다는 핵심을 맞혔다. predicate null이나 닫힌 스키마 같은 세부 내용은 빠졌지만 핵심 결론은 gold와 일치한다.
+시스템 답은 핵심 인물을 heebindev로 정확히 지목했고, review_queue.json에 넣은 관계를 리트리버는 제외하지만 Text2Cypher는 Neo4j를 직접 세어 포함한다는 메커니즘도 gold와 일치한다. dldusgh318은 문제를 직접 언급한 근거가 없다고 구분했으므로 gold와 모순되지 않는다.
 
 </details>
 
@@ -309,13 +310,14 @@ heebindev를 정확히 지목했고, review_queue 관계가 v2 검색기에서�
 
 <sub>경로 `local` · 진입 엔티티 Text2Cypher</sub>
 
-> 이 문제를 겪은 멤버는 **heebindev**입니다. [G1][C1]  
-> heebindev가 확인했고, `review_queue.json`에 넣어 둔 검토 대상 관계가 리트리버에서는 제외됐지만 Text2Cypher가 Neo4j 원본을 직접 조회해 집계에 포함됐다고 정리했습니다. [C1][C3]  
-> 즉, **정리한 사람은 heebindev**이고, **측정한 내용은 Neo4j 원본 관계 수가 그대로 집계에 들어간 것**입니다. [C1][G2]
+> heebindev가 확인했습니다. [G1][C5]  
+> 정리한 내용은 `review_queue.json`에 넣어 둔 관계가 GraphRAG v2 검색기에서는 제외됐지만, Text2Cypher가 Neo4j 원본을 직접 조회해 집계에 포함시켰다는 점입니다. [G1][C5]  
+> 즉, 검토 대기 관계가 집계에 들어간 문제를 직접 겪은 멤버 github id는 `heebindev`입니다. [G1][C5]  
+> 근거는 충분합니다.
 
 <details><summary>판정 ✅</summary>
 
-heebindev를 정확히 지목했고, review_queue 관계가 리트리버에서는 제외됐지만 Text2Cypher가 Neo4j를 직접 조회해 집계에 포함됐다는 핵심을 맞혔다. 다만 '측정한 내용' 등 일부 표현은 군더더기지만 gold와 모순되지 않는다.
+heebindev를 정확히 지목했고, review_queue.json의 관계가 v2 리트리버에서는 제외됐지만 Text2Cypher가 Neo4j를 직접 조회해 집계에 포함했다는 핵심 내용도 gold와 일치한다. 'predicate null'과 '닫힌 스키마' 세부는 빠졌지만 핵심 결론에는 영향이 없다.
 
 </details>
 
@@ -323,14 +325,14 @@ heebindev를 정확히 지목했고, review_queue 관계가 리트리버에서�
 
 <sub>검색된 위키 페이지: [[Text2Cypher]]</sub>
 
-> 검토 대기(review_queue)로 빼 둔 관계가 리트리버에서는 제외됐는데 Text2Cypher 집계에는 들어가 버린 문제를 겪은 사람은 **heebindev**입니다. [W1][W2]  
-> 위키에 따르면 heebindev는 집계 1문항에서 **검토 대상 관계가 포함된 채로** 성공했다고 정리돼 있습니다. [W2]  
+> 검토 대기(review_queue)로 빼 둔 관계가 집계에 들어간 문제를 겪은 멤버는 **heebindev**입니다. [W1][W2]  
+> 위키에는 heebindev의 Text2Cypher 집계가 **검토 대기 관계까지 포함됐다**고 정리돼 있습니다. [W2]  
 > 이건 **heebindev가 확인한 것**으로, 제가 새로 측정한 값은 아닙니다. [W2]  
-> 근거상 해당 문제를 겪은 멤버는 heebindev로 특정할 수 있습니다. [W1][W2]
+> 근거상 다른 멤버가 같은 문제를 겪었다는 정보는 없습니다. [W1][W2]
 
 <details><summary>판정 ✅</summary>
 
-핵심 인물 heebindev를 정확히 맞혔고, 검토 대상 관계가 Text2Cypher 집계에 포함됐다는 취지도 gold와 부합한다. 다만 gold의 predicate null·v2 근거 제외 같은 세부 설명은 빠졌고, '집계 1문항 성공'은 gold에 없는 세부 정보지만 모순되지는 않는다.
+핵심 인물인 heebindev를 정확히 지목했고, 검토 대기 관계가 Text2Cypher 집계에 포함됐다는 문제도 맞게 설명했다. predicate null, review_queue.json, v2 근거 제외 같은 세부는 빠졌지만 gold의 핵심(사람·결론)은 충족하며 gold와 모순되는 주장도 없다.
 
 </details>
 
@@ -342,20 +344,21 @@ heebindev를 정확히 지목했고, review_queue 관계가 리트리버에서�
 
 **정답(gold)**: 6명 — do-dop, e0ng, heebindev, kdyann, sunghyun, yujeong430
 
-<sub>gold 근거: corpus.py 태그 집계 (main fd8b7f6)</sub>
+<sub>gold 근거: corpus.py 태그 집계 (main fd8b7f6 · 162b822 둘 다 같음)</sub>
 
 ### v1 · 청크 하이브리드
 
-<sub>근거 청크의 문서: `notes/week4/04-history.md`, `notes/08-llm-wiki.md`, `notes/06-1-graphrag-patterns.md`, `notes/01-rag-history.md`, `notes/13-week6-graphrag.md`, `notes/04-1-kg-history.md`, `notes/week4/00-summary.md`, `notes/06-graphrag.md`</sub>
+<sub>근거 청크의 문서: `notes/week4/04-history.md`, `notes/08-llm-wiki.md`, `notes/06-1-graphrag-patterns.md`, `notes/week6/03-graph-indexing.md` ×3, `notes/06-graphrag.md`, `README.md`</sub>
 
-> 근거로 확인되는 멤버는 5명입니다.[C1][C3][C4][C5][C6]  
-> 확인한 멤버 github id는 dldusgh318, e0ng, kdyann, Yeongeunn, heebindev입니다.[C1][C3][C4][C5][C6]  
-> 다만 이 근거들에는 각 문서의 frontmatter 원문이 직접 보이지 않아, 실제로 `graphrag` 태그를 단 문서인지까지는 근거 없음입니다.[C1][C3][C4][C5][C6]  
-> 따라서 여기서는 “GraphRAG 관련 노트를 쓴 멤버”만 정리했고, “frontmatter에 graphrag 태그를 단 문서”는 추가 근거가 필요합니다.[C1][C3][C4][C5][C6]
+> 근거로 확인되는 멤버는 4명입니다. [C1][C3][C4][C5][C6][C7]  
+> 확인한 멤버 github id는 dldusgh318, e0ng, heebindev, kdyann입니다. [C1][C3][C4][C5][C6][C7]  
+> 다만 제공된 근거에는 각 문서의 frontmatter 원문이 없어서, 제가 **측정했다**고 말할 수는 없고 **정리했다**고만 말할 수 있습니다. [C1][C3][C4][C5][C6][C7]  
+> 따라서 “graphrag 태그를 단 문서”를 frontmatter 기준으로 엄밀히 확인한 것은 **근거 없음**입니다. [C1][C3][C4][C5][C6][C7]  
+> 현재 근거로는 GraphRAG 관련 노트를 쓴 멤버가 위 4명이라고만 말할 수 있습니다. [C1][C3][C4][C5][C6][C7]
 
 <details><summary>판정 ❌ ⚠</summary>
 
-정답은 6명(do-dop, e0ng, heebindev, kdyann, sunghyun, yujeong430)인데, 시스템은 5명이라고 하고 dldusgh318, Yeongeunn 등 gold에 없는 id를 포함했다. 일치하는 id는 e0ng, kdyann, heebindev 셋뿐이다. 또한 frontmatter 근거가 없다며 답을 유보했다.
+정답은 6명(do-dop, e0ng, heebindev, kdyann, sunghyun, yujeong430)인데 시스템은 4명이라고 했고, 그중 dldusgh318은 정답에 없다. e0ng, heebindev, kdyann 세 명만 겹치며 do-dop, sunghyun, yujeong430은 빠졌다. 또한 frontmatter 기준 확인은 '근거 없음'이라고 답해 핵심 질문에 답하지 못했다.
 
 </details>
 
@@ -364,8 +367,8 @@ heebindev를 정확히 지목했고, review_queue 관계가 리트리버에서�
 <sub>경로 `aggregate` · Cypher 결과 1행</sub>
 
 > frontmatter에 `graphrag` 태그를 단 문서를 쓴 멤버는 **6명**입니다. [G1]  
-> 확인된 멤버 github id는 **e0ng, yujeong430, do-dop, kdyann, sunghyun, heebindev**입니다. [G1]  
-> 이 값은 그래프 질의로 **측정한** 결과이며, 제가 따로 정리한 것이 아닙니다. [G1]
+> 확인된 멤버 github id는 **sunghyun, heebindev, yujeong430, do-dop, kdyann, e0ng**입니다. [G1]  
+> 이 값은 그래프 질의로 **측정한** 결과입니다. [G1]
 
 <details><summary>생성된 Cypher</summary>
 
@@ -379,7 +382,7 @@ RETURN count(DISTINCT m) AS member_count, collect(DISTINCT m.id) AS members LIMI
 
 <details><summary>판정 ✅</summary>
 
-시스템 답은 6명이라는 수치와 gold의 여섯 명(e0ng, yujeong430, do-dop, kdyann, sunghyun, heebindev)을 순서만 다르게 모두 맞혔다. 그래프 질의로 측정했다는 설명은 gold와 모순되지 않는다.
+시스템 답은 6명이라는 인원수와 gold의 여섯 명(sunghyun, heebindev, yujeong430, do-dop, kdyann, e0ng)을 순서만 다르게 모두 정확히 제시했다. gold와 모순되거나 gold에 없는 사실을 주장하지 않았다.
 
 </details>
 
@@ -387,13 +390,11 @@ RETURN count(DISTINCT m) AS member_count, collect(DISTINCT m.id) AS members LIMI
 
 <sub>검색된 위키 페이지: [[LLM-트리플-추출]], [[실습-비교표]], [[GraphRAG]], [[log]]</sub>
 
-> 근거 없음입니다. [W6]에는 frontmatter 누락·태그 표기 불일치가 언급되지만, `graphrag` 태그를 frontmatter에 단 문서와 그 멤버 목록은 제시되지 않았습니다. [W6]  
-> 따라서 몇 명인지와 누구인지는 이 근거만으로 확인할 수 없습니다. [W6]  
-> 확인한 멤버 github id도 근거에 없어 밝힐 수 없습니다. [W6]
+> 근거 없음입니다. [W6]에는 frontmatter 누락·태그 불일치 사례만 있고, `graphrag` 태그를 frontmatter에 단 문서와 그 멤버 목록은 제시되지 않았습니다. [W2][W3][W4]에도 GraphRAG 관련 실습과 멤버는 나오지만, `graphrag` 태그를 단 문서의 정확한 인원 집계는 없습니다. 확인한 멤버 github id를 특정할 수 있는 근거가 부족합니다.
 
 <details><summary>판정 ❌</summary>
 
-gold는 6명과 구체적인 멤버 목록을 제시하지만, 시스템은 '근거 없음'이라며 답하지 않았다. 답할 수 있는 질문에 답하지 못했으므로 wrong이다. 확정적으로 주장한 잘못된 사실은 없다.
+gold는 6명(do-dop, e0ng, heebindev, kdyann, sunghyun, yujeong430)으로 답할 수 있는 질문인데, 시스템은 '근거 없음'이라고 답하고 인원수와 멤버를 하나도 제시하지 않았다.
 
 </details>
 
@@ -403,9 +404,9 @@ gold는 6명과 구체적인 멤버 목록을 제시하지만, 시스템은 '근
 
 **집계(구조)** — 실습(labs) 문서를 가장 많이 쓴 멤버 상위 3명과 각자의 문서 수는?
 
-**정답(gold)**: dldusgh318 10, lys0611 7, sunghyun 6
+**정답(gold)**: dldusgh318 17, lys0611 7, sunghyun 6
 
-<sub>gold 근거: corpus.py kind=lab 집계 (dataset/·note-templates/ 제외, main fd8b7f6)</sub>
+<sub>gold 근거: corpus.py kind=lab 집계 (dataset/·note-templates/·이 실습 제외, main 162b822). fd8b7f6 기준으로는 dldusgh318 10</sub>
 
 ### v1 · 청크 하이브리드
 
@@ -415,7 +416,7 @@ gold는 6명과 구체적인 멤버 목록을 제시하지만, 시스템은 '근
 
 <details><summary>판정 ❌</summary>
 
-gold는 dldusgh318 10, lys0611 7, sunghyun 6으로 답할 수 있는 질문인데, 시스템은 '근거 없음'이라 답하고 상위 3명과 문서 수를 하나도 제시하지 못했다.
+gold는 dldusgh318 17, lys0611 7, sunghyun 6으로 답이 존재하는데, 시스템은 '근거 없음'이라며 답을 하지 못했다. 확정적인 허위 사실 주장은 없다.
 
 </details>
 
@@ -423,9 +424,9 @@ gold는 dldusgh318 10, lys0611 7, sunghyun 6으로 답할 수 있는 질문인�
 
 <sub>경로 `aggregate` · Cypher 결과 3행</sub>
 
-> 실습(labs) 문서를 가장 많이 쓴 상위 3명은 dldusgh318(10개), lys0611(7개), sunghyun(6개)입니다. [G1]  
-> 이 결과는 멤버별 고유 lab 문서 수를 집계한 것이므로, “정리했다”가 아니라 “측정했다”에 해당합니다. [G1]  
-> 확인한 멤버 github id는 dldusgh318, lys0611, sunghyun입니다. [G1]
+> 실습(labs) 문서를 가장 많이 쓴 멤버 상위 3명은 dldusgh318(17개), lys0611(7개), sunghyun(6개)입니다. [G1]  
+> 이 결과는 멤버별 고유 lab 문서 수를 집계한 것이며, 확인한 멤버 github id는 dldusgh318, lys0611, sunghyun입니다. [G1]  
+> 정리한 것이 아니라, Cypher 집계 결과를 그대로 측정한 값입니다. [G1]
 
 <details><summary>생성된 Cypher</summary>
 
@@ -442,7 +443,7 @@ RETURN m.id AS member_id, doc_count
 
 <details><summary>판정 ✅</summary>
 
-상위 3명과 문서 수(dldusgh318 10, lys0611 7, sunghyun 6)가 gold와 정확히 일치한다. 추가로 붙은 설명은 gold와 모순되지 않는다.
+상위 3명(dldusgh318 17, lys0611 7, sunghyun 6)과 각 문서 수가 gold와 모두 일치한다. 집계 방식 설명은 gold와 모순되지 않는다.
 
 </details>
 
@@ -456,7 +457,7 @@ RETURN m.id AS member_id, doc_count
 
 <details><summary>판정 ❌</summary>
 
-정답은 dldusgh318 10, lys0611 7, sunghyun 6으로 답할 수 있는 질문인데, 시스템은 "근거 없음"이라고 답하고 상위 3명과 문서 수를 하나도 제시하지 않았다. gold와 모순되는 사실을 주장하지는 않았다.
+정답은 dldusgh318 17, lys0611 7, sunghyun 6으로 답할 수 있는 질문인데, 시스템은 근거가 없다며 답하지 않았다. 잘못된 사실을 주장하지는 않았다.
 
 </details>
 
@@ -472,17 +473,17 @@ RETURN m.id AS member_id, doc_count
 
 ### v1 · 청크 하이브리드
 
-<sub>근거 청크의 문서: `notes/06-graphrag.md` ×2, `notes/06-graphrag-and-agentic-search.md` ×2, `notes/13-week6-graphrag.md`, `notes/06-1-graphrag-patterns.md`, `notes/04-knowledge-graph-background.md` ×2</sub>
+<sub>근거 청크의 문서: `notes/06-graphrag.md` ×2, `notes/06-graphrag-and-agentic-search.md` ×2, `notes/06-1-graphrag-patterns.md`, `notes/13-week6-graphrag.md`, `notes/04-knowledge-graph-background.md`, `notes/week6/01-graphRAG.md`</sub>
 
-> 근거상 **실제로 구현해 돌려 본 멤버는 확인되지 않습니다**. [C1][C3][C6]  
-> heebindev는 커뮤니티 탐지를 **이번 필수 실습에서 제외하고 선택 과제로 둔다고 정리**했고, 직접 실행하지 않았다고 적었습니다. [C1]  
-> sunghyun도 커뮤니티 탐지와 보고서 생성을 **이번 실습에는 적용하지 않았다**고 정리했습니다. [C3]  
-> 또 sunghyun은 글로벌 서치를 **“공부만, 미구현”**으로 정리했습니다. [C6]  
-> 따라서 누가 **측정했다/실행했다**고 볼 근거는 없고, 현재 근거로는 **구현·실행한 멤버 없음**입니다. [C1][C3][C6]
+> 근거상 실제로 **구현해 돌려 본 것**은 `sunghyun`이 확인했습니다. [C6]  
+> `sunghyun`은 로컬 서치는 구현했고, **글로벌 서치는 공부만 하고 미구현**이라고 정리했습니다. [C6]  
+> 또 `heebindev`도 이번 실습에서는 **커뮤니티 탐지를 직접 실행하지 않고** 로컬 서치와 Text2Cypher를 먼저 확인한다고 정리했습니다. [C1]  
+> 따라서 **Leiden·Louvain 커뮤니티 탐지와 글로벌 서치를 실제로 구현해 돌려 본 멤버는 근거 없음**입니다. [C1][C6]  
+> 즉, 현재 근거로는 **실행 확인된 멤버는 없고**, `sunghyun`은 구현하지 않았다고 확인됩니다. [C6]
 
 <details><summary>판정 ✅</summary>
 
-구현해 돌려 본 멤버가 없다는 gold의 핵심 결론을 맞혔고, heebindev가 실행하지 않았다는 점도 포함했다. 다만 '그래프가 작아서'라는 이유는 언급하지 않았지만 핵심은 아니고, 추가로 제시한 sunghyun 관련 내용도 gold와 모순되지 않는다.
+최종 결론이 '실행해 본 멤버는 없다'로 gold와 일치하고, heebindev가 커뮤니티 탐지를 실행하지 않았다는 점도 맞다. 첫 문장은 표현이 모호하고 '그래프가 작아서'라는 이유는 빠졌지만, 결론을 뒤집지는 않는다.
 
 </details>
 
@@ -490,7 +491,11 @@ RETURN m.id AS member_id, doc_count
 
 <sub>경로 `aggregate→local` · 진입 엔티티 글로벌 서치, 커뮤니티 탐지 · Cypher 결과 0행</sub>
 
-> 근거상 **실제로 구현해 돌려 본 것으로 확인되는 멤버는 heebindev와 sunghyun**입니다.[C1][C3] heebindev는 그래프 규모가 작아 커뮤니티 탐지를 **직접 실행하지 않고** 로컬 서치와 Text2Cypher를 먼저 확인했다고 정리했으므로, 커뮤니티 탐지를 실제로 돌렸다고 보기는 어렵습니다.[C1] sunghyun은 GraphRAG의 글로벌 질문 평가 결과를 **인용**했지만, 본인이 직접 구현·실행했다는 근거는 없습니다.[G2] 따라서 이 근거들만으로는 **커뮤니티 탐지와 글로벌 서치를 실제로 구현해 돌려 본 멤버를 확정할 수 없고, 근거 없음**입니다.[C1][C3][G2]
+> 근거상 실제로 구현해 돌려 본 것으로 확인되는 멤버는 **heebindev**와 **sunghyun**입니다.[C1][C3][G2]  
+> heebindev는 그래프 규모가 작아 커뮤니티 탐지를 **직접 실행하지 않고** 로컬 서치와 Text2Cypher를 먼저 확인했다고 정리했으므로, 커뮤니티 탐지를 실제로 돌렸다고는 볼 수 없습니다.[C1]  
+> sunghyun은 GraphRAG의 글로벌 질문 평가 결과를 **인용**해 설명했지만, 본인이 Leiden·Louvain이나 글로벌 서치를 실제로 구현해 실행했다는 근거는 없습니다.[G2][C3]  
+> 따라서 이 질문에 대해 “커뮤니티 탐지와 글로벌 서치를 실제로 구현해 돌려 본 멤버”를 특정할 **근거 없음**입니다.[C1][C3][G2]  
+> 부족한 것은 각 멤버가 해당 기능을 실제로 실행했다는 실행 로그나 구현 기록입니다.[C1][C3]
 
 <details><summary>생성된 Cypher</summary>
 
@@ -505,9 +510,9 @@ ORDER BY member LIMIT 50
 
 </details>
 
-<details><summary>판정 △ ⚠</summary>
+<details><summary>판정 △</summary>
 
-최종 결론은 '확정할 수 없다/근거 없음'으로 gold와 대체로 맞고 heebindev가 실행하지 않았다는 점도 맞췄지만, 첫 문장에서 heebindev와 sunghyun이 실제로 구현해 돌려 본 것으로 확인된다고 확정적으로 말해 gold와 모순되며 일관성이 없다.
+시스템 답은 첫 문장에서 heebindev와 sunghyun이 실제로 돌려 본 멤버라고 지목했다가, 이어서 둘 다 실행 근거가 없다고 말하며 '근거 없음'으로 결론짓는다. 최종 결론은 gold(없다)와 일치하고 heebindev가 그래프가 작아 실행하지 않았다는 점도 맞다. 하지만 첫 문장이 gold와 모순되어 답이 일관되지 않고, '여러 멤버가 공부만 했다'는 핵심 설명도 빠졌다.
 
 </details>
 
@@ -515,14 +520,14 @@ ORDER BY member LIMIT 50
 
 <sub>검색된 위키 페이지: [[GraphRAG]], [[온톨로지와-추론]], [[실습-비교표]], [[10기-KG-스터디]]</sub>
 
-> 근거상 **실제로 구현해 돌려 본 멤버는 없습니다**. [W2][W6]  
-> 위키에는 **글로벌 서치는 아무도 구현하지 않았다**고 되어 있고, 6주차 스코프에도 글로벌 서치는 **아직 밖**으로 적혀 있습니다. [W2][W6]  
-> 따라서 누가 **정리했다**고 볼 수 있는지도 근거가 없고, **측정했다**는 멤버는 확인되지 않습니다. [W2][W10]  
-> 확인한 멤버 github id는 **없음**입니다. [W2][W6]
+> 근거상 **커뮤니티 탐지(Leiden·Louvain)와 글로벌 서치를 실제로 구현해 돌려 본 멤버는 0명**입니다. [W1][W2][W6]  
+> 위키에는 글로벌 서치는 **아무도 구현하지 않았다**고 되어 있고, 6주차 스코프에도 글로벌 서치는 아직 밖으로 적혀 있습니다. [W2][W6]  
+> 따라서 확인된 멤버 github id는 **없음**입니다. [W2][W6]  
+> 정리하면, **구현·실행한 사람은 없고 공부만 한 상태**로 기록돼 있습니다. [W1][W2]
 
 <details><summary>판정 ✅</summary>
 
-시스템 답은 '실제로 구현해 돌려 본 멤버는 없다'는 gold의 핵심 결론을 맞혔다. 6주차에 공부만 했고 heebindev 등이 그래프가 작아 실행하지 않았다는 세부 사항은 빠졌지만, 핵심 결론과는 모순되지 않는다. 글로벌 서치 미구현이라는 추가 설명도 gold와 충돌하지 않는다.
+시스템 답은 구현·실행한 멤버가 없고 공부만 했다고 하여 gold의 핵심 결론과 일치한다. heebindev 등이 그래프가 작아 실행하지 않았다는 세부 사유는 빠졌지만 핵심 결론은 맞고 gold와 모순되는 주장도 없다.
 
 </details>
 
@@ -557,15 +562,15 @@ ORDER BY member LIMIT 50
 
 <sub>경로 `global`</sub>
 
-> 10기 스터디 전체에서 멤버들이 공통으로 부딪힌 문제는, 검색기가 질문 유형에 따라 달라져서 하나의 방법으로는 다 못 맞춘다는 점이었다 [S2][S5][S7][S20].  
-> 또한 멀티홉·집계·3-hop처럼 근거가 분산되거나 누적되는 질문에서는 검색과 추론이 함께 무너졌고, 필요한 근거를 다 넣어도 생성 단계에서 틀리는 경우가 있었다 [S1][S6][S11][S14].  
-> 하이브리드/RRF, 리랭커, 그래프 도구 같은 보완책도 도움이 되지만 만능은 아니어서, 잘못된 문서 선택·직접 경로 선택·대화 오독 같은 실패가 계속 남았다 [S5][S10][S12][S15][S16].  
-> 청킹과 인용·평가에서도 의미 단위 청킹이 더 유리했고, 인용 precision/recall이나 형식 통제만으로는 실제 답변 정확도와 근거 지지 여부를 보장하지 못했다 [S9][S11][S13][S18][S19].  
-> 정리한 멤버 github id는 [do-dop], [dldusgh318], [lys0611], [sunghyun], [sese2204], [ur2e]이고, 이들은 각각 검색·추론 실패, RAG 검증, 그래프 활용, 평가 한계를 확인했다 [S1][S4][S6][S8][S9][S11][S12][S13][S14][S17][S18].
+> 10기 스터디 전체에서 공통으로 부딪힌 문제는, 검색이 항상 정답을 보장하지 않았고 질의 유형에 따라 벡터·BM25·grep·하이브리드·그래프·Text2Cypher의 적합성이 크게 달랐다는 점이다.[S3][S4][S6][S9][S20]  
+> 또 하나의 공통 문제는 Retrieval 자체가 병목이어서, 정답 문서나 근거를 못 찾으면 생성 모델이 좋아도 최종 답이 흔들렸다는 점이다.[S5][S17]  
+> 평가 측면에서는 정답셋 부재, 정답 청크 수를 미리 정하기 어려움, 동등 청크 그룹 처리 문제 때문에 Recall@k·Hit@k 같은 지표를 제대로 쓰기 어려웠다.[S2][S12][S18]  
+> 또한 멀티홉·집계·상태 구분 같은 복합 질문에서는 단순 검색보다 관계 그래프 순회나 정확한 쿼리 해석이 필요했고, 로컬 서치만으로는 근거를 놓치는 경우가 있었다.[S6][S7][S15][S16]  
+> 마지막으로, 평가 심판과 기준도 고정되지 않았고 오답 사례를 반영해 계속 다듬어야 했다는 교훈이 있었으며, 이 부분은 [C11]의 sese2204가 확인했다.[S13][S19]
 
 <details><summary>판정 △</summary>
 
-gold 핵심 5개 중 시스템 답이 명확히 맞힌 것은 하이브리드/RRF가 만능이 아니라는 ①의 일부와 평가 한계(②와 부분 일치) 정도다. 멀티홉에 그래프가 꼭 필요한 건 아니라는 ③, LLM 트리플이 후보라는 ④, 그래프가 관계·집계 질문에서만 이긴다는 ⑤는 빠졌거나 모호하다. 3개 기준에는 못 미치지만 일부는 맞혔다. gold와 모순되는 확정적 주장은 없다.
+②(평가는 정답셋·기준에 좌우됨)는 정답셋 부재와 심판 기준 변동으로 대체로 맞혔고, ⑤(그래프는 관계·집계 질문에 적합)도 멀티홉·집계 질문에서 그래프 순회가 필요하다는 식으로 부분 반영했다. 그러나 BM25가 강한 기준선이고 RRF가 항상 이기지 않는다는 점, 멀티홉이라고 그래프가 필요한 건 아니라는 점, LLM 트리플은 후보라는 점은 빠졌다. 핵심 3개 이상에는 못 미쳐 partial로 본다.
 
 </details>
 
@@ -573,17 +578,15 @@ gold 핵심 5개 중 시스템 답이 명확히 맞힌 것은 하이브리드/RR
 
 <sub>검색된 위키 페이지: [[10기-KG-스터디]], [[시맨틱-웹에서-지식그래프까지]]</sub>
 
-> 멤버 공통의 문제·교훈은 5가지로 정리할 수 있습니다. [W2][W5][W6]  
-> 1) 개인 데이터에서 출발해도 결국 **관계·집계·시간처럼 청크 검색이 못 푸는 질문**이 남아, 이를 그래프로 넘겨야 한다는 점입니다. [W1][W6]  
-> 2) 여러 멤버의 그래프를 합치려면 **관계 의미 합의, 공통 vocabulary, entity resolution, schema/ontology alignment**가 필요하다는 점입니다. [W5][W11]  
-> 3) **RDF/프로퍼티 그래프, SPARQL/그래프 DB, Neo4j/Postgres**처럼 모델과 도구의 차이는 “무엇이 더 좋다”보다 **어떤 설계 관점을 강조하느냐**의 문제라는 점입니다. [W8][W9][W6]  
-> 4) **추출·저장 품질이 먼저**여야 멀티홉 질의나 RAG가 의미가 있고, 스키마·관계가 제대로 들어가 있지 않으면 질의 언어만으로는 해결되지 않는다는 점입니다. [W9][W10][W6]  
-> 5) 개인 데이터·조직 데이터 모두에서 **식별자 정리, 근거/품질 관리, 변경 반영, 가명화와 공개 범위 조정**이 반복되는 실무적 교훈입니다. [W2][W6][W11]  
-> 이 정리는 위키 기준으로 제가 **정리한 것**이고, 별도 실측은 하지 않았습니다. [W2][W4]
+> 멤버들이 공통으로 부딪힌 문제는 ① 개인 데이터에서 관계를 어떻게 정규화할지, ② 여러 데이터 소스의 같은 대상을 어떻게 식별·통합할지, ③ 그래프에 빠진 정보나 불완전한 데이터를 어떻게 다룰지, ④ RDF/프로퍼티 그래프/SPARQL 같은 모델·질의 방식의 차이를 어떻게 이해할지, ⑤ 청크 검색으로 안 풀리는 관계·집계·시간 질문을 그래프로 넘기는 기준을 어떻게 세울지로 정리할 수 있다.[W5][W7][W8][W9][W1]  
+> 이 중 관계 정규화와 n항 관계 문제는 dldusgh318이 확인했고, “세 칸에 목적·상태·기간이 안 들어간다”는 식으로 실습에서 먼저 부딪힌다고 정리했다.[W7]  
+> 대상 통합과 식별자 정리는 do-dop, dldusgh318, Yeongeunn이 확인했으며, 여러 멤버의 그래프를 합치면 동일성 문제와 공통 Vocabulary, Schema·Ontology Alignment가 다시 돌아온다고 정리했다.[W5][W11]  
+> 모델·질의 방식의 교훈은 dldusgh318과 여섯 멤버의 4주차 실측으로 확인됐고, RDF는 상호운용성, 프로퍼티 그래프는 탐색·개발 편의, SPARQL은 조인 키워드 없이 멀티홉을 표현하지만 그래프에 관계가 제대로 들어가 있어야 한다는 점이다.[W8][W9]  
+> 근거로는 “측정했다”는 표현까지 확인되는 항목이 제한적이라, 공통 교훈의 빈도나 우선순위는 근거 없음이며 위 내용은 위키에 정리된 공통분모를 묶은 것이다.[W2][W4]
 
-<details><summary>판정 △</summary>
+<details><summary>판정 ❌ ⚠</summary>
 
-시스템 답은 gold 핵심 5개 중 ⑤(그래프는 관계·집계 질문에 유효)와 ④(추출 품질이 먼저)만 대략 맞혔다. BM25 기준선/RRF, 평가 정답셋·채점 엄격도, 멀티홉이 곧 그래프 필요는 아니라는 점은 언급하지 않아 3개 기준에 못 미친다. 다만 gold에 없는 내용도 위키 기반 정리로 보여 근거 없는 주장으로 단정하기는 어렵다.
+시스템 답은 관계 정규화, 개체 통합, 불완전한 데이터, RDF/SPARQL 모델 차이 등을 들었는데 gold의 핵심 5개(BM25 기준선·RRF, 정답셋/채점 엄격도, 멀티홉≠그래프, LLM 트리플은 후보, 그래프는 관계·집계에서만 이김) 중 ⑤와 겨우 비슷한 항목 하나만 부분적으로 겹친다. 3개 이상 기준에 못 미치며, gold에 없는 멤버별 확인 내용을 확정적으로 주장했다.
 
 </details>
 
@@ -599,18 +602,18 @@ gold 핵심 5개 중 시스템 답이 명확히 맞힌 것은 하이브리드/RR
 
 ### v1 · 청크 하이브리드
 
-<sub>근거 청크의 문서: `readings.md`, `README.md`, `notes/05-reranker.md`, `notes/04-1-kg-history.md`, `README.md`, `notes/11-rdf-data-pipeline-concepts.md`, `notes/10-semantic-web-to-knowledge-graph.md`, `notes/02-search-generations.md`</sub>
+<sub>근거 청크의 문서: `readings.md`, `README.md`, `notes/05-reranker.md`, `notes/04-1-kg-history.md`, `README.md`, `notes/11-rdf-data-pipeline-concepts.md`, `notes/10-semantic-web-to-knowledge-graph.md`, `labs/README.md`</sub>
 
-> 이 스터디의 큰 흐름은 먼저 온톨로지와 시맨틱 웹의 개념적 배경을 이해하는 것에서 시작해, RDF·RDFS·OWL 같은 표준과 지식 그래프의 역사로 이어지는 순서입니다. [C1][C4][C7]  
-> 그다음에는 문장을 그래프 데이터로 바꾸는 방법, 즉 어떤 대상을 기록하고 어떻게 추출하며 어떤 형식으로 전달할지(RDF, Turtle, JSON-LD)를 다룹니다. [C6]  
-> 이후에는 검색 관점으로 넘어가서 grep → BM25 → 벡터 → 하이브리드 → GraphRAG처럼 검색/회수 방식의 변천과 각 단계의 장단점을 비교하려는 흐름이 보입니다. [C2][C3][C8]  
-> 또한 GraphRAG는 문서 관계를 탐색·요약에 쓰는 방향으로, Palantir Ontology는 업무 모델과 액션에 연결하는 방향으로 구분해 이해하도록 정리되어 있습니다. [C7][C4]  
-> 확인한 멤버는 heebindev, lys0611, sese2204, kdyann, yujeong430, e0ng입니다. [C1][C2][C3][C4][C5][C6][C7][C8]  
-> 정리한 내용이며, 별도의 측정은 근거에 없습니다. [C1][C2][C3][C4][C5][C6][C7][C8]
+> 이 스터디의 큰 흐름은 온톨로지·시맨틱 웹의 개념적 배경을 먼저 잡고, 그다음 RDF/OWL 같은 표준과 지식 그래프의 역사적 전개를 따라가며, 마지막으로 GraphRAG와 기업 온톨로지까지 연결하는 순서로 밟아 왔습니다. [C1][C4][C7]  
+> heebindev가 1주차에 「온톨로지 세미나」 PDF로 스터디 전체 흐름과 온톨로지 개념을 이해하는 자료를 먼저 확인했습니다. [C1]  
+> yujeong430은 시맨틱 웹 → RDF/RDFS/OWL → 링크드 데이터/DBpedia/Wikidata → Google Knowledge Graph → 기업 지식 그래프 → GraphRAG → Palantir Ontology의 순서로 공부하기 좋은 흐름을 정리했습니다. [C7]  
+> kdyann도 비슷하게 철학적 배경에서 시작해 프레게·논리학, 온톨로지 정의, RDF 표준, 시맨틱 웹, 링크드 데이터, 지식 그래프, GraphRAG로 이어지는 역사 흐름을 정리했습니다. [C4]  
+> 실습 측면에서는 Yeongeunn이 Notion 데이터를 전처리·청킹한 뒤 BM25, 임베딩, RRF, 관계 추출, Postgres/Neo4j, Turtle/JSON-LD까지 이어지는 전체 파이프라인을 정리했고, GraphRAG는 답변 생성 루프의 리트리버로 연결하는 범위로 다뤘습니다. [C8]  
+> 근거상 확인된 멤버 github id는 heebindev, yujeong430, kdyann, Yeongeunn이며, 이 답변은 이들의 기록을 바탕으로 정리했습니다. [C1][C4][C7][C8]
 
-<details><summary>판정 △ ⚠</summary>
+<details><summary>판정 ❌</summary>
 
-grep→BM25→벡터→하이브리드→GraphRAG라는 검색 흐름은 언급했지만, 순서가 gold와 반대다. 온톨로지·RDF에서 시작해 검색으로 넘어간다고 했는데, gold는 검색(grep~RAG·평가)이 먼저이고 지식그래프 이론이 그 뒤에 온다. 또 역색인/nori, HNSW/pgvector, RRF, 평가, 닫힌 스키마·LLM 트리플 추출, Text2Cypher 같은 핵심 단계가 빠졌고, '무엇을 찾을까→어떻게 이을까'라는 핵심 메시지도 없다. 시작점을 온톨로지·시맨틱 웹 배경으로 확정한 것은 gold와 모순된다.
+gold 의 흐름은 grep → 역색인·BM25 → 임베딩·벡터 검색 → 하이브리드·RAG·평가 → 지식그래프 이론 → 스키마·트리플 추출·적재 → GraphRAG 인데, 시스템 답은 온톨로지·시맨틱 웹 이론에서 시작해 GraphRAG·기업 온톨로지로 끝나는 순서로 요약해 검색 단계(grep·BM25·임베딩)가 앞선다는 핵심 흐름을 놓쳤다. 다만 인용한 개별 멤버 기록은 근거에 기반한 것으로 보여 unsupported 는 아니다.
 
 </details>
 
@@ -618,16 +621,16 @@ grep→BM25→벡터→하이브리드→GraphRAG라는 검색 흐름은 언급�
 
 <sub>경로 `global`</sub>
 
-> 스터디는 먼저 BM25·벡터 검색·HNSW·하이브리드·RRF 같은 **기본 검색기법 비교와 융합 함정**을 보며 출발했고, 이 흐름은 검색 성능 차이와 후보 누락 문제까지 정리한 것으로 확인됐다. [C0][C9][C17]  
-> 그다음에는 **문자열/의미 검색, 청킹, 검색평가 지표**를 다루며 grep·BM25·pgvector의 강약과 Recall@k·MRR·Hit@k, 의미 단위 청킹의 유리함을 점검했다. [C4][C6]  
-> 이후 **RAG 검증과 실패 양상, RAGAS 평가, 리랭커**로 넘어가 단일 홉·2-hop·3-hop 실패, Faithfulness/Answer Relevance/Context Relevance, 심판 프롬프트 개선과 리랭커 지연·도메인 밖 한계를 살폈다. [S7][C8][C9][S16]  
-> 그 다음 큰 축은 **멀티홉 검색·추론 보완**으로, 쿼리 분해·에이전틱 검색·그래프 도구가 어디까지 통하고 어디서 실패하는지 확인했다. [C5][S13][S20]  
-> 마지막으로 **지식그래프 추출·검증과 그래프 저장/질의**로 확장해, 엔티티 정규화·신원해소·트리플 추출·스키마 한계, 그리고 PostgreSQL·Neo4j·RDF 저장 일관성과 Cypher/JOIN/Text2Cypher/GraphRAG 질의를 비교했다. [C1][S3][S11][S18]  
-> 정리하면, 확인한 멤버는 dldusgh318, sese2204, Yeongeunn이고, 이 흐름은 제가 **정리한** 것이며 별도 **측정한** 것은 아닙니다. [S7][S8][S18]
+> 스터디의 큰 흐름은 먼저 문자열 기반 검색(grep)과 전통적 검색(BM25), 벡터 검색(pgvector)을 비교하고 청킹 방식까지 최적화하는 단계에서 시작했다는 점이 확인됩니다. [C1][C1][C1]  
+> 그다음에는 벡터·BM25·RRF 같은 하이브리드 검색으로 확장해, 자연어/의미 질의와 정확한 용어 질의에서 각각 무엇이 강한지와 recall 개선을 살폈습니다. [C0][C0]  
+> 이후 그래프 검색, GraphRAG, Text2Cypher를 비교하며 서술 탐색·숨은 관계 탐색·집계/상태 조건 질의에 어떤 도구가 맞는지 정리했습니다. [C3][C3][C3]  
+> 그 다음 단계에서는 멀티홉 검색과 추론 실패를 점검하고, 쿼리 재작성·에이전틱 검색·그래프 도구로 어디까지 보완되는지 확인했습니다. [C6][C6]  
+> 또한 하이브리드 검색의 한계와 지식그래프/GraphRAG 보완, 그래프 저장·질의 검증, 스키마 기반 추출 품질 점검까지 이어졌습니다. [C8][C7][C4]  
+> 마지막으로는 RAG 평가 지표와 심판 개선으로 넘어가, 검색/추출 결과를 어떻게 평가하고 사람 라벨과 맞출지까지 다뤘습니다. [C11][C11][C11]
 
 <details><summary>판정 △ ⚠</summary>
 
-검색 → RAG·평가 → 지식그래프·GraphRAG라는 큰 방향은 맞지만, gold의 단계 순서를 놓쳤다. grep → 역색인·BM25 → 임베딩·벡터 → 하이브리드·RAG·평가 → KG 이론(RDF·OWL·SPARQL) → 스키마·트리플 추출 → GraphRAG 순서인데, 시스템 답은 BM25·벡터·하이브리드로 시작하고 grep을 뒤에 넣었다. KG 이론 단계도 빠졌고 '멀티홉 검색' 단계를 따로 끼워 넣었다. 또한 gold에 없는 멤버 이름을 확정적으로 언급했다.
+grep, BM25, 벡터 검색, 하이브리드(RRF), GraphRAG, Text2Cypher 같은 주제는 언급했다. 그러나 gold의 순서(역색인·BM25 → 임베딩·HNSW → 하이브리드·RAG·평가 → 지식그래프 이론 → 스키마·트리플 추출 → GraphRAG)를 따르지 않았고, RDF·OWL·SPARQL 같은 지식그래프 이론도 빠뜨렸다. 평가를 마지막 단계로 놓고 멀티홉·에이전틱 검색 단계를 추가한 부분은 gold와 어긋난다.
 
 </details>
 
@@ -677,14 +680,15 @@ do-dop, 57청크에서 정규화 100% vs RRF 96.7%, 69청크에서 RRF 100% vs �
 
 <sub>경로 `local` · 진입 엔티티 RRF, 점수 정규화 융합</sub>
 
-> 네, 결론이 갈린 사례가 있습니다. do-dop가 확인한 실험에서 57개 청크 코퍼스에서는 점수 정규화 융합이 더 좋았고, 69개 청크로 넓히면 RRF가 더 좋았으며, 이 차이는 코퍼스 구성과 문서 수 변화가 뒤집은 것으로 정리했다. [G7][G4][G5][C3]  
-> 또 다른 do-dop 확인 사례에서는 BM25에서 압도적 1위였지만 벡터 검색에 없는 문서를 RRF가 11위로 밀어냈고, 점수 정규화 융합은 그 문서를 4위로 살려냈다. [G3][G6][C1]  
-> 즉, RRF는 등수만 반영해 점수 격차를 버리는 반면, 점수 정규화는 원래 점수 차이를 반영해 이런 문서를 더 높게 유지한 것이 결과를 뒤집은 핵심이다. [C3][C4][C5]  
-> 다만 같은 do-dop 실험에서도 코퍼스를 69개 청크로 늘리면 RRF가 다시 우세해져, 어느 방식이 항상 낫다고는 단정할 수 없다고 확인했다. [G1][G2][C2]
+> 네, 결론이 갈린 사례가 있습니다. do-dop가 확인한 실험에서 57개 청크 코퍼스에서는 점수 정규화 융합이, 69개 청크 코퍼스에서는 RRF가 더 나았고, 그래서 한 방식이 항상 우세하다고 단정할 수 없었습니다. [G1][G7][G4]  
+> 또 다른 확인에서도 do-dop가 뉴스룸 문서를 10건에서 14건으로 늘리고 무관한 문서 4건을 추가하자 Recall@5 우세가 RRF로 뒤집혔습니다. [G2][G8][G9]  
+> 결과를 뒤집은 핵심은 코퍼스 구성, 즉 문서 수와 무관한 문서의 섞임이었습니다. [G1][G2][G5]  
+> 특히 BM25에서 압도적 1위였지만 벡터 검색에는 없던 문서는 RRF에서 11위로 밀렸고, 점수 정규화 융합에서는 4위로 살아나서, 원래 점수 격차를 보존하느냐가 차이를 만들었습니다. [C1][C3][G6][G10]  
+> 정리한 사람은 do-dop이며, 측정한 사람도 do-dop입니다. [G1][G2][C1]
 
 <details><summary>판정 △ ⚠</summary>
 
-57청크에서는 정규화가 이기고 69청크에서는 RRF가 이긴다는 뒤집힘은 맞혔지만, R@5 수치(100% vs 96.7%)와 '무관 문서 4건 추가'라는 핵심 조건이 빠졌다. 또한 gold에 없는 'RRF 11위/정규화 4위' 사례를 덧붙이고, 뒤집힌 원인을 '점수 격차 반영'이라고 주장해 gold의 원인(코퍼스에 섞인 문서)과 어긋난다.
+57청크에서는 정규화가, 69청크에서는 RRF가 이겼고 원인이 코퍼스 구성(무관 문서 4건 추가)이라는 핵심은 맞혔다. 그러나 R@5 수치(100% vs 96.7%)와 '정규화는 안 된다'는 이전 정리에 대한 반례라는 점이 빠졌다. 또 BM25 1위 문서가 RRF에서 11위, 정규화에서 4위가 되었다는 내용은 gold에 없는 구체적 사실을 확정적으로 주장하며, 문서를 10건에서 14건으로 늘렸다는 설명도 gold에 없다.
 
 </details>
 
@@ -735,9 +739,8 @@ do-dop, 57청크에서 정규화 100% vs RRF 96.7%, 69청크에서 RRF 100% vs �
 <sub>경로 `aggregate→local` · 진입 엔티티 임베딩 · Cypher 결과 0행</sub>
 
 > 근거 없음입니다. [C1][C2][C3][C4][C5]  
-> 제공된 근거에는 임베딩 모델이나 LLM을 **직접 파인튜닝해서 검색 성능을 비교했다**는 내용이 없고, 검색 방식 비교나 벤치마크/실험만 있습니다. [G1][G2][G3][G4][G5][G6][G8][G11][G14]  
-> 따라서 누가 그런 비교를 했는지, 그리고 멤버 github id가 누구인지 확인할 수 없습니다. [C1][C5]  
-> 정리된 근거만 보면 `sese2204`, `dldusgh318`, `lys0611`, `Yeongeunn`, `do-dop`, `e0ng`, `jjinthung`, `sunghyun` 등이 검색 실험을 했지만, 파인튜닝 여부는 확인되지 않습니다. [G1][G2][G4][G5][G6][G7][G8][G9][G10][G11][G12][G13][G14]
+> 제공된 근거에는 임베딩 모델이나 LLM을 **직접 파인튜닝해서 검색 성능을 비교했다**는 내용이 없고, 주로 벡터/BM25/RRF 검색 비교와 자체 골든셋 평가만 있습니다. [C1][C2][C3][C4][C5]  
+> 따라서 해당 질문에 답하려면, 파인튜닝 수행 여부와 비교 결과가 적힌 추가 근거가 필요합니다. [C1][C2][C3][C4][C5]
 
 <details><summary>생성된 Cypher</summary>
 
@@ -771,7 +774,7 @@ ORDER BY member LIMIT 50
 
 <details><summary>판정 ✅</summary>
 
-시스템 답이 '근거 없음'이라고 했고, 멤버가 직접 파인튜닝해 검색 성능을 비교했다는 기록이 없다는 gold 결론과 일치한다. 검색 실험을 한 멤버를 나열했지만 파인튜닝 여부는 확인되지 않는다고 분명히 밝혀서 누군가를 지목한 것은 아니다.
+gold가 '없다(근거 없음)'인데 시스템도 근거 없음이라고 답하고 특정 멤버를 지목하지 않았다. KURE 언급은 빠졌지만 핵심 결론은 일치하며, 벡터/BM25/RRF 비교 언급도 gold와 모순되지 않는다.
 
 </details>
 

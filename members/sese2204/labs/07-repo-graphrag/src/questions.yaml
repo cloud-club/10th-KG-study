@@ -1,6 +1,7 @@
 # 평가 질문 12개 — 6주차 분류(단일 사실 · 교차 멤버 · 멀티홉 · 집계 · 글로벌 · 모순 · 근거 없음)를 따른다.
 # gold 는 사람이 원문과 대조해 확정했다. gold_source 에 근거를 적는다.
-# 구조 질문(Q06·Q07)의 gold 는 frontmatter·폴더에서 결정적으로 계산했다(corpus.py 결과, main fd8b7f6 기준).
+# 구조 질문(Q06·Q07)의 gold 는 frontmatter·폴더에서 결정적으로 계산했다(corpus.py 결과).
+# 1~4회차는 main fd8b7f6, 5회차부터는 main 162b822(PR #45 머지) 기준이다. Q07 은 dldusgh318 10 → 17 로 바뀌었다.
 
 - id: Q01
   type: 단일 사실
@@ -36,13 +37,13 @@
   type: 집계(구조)
   q: frontmatter에 graphrag 태그를 단 문서를 쓴 멤버는 몇 명이고 누구인가?
   gold: "6명 — do-dop, e0ng, heebindev, kdyann, sunghyun, yujeong430"
-  gold_source: corpus.py 태그 집계 (main fd8b7f6)
+  gold_source: corpus.py 태그 집계 (main fd8b7f6 · 162b822 둘 다 같음)
 
 - id: Q07
   type: 집계(구조)
   q: 실습(labs) 문서를 가장 많이 쓴 멤버 상위 3명과 각자의 문서 수는?
-  gold: "dldusgh318 10, lys0611 7, sunghyun 6"
-  gold_source: corpus.py kind=lab 집계 (dataset/·note-templates/ 제외, main fd8b7f6)
+  gold: "dldusgh318 17, lys0611 7, sunghyun 6"
+  gold_source: corpus.py kind=lab 집계 (dataset/·note-templates/·이 실습 제외, main 162b822). fd8b7f6 기준으로는 dldusgh318 10
 
 - id: Q08
   type: 집계(함정)

@@ -18,7 +18,8 @@ from common import LAB, OUT, neo4j_driver
 
 SNAP = LAB / "snapshot"
 CACHES = ["extract.jsonl", "community_summaries.jsonl", "datasets.jsonl", "answers.jsonl"]
-RESULTS = ["eval_run1.json", "eval_run2.json", "eval_run3_terra.json", "eval_run4_terra.json", "communities.json",
+RESULTS = ["eval_run1.json", "eval_run2.json", "eval_run3_terra.json", "eval_run4_terra.json", "eval_run5.json",
+           "communities.json",
            "datasets.json", "judge_extract.json"]
 DROP_PROPS = {"embedding"}
 CONSTRAINTS = {  # 라벨 → 고유 키 (load_structure · load_semantic 과 같다)

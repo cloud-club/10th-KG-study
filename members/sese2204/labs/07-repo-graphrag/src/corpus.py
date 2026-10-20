@@ -14,6 +14,8 @@ import yaml
 from common import REPO
 
 EXCLUDE = re.compile(r"/(dataset|note-templates|\.venv|site-packages|node_modules)/")
+# 이 실습 자신과 그 정리 노트는 질문·gold·답변을 담고 있어 코퍼스에 들어가면 정답이 샌다 (PR #50·#51 머지 후 발견)
+SELF = re.compile(r"^members/sese2204/(labs/07-repo-graphrag/|notes/11-repo-graphrag-insights\.md$)")
 
 # 경로에 주차 표시가 없을 때 쓰는 날짜 구간 (10기 허브 타임라인의 주차별 노트 몰림 기준)
 WEEK_BINS = [
@@ -106,7 +108,7 @@ def collect():
     docs = []
     for p in sorted((REPO / "members").glob("*/**/*.md")):
         rel = p.relative_to(REPO).as_posix()
-        if EXCLUDE.search(rel):
+        if EXCLUDE.search(rel) or SELF.search(rel):
             continue
         text = p.read_text(errors="ignore")
         fm, body = parse_frontmatter(text)

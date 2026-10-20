@@ -1,0 +1,75 @@
+# 평가 질문 12개 — 6주차 분류(단일 사실 · 교차 멤버 · 멀티홉 · 집계 · 글로벌 · 모순 · 근거 없음)를 따른다.
+# gold 는 사람이 원문과 대조해 확정했다. gold_source 에 근거를 적는다.
+# 구조 질문(Q06·Q07)의 gold 는 frontmatter·폴더에서 결정적으로 계산했다(corpus.py 결과, main fd8b7f6 기준).
+
+- id: Q01
+  type: 단일 사실
+  q: kdyann의 6주차 GraphRAG 실습에서 다중 홉·추천 질문 4개의 Recall@5는 v1과 v2가 각각 얼마였나?
+  gold: "v1 0.33 · 0.50 · 0.00 · 0.00, v2는 네 문항 모두 1.00 (단순 질문 2개는 둘 다 1.00)"
+  gold_source: members/kdyann/labs/06-graphrag/README.md 67~72행
+
+- id: Q02
+  type: 단일 사실
+  q: sunghyun의 에이전틱 검색 비교에서 그래프 조회 도구를 추가했을 때 사실 항목 점수는 어떻게 바뀌었나?
+  gold: "그래프 없이 4/9 → 그래프 도구 추가 3/9로 떨어졌다. 경로를 잘못 골라(Task→Test Case 직접 연결) 13개를 18개로 셌다"
+  gold_source: members/sunghyun/labs/06-graphrag/README.md 111행, notes/06-graphrag-and-agentic-search.md
+
+- id: Q03
+  type: 교차 멤버
+  q: RRF 융합이 BM25나 벡터 단독 검색보다 못한 결과를 직접 측정한 멤버는 누구이고, 각각 어떤 조건이었나?
+  gold: "다섯 명 — Yeongeunn(Notion 10문항, R@5 BM25 0.60·벡터 0.70·RRF 0.55), yujeong430(카카오톡 40문항, R@1 BM25 58.8% > RRF 57.5%), sunghyun(회의록 질문 Q5, R@10 BM25 1.00 > RRF 0.75), lys0611(R@10에서 BM25보다 낮음), e0ng(36문항 R@3·R@5). do-dop은 단독 검색이 아니라 정규화 융합과의 비교라 별개"
+  gold_source: wiki 하이브리드-검색과-RRF 정의문 + 원문 대조(yujeong430 evaluation/README 37행, sunghyun notes/03 167~169행, Yeongeunn labs/04 35행)
+
+- id: Q04
+  type: 교차 멤버
+  q: BM25가 벡터 검색보다 더 잘 찾았다고 측정한 멤버와, 반대로 벡터가 더 나았던 멤버를 나눠서 알려줘.
+  gold: "BM25 우세: lys0611(R@10 0.926 > 0.870), dldusgh318(R@5 0.469 > 0.407), kdyann(R@1 0.733 > 0.600), jjinthung(Hit@5 45% ≫ 2.5%). 벡터 우세: heebindev(0.50 < 0.80), Yeongeunn(0.60 < 0.70), e0ng(10문항 0.575 < 0.675, 36문항에서는 격차 소멸)"
+  gold_source: wiki 하이브리드-검색과-RRF 23행 (멤버 노트 수치 정리)
+
+- id: Q05
+  type: 멀티홉
+  q: Text2Cypher를 직접 돌려 본 멤버 중에서, 검토 대기(review_queue)로 빼 둔 관계가 리트리버에서는 제외됐는데 Text2Cypher 집계에는 들어가 버린 문제를 겪은 사람은?
+  gold: "heebindev. 닫힌 스키마에 억지로 맞춘 관계를 predicate null로 review_queue.json에 모아 v2 근거에서 뺐지만, Text2Cypher는 Neo4j를 직접 조회해 그 관계까지 셌다"
+  gold_source: members/heebindev/labs/04-graphrag-agent/README.md, wiki GraphRAG 함정 절
+
+- id: Q06
+  type: 집계(구조)
+  q: frontmatter에 graphrag 태그를 단 문서를 쓴 멤버는 몇 명이고 누구인가?
+  gold: "6명 — do-dop, e0ng, heebindev, kdyann, sunghyun, yujeong430"
+  gold_source: corpus.py 태그 집계 (main fd8b7f6)
+
+- id: Q07
+  type: 집계(구조)
+  q: 실습(labs) 문서를 가장 많이 쓴 멤버 상위 3명과 각자의 문서 수는?
+  gold: "dldusgh318 10, lys0611 7, sunghyun 6"
+  gold_source: corpus.py kind=lab 집계 (dataset/·note-templates/ 제외, main fd8b7f6)
+
+- id: Q08
+  type: 집계(함정)
+  q: 커뮤니티 탐지(Leiden·Louvain)와 글로벌 서치를 실제로 구현해 돌려 본 멤버는 누구인가?
+  gold: "없다. 6주차에 여러 멤버가 공부만 했고, heebindev 등은 그래프가 작아 의미 있는 커뮤니티가 안 나온다며 실행하지 않았다"
+  gold_source: members/heebindev/labs/04-graphrag-agent/README.md 12·249행, wiki GraphRAG 세 패턴 표
+
+- id: Q09
+  type: 글로벌
+  q: 10기 스터디 전체에서 멤버들이 공통으로 부딪힌 문제나 교훈을 4~5가지로 정리해줘.
+  gold: "핵심 5개 중 3개 이상이면 정답: ① BM25는 여전히 강한 기준선이고 RRF가 항상 이기지는 않는다 ② 평가 수치는 정답셋을 누가 어떻게 만들었는지·채점 엄격도에 좌우된다 ③ 멀티홉이라고 그래프가 필요한 건 아니다(한 번 검색으로 근거가 모이느냐가 기준) ④ LLM이 뽑은 트리플은 사실이 아니라 후보 — 형식 통과와 의미 오류가 함께 나온다 ⑤ 그래프는 관계·집계 질문에서만, 맞는 경로를 골랐을 때만 이긴다"
+  gold_source: docs/10기-최종발표/10기-최종정리.md §3 (위키 합성 결과를 사람이 정리)
+
+- id: Q10
+  type: 글로벌
+  q: 이 스터디는 어떤 순서로 주제를 밟아 왔나? 큰 흐름을 요약해줘.
+  gold: "grep → 역색인·BM25(nori) → 임베딩·벡터 검색(HNSW·pgvector) → 하이브리드(RRF)·RAG·평가 → 지식그래프 이론(RDF·OWL·SPARQL·프로퍼티 그래프) → 닫힌 스키마·LLM 트리플 추출·적재 → GraphRAG(로컬·글로벌·Text2Cypher). '무엇을 찾을까'에서 '찾은 것을 어떻게 이을까'로"
+  gold_source: docs/10기-최종발표/10기-최종정리.md §2
+
+- id: Q11
+  type: 모순
+  q: 점수 정규화 융합과 RRF 중 어느 쪽이 나은지를 두고 결론이 갈린 사례가 있나? 무엇이 결과를 뒤집었나?
+  gold: "do-dop이 min-max 정규화 + 동일 가중 융합을 RRF와 같은 10문항으로 비교: 뉴스룸 57청크에서는 정규화 R@5 100% vs RRF 96.7%로 정규화가 이겼고, 무관 문서 4건을 더한 69청크에서는 RRF 100% vs 정규화 96.7%로 뒤집혔다. 코퍼스에 어떤 문서가 섞였는지에 따라 승자가 바뀐다 — '정규화는 안 된다'는 이전 정리에 대한 반례"
+  gold_source: wiki 하이브리드-검색과-RRF ⚠️ Contradiction, members/do-dop/notes/03-reciprocal-rank-fusion.md
+
+- id: Q12
+  type: 근거 없음
+  q: 10기 멤버 중 임베딩 모델이나 LLM을 직접 파인튜닝해서 검색 성능을 비교한 사람은 누구인가?
+  gold: "없다(근거 없음). 파인튜닝은 KURE(bge-m3를 한국어로 파인튜닝한 외부 모델) 같은 모델 설명에만 나오고, 멤버가 직접 파인튜닝한 기록은 없다"
+  gold_source: members/ 전체 grep — 파인튜닝은 모델 설명에만 등장

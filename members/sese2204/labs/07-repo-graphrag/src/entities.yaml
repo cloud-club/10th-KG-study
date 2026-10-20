@@ -1,0 +1,72 @@
+# 닫힌 엔티티 사전 — Technique · Tool 의 정규 이름과 별칭.
+# 근거: 멤버 노트 frontmatter tags 156개 + wiki/ 페이지 이름 (이름만 가져온다. 위키의 내용·결론은 쓰지 않는다)
+# alias 는 대소문자 무시, 단어 경계로 청크 본문에서 찾는다 → (Chunk)-[:MENTIONS]->(엔티티) 를 결정적으로 만든다.
+# part_of 는 (Technique)-[:PART_OF]->(Technique). 사람이 정한 분류이지 추출 결과가 아니다.
+
+Technique:
+  grep:             {aliases: [grep, 문자열 매칭, string matching, ripgrep]}
+  역색인:            {aliases: [inverted index, 역색인, 역 색인, 전치 색인]}
+  BM25:             {aliases: [bm25, okapi], part_of: 키워드 검색}
+  TF-IDF:           {aliases: [tf-idf, tfidf], part_of: 키워드 검색}
+  키워드 검색:        {aliases: [lexical search, 키워드 검색, 어휘 검색, sparse retrieval, full-text search, 전문 검색]}
+  n-gram:           {aliases: [n-gram, ngram, bigram, 바이그램]}
+  형태소 분석:        {aliases: [형태소 분석, morphological, tokenizer, 토크나이저, 토크나이징]}
+  임베딩:            {aliases: [embedding, 임베딩, dense retrieval, 밀집 검색, 벡터 검색, vector search]}
+  코사인 유사도:       {aliases: [cosine similarity, 코사인 유사도, cosine], part_of: 임베딩}
+  HNSW:             {aliases: [hnsw], part_of: ANN}
+  ANN:              {aliases: [ann, approximate nearest, 근사 최근접]}
+  하이브리드 검색:     {aliases: [hybrid search, hybrid retrieval, 하이브리드 검색]}
+  RRF:              {aliases: [rrf, reciprocal rank fusion], part_of: 하이브리드 검색}
+  점수 정규화 융합:    {aliases: [min-max, score normalization, score-based fusion, 점수 정규화, convex combination], part_of: 하이브리드 검색}
+  청킹:              {aliases: [chunking, 청킹, 청크 분할, late chunking, contextual retrieval]}
+  리랭커:            {aliases: [reranker, re-ranker, 리랭커, 리랭킹, cross-encoder, 크로스 인코더, colbert]}
+  쿼리 재작성:        {aliases: [query rewriting, 쿼리 재작성, hyde, multi-query, 질의 재작성, query expansion]}
+  RAG:              {aliases: [rag, retrieval-augmented, 검색 증강]}
+  근거 인용:          {aliases: [citation, 근거 인용, 인용 검증, grounding, citation grounding], part_of: RAG}
+  에이전틱 검색:       {aliases: [agentic rag, agentic search, agentic retrieval, 에이전틱, self-rag, adaptive rag, crag, ircot], part_of: RAG}
+  멀티홉 질의:        {aliases: [multi-hop, multihop, 멀티홉, 다중 홉, bridge entity, 브릿지 엔티티]}
+  Recall@k:         {aliases: [recall@k, recall@5, recall@10, recall@3, recall-at-k], part_of: RAG 평가}
+  MRR:              {aliases: [mrr, mean reciprocal rank], part_of: RAG 평가}
+  nDCG:             {aliases: [ndcg], part_of: RAG 평가}
+  RAG 평가:          {aliases: [rag 평가, golden set, 골든셋, 평가셋, qrels, faithfulness, llm-as-judge, llm as a judge, 심판 모델]}
+  지식그래프:         {aliases: [knowledge graph, 지식그래프, 지식 그래프]}
+  온톨로지:           {aliases: [ontology, 온톨로지, tbox, abox]}
+  RDF:              {aliases: [rdf, 트리플, triple, turtle, json-ld, n-triples]}
+  RDFS:             {aliases: [rdfs], part_of: 온톨로지}
+  OWL:              {aliases: [owl], part_of: 온톨로지}
+  SPARQL:           {aliases: [sparql]}
+  프로퍼티 그래프:     {aliases: [property graph, 프로퍼티 그래프, labeled property graph, lpg]}
+  Cypher:           {aliases: [cypher]}
+  닫힌 스키마:        {aliases: [closed schema, 닫힌 스키마, 폐쇄 스키마, 미니 온톨로지, competency question, 역량 질문]}
+  트리플 추출:        {aliases: [triple extraction, 트리플 추출, information extraction, 정보 추출, 관계 추출]}
+  엔티티 신원해소:     {aliases: [entity resolution, 신원해소, 신원 해소, 엔티티 정규화, 중복 엔티티, deduplication, canonicalization]}
+  출처 추적:          {aliases: [provenance, 출처 추적, prov-o, w3c prov, lineage, traceability]}
+  가명화:            {aliases: [가명화, 비식별, pii, 마스킹, pseudonymization, anonymization]}
+  GraphRAG:         {aliases: [graphrag, graph rag, 그래프 rag, graph-rag]}
+  로컬 서치:          {aliases: [local search, 로컬 서치, 로컬 검색], part_of: GraphRAG}
+  글로벌 서치:        {aliases: [global search, 글로벌 서치, 글로벌 검색, community summary, 커뮤니티 요약], part_of: GraphRAG}
+  커뮤니티 탐지:       {aliases: [community detection, 커뮤니티 탐지, leiden, louvain], part_of: 글로벌 서치}
+  Text2Cypher:      {aliases: [text2cypher, text-to-cypher, text to cypher]}
+  하이브리드 리트리버:  {aliases: [hybrid retriever, 하이브리드 리트리버], part_of: GraphRAG}
+  LLM 위키:          {aliases: [llm wiki, llm 위키, llm-wiki]}
+  시맨틱 웹:          {aliases: [semantic web, 시맨틱 웹, linked data, 링크드 데이터]}
+
+Tool:
+  Elasticsearch:    {aliases: [elasticsearch, opensearch, 엘라스틱서치]}
+  nori:             {aliases: [nori]}
+  Lucene:           {aliases: [lucene]}
+  PostgreSQL:       {aliases: [postgresql, postgres]}
+  pgvector:         {aliases: [pgvector]}
+  Neo4j:            {aliases: [neo4j, apoc]}
+  RAGAS:            {aliases: [ragas]}
+  BEIR:             {aliases: [beir]}
+  Wikidata:         {aliases: [wikidata, dbpedia]}
+  Palantir Foundry: {aliases: [palantir, foundry]}
+  OpenViking:       {aliases: [openviking]}
+  bge-m3:           {aliases: [bge-m3]}
+  multilingual-e5:  {aliases: [multilingual-e5, e5-small, e5-base, e5-large, multilingual e5]}
+  KURE:             {aliases: [kure]}
+  rdflib:           {aliases: [rdflib]}
+  Docker Compose:   {aliases: [docker compose, docker-compose]}
+  Obsidian:         {aliases: [obsidian, 옵시디언]}
+  Notion:           {aliases: [notion, 노션]}

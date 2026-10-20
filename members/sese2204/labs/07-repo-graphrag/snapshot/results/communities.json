@@ -1,0 +1,381 @@
+[
+ {
+  "id": "C0",
+  "title": "검색 방식 비교와 융합 함정",
+  "summary": "이 묶음은 BM25, 벡터 검색, 하이브리드 검색, RRF, 점수 정규화 융합을 여러 실험으로 비교한 내용이다. 멤버들은 코사인 유사도와 임베딩의 기본 성질, BM25의 토큰 일치 한계, 그리고 하이브리드 결합이 점수 스케일 문제를 어떻게 다루는지 확인했다. 결과는 데이터셋과 질문 유형에 따라 갈렸고, 어떤 실험에서는 벡터나 하이브리드가 더 좋았지만 다른 실험에서는 BM25가 더 낫거나 RRF가 오히려 손해를 보기도 했다. 특히 RRF는 후보를 넓게 모으는 데는 유리하지만, 한쪽에서 강한 문서를 밀어내거나 1위와 2위의 격차를 반영하지 못하는 한계가 반복해서 드러났다.",
+  "key_points": [
+   "Yeongeunn: 공통 스냅샷 1,369개와 질문 10개 비교에서 지정 근거 Recall@5는 벡터 0.70, BM25 0.60, RRF 0.55였다.",
+   "Yeongeunn: RRF는 q01에서 BM25 1위 근거를 6위로, q05에서 벡터 1위 근거를 7위로 밀어 상위 5개에서 놓쳤지만 q10에서는 BM25만으로 놓친 근거를 보완했다.",
+   "Yeongeunn: 코사인 유사도는 같은 방향이면 길이가 달라도 1, 직각이면 0이며, min-max 정규화 후 가중합으로 검색 방식의 영향력을 조절할 수 있다.",
+   "dldusgh318: 평가셋에서는 Hybrid Search가 평균 Recall@5/10에서 BM25와 Vector보다 높았지만, 정확한 코드 심볼 질문 R02에서는 BM25 단독이 Hybrid보다 좋았다.",
+   "do-dop: 문서를 늘리기 전에는 점수 정규화 융합이 RRF보다 Recall@5가 높았고, 문서를 늘린 뒤에는 RRF가 더 좋아져 하이퍼파라미터 우열이 코퍼스 구성에 따라 뒤집혔다.",
+   "heebindev: 벡터 후보가 정답 청크를 아예 못 담으면 RRF로도 회복되지 않았고, 결합 결과에 관련성 낮은 상위 노출이 섞일 수 있었다."
+  ],
+  "size": 268,
+  "members": [
+   "do-dop",
+   "lys0611",
+   "e0ng",
+   "dldusgh318",
+   "sunghyun",
+   "Yeongeunn",
+   "heebindev",
+   "yujeong430",
+   "sese2204",
+   "kdyann",
+   "jjinthung",
+   "ur2e"
+  ],
+  "entities": [
+   "BM25",
+   "키워드 검색",
+   "임베딩",
+   "코사인 유사도",
+   "하이브리드 검색",
+   "RRF",
+   "점수 정규화 융합",
+   "Recall@k"
+  ]
+ },
+ {
+  "id": "C1",
+  "title": "지식그래프 추출·정규화 요약",
+  "summary": "이 묶음은 팀 Notion과 관련 문서에서 지식그래프를 만들기 위해 트리플 추출, 엔티티 신원해소, 출처 추적, 가명화, 시맨틱 웹의 한계를 함께 다뤘다. 멤버들은 개체추출과 관계추출을 구분하고, 닫힌 스키마와 관계 술어를 고정해 일관성을 높이려 했으며, Wikidata/Wikibase의 statement·qualifier·reference 구조와 직접 조회의 한계를 확인했다. 실험에서는 문맥 보강으로 후보 수가 줄었지만 정확도 향상은 단정하지 못했고, 그래프 적재 결과는 15개 엔티티·20개 관계·29건 근거로 정리됐다. 다만 LLM 자동화가 비용은 줄여도 중복, ID 불일치, 누락 사실, 허위 대상 생성 같은 신원해소·정규화 문제를 없애지 못했고, 여러 문서와 청크에 분산된 관계를 어떻게 같은 사용례로 볼지에서 의견이 갈렸다.",
+  "key_points": [
+   "Yeongeunn: 팀 Notion의 금융 도메인 조사, 회의록, 멘토링 기록, 기획·API 명세를 분석 대상으로 정했다.",
+   "Yeongeunn: 첫 관계 추출은 7개 후보, 문맥 보강 추출은 5개 후보였고, 후보 감소만으로 정확도 개선을 단정할 수는 없었다.",
+   "Yeongeunn: 그래프 적재 결과는 15개 엔티티, 20개 관계, 29건 근거로 저장됐다.",
+   "Yeongeunn: 개체추출은 대상을 찾는 단계이고 관계추출은 이유·결정의 연결까지 다루므로 둘을 구분해야 한다.",
+   "Yeongeunn: Wikidata/Wikibase는 claim/statement, qualifier, reference, rank를 분리해 맥락과 변경 이력을 보존하며, wdt: 직접 관계만으로는 한정어와 출처를 다룰 수 없다.",
+   "dldusgh318: 작은 문서 집합에서는 술어를 5종으로 제한하고 TechnologyUse 중간 노드를 두어 목적과 상태를 분리하는 것이 유리했다."
+  ],
+  "size": 238,
+  "members": [
+   "dldusgh318",
+   "Yeongeunn",
+   "sunghyun",
+   "do-dop",
+   "lys0611",
+   "kdyann",
+   "heebindev",
+   "kungbi",
+   "yujeong430",
+   "e0ng",
+   "sese2204",
+   "sdunge"
+  ],
+  "entities": [
+   "지식그래프",
+   "트리플 추출",
+   "엔티티 신원해소",
+   "출처 추적",
+   "가명화",
+   "시맨틱 웹"
+  ]
+ },
+ {
+  "id": "C2",
+  "title": "RAG·인용·멀티홉 검증",
+  "summary": "이 묶음은 RAG에서 근거를 어떻게 찾고, 조립하고, 인용까지 검증할지에 대한 실험과 함정을 다룬다. 멤버들은 검색 누락, 다중 홉 연결 실패, 인용 문자열 불일치가 각각 어디서 생기는지 확인했고, Oracle Context나 그래프 조회로 원인을 분리해 보았다. 또 복제 페이지 제거, 공백 정규화, provenance 기록, 원문 대조 같은 방어 장치가 필요하다는 점이 반복해서 드러났다. 갈린 지점은 검색이 실패한 것인지, LLM 추론이 실패한 것인지, 혹은 인용 검증만 실패한 것인지의 구분이었다.",
+  "key_points": [
+   "Yeongeunn: 상위 검색 결과에 복제 페이지가 섞였지만 RAG 단계에서 공백 정규화 중복 제거로 근거 3개를 선택했다.",
+   "Yeongeunn: 다중 홉 질문은 여러 문서의 근거를 모두 찾고 올바르게 연결해야 하며, 검색 누락과 관계 연결 오류가 모두 발생할 수 있다.",
+   "dldusgh318: 단일 홉과 2홉은 성공했지만 Aggregation은 인용 실패가 있었고 3홉 후보는 검색 실패로 불완전했다.",
+   "dldusgh318: H01에서는 필요한 근거 청크를 충분히 검색하지 못해 LLM에 불완전한 Context가 전달됐고, Oracle Context에서는 정확한 답변이 나왔다.",
+   "do-dop: 하이브리드 검색과 근거 인용을 포함한 RAG 루프를 구성했지만, 정답이 없는 질문에서도 과잉 확신으로 틀린 답을 낼 수 있었다.",
+   "e0ng: 확률적 검색은 연결을 놓칠 수 있지만 그래프는 미리 저장된 관계를 따라가므로 다중 홉 연결을 놓치지 않는다고 보았다."
+  ],
+  "size": 236,
+  "members": [
+   "dldusgh318",
+   "lys0611",
+   "kdyann",
+   "do-dop",
+   "Yeongeunn",
+   "sunghyun",
+   "sese2204",
+   "heebindev",
+   "yujeong430",
+   "e0ng",
+   "jjinthung",
+   "kungbi",
+   "sdunge"
+  ],
+  "entities": [
+   "RAG",
+   "근거 인용",
+   "멀티홉 질의",
+   "LLM 위키"
+  ]
+ },
+ {
+  "id": "C3",
+  "title": "RDF·OWL·SPARQL 요약",
+  "summary": "이 묶음은 온톨로지, RDF/RDFS/OWL, SPARQL, 프로퍼티 그래프, 닫힌 스키마, Wikidata를 비교하며 사실 표현과 의미 추론, 질의, 실무 모델링의 차이를 정리한다. 멤버들은 RDF가 IRI와 리터럴로 사실을 표현하고, RDFS와 OWL이 하위 클래스·domain/range·역관계·대칭성·추이성 같은 의미를 더해 추론을 가능하게 한다는 점을 확인했다. 동시에 열린 세계 가정 때문에 부재를 거짓으로 단정하면 안 되고, 검증 규칙과 의미 추론을 혼동하면 안 된다는 점에서 여러 번 갈렸다. 또 SPARQL은 Triple 패턴 질의와 조인에 강하지만 추론 엔진 자체는 아니며, RDF와 프로퍼티 그래프는 목적이 달라 표준·상호운용성과 탐색·개발 편의 사이의 선택이 필요하다는 점도 확인했다.",
+  "key_points": [
+   "Yeongeunn · RDF에서는 IRI로 대상을 식별하고 리터럴은 값이며, 접두어는 긴 주소를 줄여 쓰는 표기다.",
+   "dldusgh318 · RDFS의 하위 클래스 관계와 domain/range는 검증이 아니라 추론에 쓰이며, 저장하지 않은 타입 사실도 유도할 수 있다.",
+   "dldusgh318 · OWL은 배타성·동일성·역관계·대칭성·추이성 같은 더 풍부한 의미를 표현하고 모순도 찾을 수 있다.",
+   "dldusgh318 · SPARQL은 빈칸이 있는 Triple 패턴으로 조회하며, 같은 변수를 공유하면 자연스럽게 조인 역할을 한다.",
+   "dldusgh318 · RDF와 프로퍼티 그래프는 같은 그래프라도 목적이 달라, RDF는 표준·식별·상호운용성에, 프로퍼티 그래프는 탐색·속성 표현에 강하다.",
+   "dldusgh318 · 닫힌 스키마에서는 질문에 필요한 관계만 미리 정하고, 전체 문서를 다 담으려 하면 범위가 끝없이 커진다."
+  ],
+  "size": 222,
+  "members": [
+   "dldusgh318",
+   "do-dop",
+   "kdyann",
+   "e0ng",
+   "yujeong430",
+   "sunghyun",
+   "Yeongeunn",
+   "heebindev",
+   "kungbi",
+   "lys0611"
+  ],
+  "entities": [
+   "온톨로지",
+   "RDF",
+   "RDFS",
+   "OWL",
+   "SPARQL",
+   "프로퍼티 그래프",
+   "닫힌 스키마",
+   "Wikidata"
+  ]
+ },
+ {
+  "id": "C4",
+  "title": "검색 방식 비교와 실험 요약",
+  "summary": "이 묶음은 grep, 역색인/BM25, 형태소 분석(nori·n-gram), 그리고 pgvector/HNSW 기반 벡터 검색을 같은 데이터에서 비교한 내용이다. 멤버들은 문자열 일치만 하는 grep의 한계, Elasticsearch의 역색인과 BM25가 관련도 순 정렬을 제공하는 점, pgvector와 HNSW가 의미 검색을 가능하게 하지만 근사 오차와 비용이 있다는 점을 확인했다. 또한 한국어에서는 형태소 분석과 n-gram 선택이 검색 품질에 큰 영향을 주며, 사전 밖 표현·띄어쓰기·복합어 처리에서 결과가 갈릴 수 있음을 봤다. 실험에서는 작은 데이터에서 HNSW가 정확 검색과 일치한 경우도 있었지만, 다른 측정에서는 pgvector가 정확도는 높아도 속도와 적재 비용이 더 크거나, HNSW가 필터와 근사 탐색 때문에 결과를 덜 채우는 경우도 있었다.",
+  "key_points": [
+   "Yeongeunn: 628개의 Notion Markdown을 1,477개 청크로 적재했고 BM25 검색에서 관련 문서 조각과 점수를 확인했다.",
+   "dldusgh318: grep은 정확한 문자열 찾기에는 강하지만 관련도 판단과 의미 이해를 하지 못해 역색인과 BM25가 필요했다.",
+   "do-dop: 한국어 검색에서는 형태소 분석기(nori)나 n-gram처럼 목적에 맞는 토크나이저를 선택해야 한다.",
+   "e0ng: 이번 질의에서 pgvector가 Precision@5 1.0으로 가장 높았고 BM25는 0.6, grep은 0.0이었다.",
+   "e0ng: 검색 시간은 grep 6.2ms, BM25 116.8ms, pgvector 204.4ms로 측정됐다.",
+   "Yeongeunn: 작은 데이터의 한 설정에서 HNSW는 정확 검색 결과와 상위 5개 이웃이 완전히 일치했고 10질의 평균 이웃 일치율은 1.0이었다."
+  ],
+  "size": 182,
+  "members": [
+   "lys0611",
+   "dldusgh318",
+   "e0ng",
+   "kdyann",
+   "yujeong430",
+   "Yeongeunn",
+   "sunghyun",
+   "do-dop",
+   "heebindev",
+   "ur2e",
+   "sdunge",
+   "jjinthung"
+  ],
+  "entities": [
+   "grep",
+   "역색인",
+   "n-gram",
+   "형태소 분석",
+   "HNSW",
+   "ANN",
+   "Elasticsearch",
+   "nori",
+   "Lucene",
+   "pgvector",
+   "Docker Compose"
+  ]
+ },
+ {
+  "id": "C5",
+  "title": "GraphRAG와 검색 전략 요약",
+  "summary": "이 묶음은 GraphRAG를 중심으로 로컬 서치, 글로벌 서치, 하이브리드 리트리버, 커뮤니티 탐지, Text2Cypher, Palantir Foundry/Ontology까지 이어지는 그래프 기반 검색·답변 흐름을 다룬다. 멤버들은 GraphRAG가 문서에서 추출한 엔티티·관계와 커뮤니티 요약을 활용해 전체 주제나 관계 질문에 강하다는 점을 확인했고, 로컬 서치는 주변 서브그래프 탐색, 글로벌 서치는 커뮤니티 요약 재사용이라는 차이를 정리했다. 다만 집계형 질문에서는 로컬 서치나 top-k 문서 검색이 약했고 Text2Cypher가 유리했으며, 그래프 추출 오류·요약 손실·구축 비용이 답변 품질에 전파된다는 점에서 의견이 갈렸다. Palantir Ontology는 그래프 조회를 넘어 실제 업무 행동과 상태 변경으로 확장되는 운영 인터페이스로 설명됐다.",
+  "key_points": [
+   "Yeongeunn · GraphRAG는 추출·요약·검색과 그래프를 결합해 문서 전체의 공통 주제 같은 질문에 활용된다.",
+   "e0ng · 로컬 서치는 질문과 관련된 엔티티 주변 서브그래프를 탐색하고, 글로벌 서치는 커뮤니티 요약으로 그래프 전반의 주제를 종합한다.",
+   "heebindev · 집계 질문에는 로컬 GraphRAG보다 Text2Cypher가 유리했고, 문서 검색과 로컬 서치는 '가장 많은 관계' 같은 질문에 실패했다.",
+   "kdyann · 질문 유형에 따라 로컬 서치, 글로벌 서치, Text2Cypher의 쓰임이 다르며, 관계를 요구하는 질문에서는 v2가 더 적합했다.",
+   "sunghyun · GraphRAG는 글로벌 질문에 적합하지만 모든 질문에서 벡터 RAG보다 낫지는 않으며, 구축 비용과 추출·요약 손실이 있다.",
+   "dldusgh318 · Palantir Ontology는 그래프 조회를 넘어 실제 업무 행동으로 상태를 변경하는 운영 인터페이스로 확장된다."
+  ],
+  "size": 92,
+  "members": [
+   "kdyann",
+   "sunghyun",
+   "heebindev",
+   "dldusgh318",
+   "e0ng",
+   "Yeongeunn",
+   "yujeong430",
+   "do-dop"
+  ],
+  "entities": [
+   "GraphRAG",
+   "로컬 서치",
+   "글로벌 서치",
+   "커뮤니티 탐지",
+   "하이브리드 리트리버",
+   "Palantir Foundry"
+  ]
+ },
+ {
+  "id": "C6",
+  "title": "그래프 적재와 Text2Cypher 검증",
+  "summary": "이 묶음은 PostgreSQL, Neo4j, Cypher, Text2Cypher를 중심으로 지식그래프를 적재하고 질의하는 실험을 다뤘다. 멤버들은 중복 없이 재적재되는지, Postgres와 Neo4j에 같은 사실이 들어갔는지, 그래프 질의가 JOIN 기반 SQL보다 어떤 점에서 단순한지 확인했다. 또한 Text2Cypher가 자연어를 Cypher로 바꿔 직접 조회할 수 있는지 검증했지만, 스키마 이해 부족·방향 오해·근거 부족 때문에 실패하거나 보류된 사례도 있었다. 갈린 지점은 그래프 질의가 집계와 다중 홉에서 유리한 경우와, 그래프에 없는 정보나 잘못 들어간 관계 때문에 오답이 되는 경우였다.",
+  "key_points": [
+   "e0ng · id 기반 MERGE 적재는 재실행해도 노드·관계 수가 늘지 않았고, Postgres 3테이블에 엔티티 246개·엣지 304개·근거 237개가 저장됐다.",
+   "dldusgh318 · 문서에서 실제 그래프를 만들기 위해 LLM Triple Extraction→PostgreSQL→RDF→Neo4j→Cypher 질의 파이프라인을 완주했다.",
+   "dldusgh318 · 프로젝트→기술 질의와 REPLACES 연쇄 질의는 Cypher가 PostgreSQL보다 더 직접적이었고, PostgreSQL은 더 많은 JOIN/재귀 CTE가 필요했다.",
+   "heebindev · 로컬 GraphRAG는 전체 관계 수 같은 집계 질문에 약했지만, Text2Cypher는 Neo4j 전체를 직접 세어 답할 수 있었다.",
+   "sunghyun · 생성된 Cypher는 라벨·관계 방향·집계가 실제 스키마와 맞지 않으면 실행돼도 정답이 아니어서, 생성문과 결과를 정답에 대조해야 했다.",
+   "kdyann · Text2Cypher는 8개 질문 중 2개만 실행 성공했고 4개는 검증 거절, 2개는 지원 불가였으며 문자열 검증만으로는 의미 판별이 어려웠다."
+  ],
+  "size": 91,
+  "members": [
+   "Yeongeunn",
+   "dldusgh318",
+   "heebindev",
+   "sunghyun",
+   "kdyann",
+   "e0ng",
+   "do-dop",
+   "kungbi",
+   "lys0611",
+   "yujeong430"
+  ],
+  "entities": [
+   "Cypher",
+   "Text2Cypher",
+   "PostgreSQL",
+   "Neo4j"
+  ]
+ },
+ {
+  "id": "C7",
+  "title": "RAG 평가 지표와 실험 요약",
+  "summary": "이 묶음은 GraphRAG/하이브리드 검색 비교와 RAG 평가 방법을 함께 정리한 것으로, 검색 단계와 생성 단계를 분리해 봐야 한다는 점이 핵심이다. 멤버들은 수동 qrels를 만들어 MRR, nDCG 같은 IR 지표와 RAGAS 같은 생성 지표를 구분해 확인했고, RAGAS와 RAGChecker의 동작 방식도 비교했다. 다만 여러 결과가 소표본·라벨 오류·AI 심판 편향·공개 벤치마크 일반화 한계에 걸려 있어, 수치를 확정 성능으로 해석하기 어렵다는 점에서 갈렸다. 특히 답이 없는 질문, 멀티턴 대화, 한국어 프롬프트 적응처럼 평가 조건에 따라 지표 해석이 달라지는 함정이 반복해서 확인됐다.",
+  "key_points": [
+   "Yeongeunn: 그래프 근거를 추가한 v2와 하이브리드 문서 검색 v1을 비교해 GraphRAG 효과를 보려 했다.",
+   "dldusgh318: 10개의 검색 질문에 대해 relevant/irrelevant를 직접 판정해 Gold Set(qrels)를 만들었다.",
+   "sese2204: 검색 평가는 recall@k, NDCG@k, MRR로, 생성 평가는 faithfulness와 answer relevance 같은 RAGAS 계열 지표로 나눠야 한다.",
+   "sese2204: reference-free 지표는 정답 일치가 아니라 주어진 근거와의 모순 없음만 재므로, 검색 층 평가는 reference contexts로 따로 해야 한다.",
+   "sese2204: RAGAS는 원자적 진술로 쪼개 LLM이 근거·정답과 대조하고, RAGChecker는 claim 단위로 entailment를 판정해 검색기/생성기 지표로 분해한다.",
+   "sese2204: 여러 실험에서 LLM 심판은 사람과 80% 이상 일치했지만, 오답이 관대한 방향으로 나오는 편향과 context relevance의 어려움이 확인됐다."
+  ],
+  "size": 46,
+  "members": [
+   "sese2204",
+   "Yeongeunn",
+   "lys0611",
+   "dldusgh318",
+   "kdyann",
+   "e0ng",
+   "yujeong430"
+  ],
+  "entities": [
+   "MRR",
+   "nDCG",
+   "RAG 평가",
+   "RAGAS"
+  ]
+ },
+ {
+  "id": "C8",
+  "title": "청킹·리랭커 성능과 함정",
+  "summary": "이 묶음은 청킹 방식과 리랭커가 검색 성능에 어떤 영향을 주는지, 그리고 어떤 함정이 있는지를 다뤘다. 멤버들은 문자 기준 고정 청킹, 세션/헤딩 기반 청킹, contextual retrieval, late chunking, RAPTOR 같은 방법을 비교했고, BM25와 pgvector, reranker의 성능 차이도 확인했다. 전반적으로 헤딩이나 문맥을 살린 방식이 유리한 경우가 많았지만, 질문 유형에 따라 최적 청크 크기가 달랐고, 검색을 잘해도 생성 단계 오류나 현재 사실 검증 실패가 남는다는 점에서 갈렸다. 또한 청크 경계 절단, 토큰 수 오해, 답변 분리 같은 운영상의 함정도 함께 확인했다.",
+  "key_points": [
+   "Yeongeunn: 현재 청킹은 토큰 기준이 아니라 문자 기준 슬라이싱이며 1,200자 청크와 1,000자 오버랩을 쓴다.",
+   "Yeongeunn: 청크 겹침은 경계 문맥 손실을 줄이지만 저장량·임베딩 계산량·중복 검색을 늘린다.",
+   "dldusgh318: `text`에 헤딩 경로를 붙이는 방식은 Contextual Retrieval의 저비용 대안으로 설명된다.",
+   "kdyann: RAPTOR는 문서 전체 주제나 여러 부분을 연결하는 질문에 약한 일반 RAG를 보완한다.",
+   "sese2204: 리랭커는 bi-encoder 회수 뒤 cross-encoder 재정렬하는 표준 패턴이며, recall@100과 recall@5의 격차로 도입 여지를 본다.",
+   "ur2e: 전체 평균에서는 heading 청킹이 가장 좋았지만, 질문 유형별로는 최적 청크가 달랐다."
+  ],
+  "size": 44,
+  "members": [
+   "sese2204",
+   "Yeongeunn",
+   "kdyann",
+   "ur2e",
+   "do-dop",
+   "lys0611",
+   "kungbi",
+   "dldusgh318",
+   "e0ng"
+  ],
+  "entities": [
+   "청킹",
+   "리랭커"
+  ]
+ },
+ {
+  "id": "C9",
+  "title": "쿼리 재작성과 에이전틱 검색",
+  "summary": "이 묶음은 쿼리 재작성, 쿼리 분해, HyDE, 에이전틱 RAG/검색이 검색 품질과 추론을 어떻게 바꾸는지 다뤘다. 멤버들은 멀티홉·멀티턴 질문에서 재질의와 분해가 일부 도움이 되지만, 비용과 지연이 늘고 오류 전파나 잘못된 경로 선택은 여전히 남는다는 점을 확인했다. 특히 브릿지를 숨긴 질문, 정답 없는 질문, 엔티티 혼동, 조각 연결 실패에서 성능이 갈렸고, 그래프 도구를 붙여도 항상 좋아지지는 않았다. 전반적으로 단순 파이프라인보다 더 정교한 모듈 조합이 필요하지만, 모든 질문에 무조건 적용할 만한 만능 해법은 아니라는 결론으로 모였다.",
+  "key_points": [
+   "Yeongeunn: 이번 실습은 대화 UI나 에이전트 프레임워크가 필수가 아닌 단발성 RAG 구조였다.",
+   "dldusgh318: 브릿지 이름을 숨긴 질문에서는 Retrieval과 Composition 실패가 관찰됐고, Agentic Search는 일부 Multi-hop 질문만 해결했다.",
+   "do-dop: 쿼리 분해는 같은 문서 안에 흩어진 멀티홉 질문에서 근거를 모아 정답을 바로 냈지만, 정답 없는 질문에서는 과잉 확신을 막지 못했다.",
+   "do-dop: 에이전틱 검색은 정답 문서를 찾아도 두 문서를 이어붙이는 추론과 오류 전파를 완전히 해결하지 못했다.",
+   "kdyann: Advanced RAG와 Modular RAG는 문서 정제, 의미 단위 청킹, 메타데이터, 쿼리 재작성/분해, 하이브리드 검색, 리랭킹 등으로 검색 전후 품질을 세밀하게 개선한다.",
+   "sese2204: 에이전틱 RAG는 쿼리당 비용과 지연이 크게 늘고, 회수율이 이미 충분하면 쿼리 재작성은 순손해가 될 수 있다."
+  ],
+  "size": 42,
+  "members": [
+   "do-dop",
+   "sunghyun",
+   "sese2204",
+   "dldusgh318",
+   "kdyann",
+   "Yeongeunn",
+   "yujeong430"
+  ],
+  "entities": [
+   "쿼리 재작성",
+   "에이전틱 검색"
+  ]
+ },
+ {
+  "id": "C10",
+  "title": "TF-IDF와 BM25 핵심 정리",
+  "summary": "이 묶음은 TF-IDF가 문서 내 자주 나오고 전체 말뭉치에서는 드문 term에 더 큰 가중치를 주어 관련도를 계산하는 방식임을 다뤘다. 멤버들은 단순 TF-IDF가 반복 등장과 긴 문서에 의해 점수가 부풀려질 수 있어 sublinear TF scaling과 문서 길이 정규화가 필요하다는 점을 확인했다. 또한 BM25가 TF 포화와 길이 보정을 더해 TF-IDF의 한계를 완화하며, Elasticsearch text 필드의 기본 유사도 함수라는 점도 정리됐다. 한편 Yeongeunn은 Sentence-BERT가 문장 검색에 더 적합한 임베딩을 학습한다는 점을 언급했지만, 이 커뮤니티의 중심 논점은 TF-IDF와 BM25의 점수화 특성과 함정이었다.",
+  "key_points": [
+   "do-dop: TF-IDF는 문서 안에서 자주 나오고 전체 문서 집합에서는 희귀한 term에 더 큰 가중치를 주어 관련도 점수로 정렬한다.",
+   "e0ng: TF-IDF는 한 문서에서 자주 등장하지만 전체 문서에서는 드문 토큰을 그 문서의 중요한 키워드로 본다.",
+   "do-dop: 단순 TF-IDF는 term이 과도하게 반복되면 점수가 지나치게 커질 수 있어 sublinear TF scaling 같은 완화가 필요하다.",
+   "do-dop: 긴 문서는 같은 term이 우연히 더 많이 등장해 TF-IDF 점수가 부풀려질 수 있어 문서 길이 정규화가 필요하다.",
+   "kdyann: BM25는 TF-IDF에 단어 빈도 포화와 문서 길이 정규화를 더한 확률적 순위 함수다.",
+   "yujeong430: BM25는 TF 증가를 포화시키고 문서 길이를 보정해 TF-IDF의 한계를 완화하며, Elasticsearch text 필드의 기본 유사도 함수다."
+  ],
+  "size": 9,
+  "members": [
+   "do-dop",
+   "e0ng",
+   "Yeongeunn",
+   "kdyann",
+   "yujeong430"
+  ],
+  "entities": [
+   "TF-IDF"
+  ]
+ },
+ {
+  "id": "C11",
+  "title": "로컬 임베딩 모델 선택",
+  "summary": "이 묶음은 로컬 임베딩 옵션으로 KURE-v1과 bge-m3를 검토한 내용이다. 멤버들은 KURE가 bge-m3의 한국어 파인튜닝이라고 적혀 있는 점을 확인했고, 로컬 설정에서 두 모델을 후보로 두었다. 또한 bge-m3처럼 한 모델에서 dense, sparse, 멀티벡터를 동시에 뽑는 방식이 하이브리드 구현을 단순화한다는 점이 확인되었다. 다만 이 커뮤니티 안에서는 두 모델의 우열을 직접 가르기보다는, 로컬 사용성과 하이브리드 구성 단순화 관점이 중심이었다.",
+  "key_points": [
+   "lys0611: 로컬 임베딩 옵션은 KURE-v1 또는 bge-m3이며, KURE는 bge-m3 한국어 파인튜닝이라고 적혀 있다.",
+   "lys0611: openai 기본값, gemini는 768·1536·3072, local은 KURE-v1 또는 bge-m3 / 1024로 정리됐다.",
+   "sese2204: BGE-M3처럼 한 모델에서 dense, sparse, 멀티벡터를 동시에 뽑는 선택지는 하이브리드 구현을 단순화한다.",
+   "sese2204: dense / sparse / 멀티벡터를 한 모델에서 동시에 뽑는 점이 핵심이다."
+  ],
+  "size": 4,
+  "members": [
+   "lys0611",
+   "sese2204"
+  ],
+  "entities": [
+   "bge-m3",
+   "KURE"
+  ]
+ }
+]

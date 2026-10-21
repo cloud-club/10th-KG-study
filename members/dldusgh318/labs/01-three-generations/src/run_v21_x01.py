@@ -14,7 +14,7 @@ import yaml
 
 import agent
 import graph_retriever as graph
-from common import LAB, PG_DSN, PG_TABLE, load_chunks_by_id
+from common import LAB, PG_DSN, PG_TABLE, load_chunks_by_id, active_vector_table
 from gen2_pgvector import embedder
 from hybrid_search import hybrid_search
 from run_v1_w6 import recall, settings
@@ -29,7 +29,7 @@ def rank_candidates(question, ids, corpus):
         register_vector(conn)
         rows = conn.execute(sql.SQL('''SELECT id, 1-(embedding <=> %s) AS similarity, text
             FROM {} WHERE id=ANY(%s) AND embedding IS NOT NULL
-            ORDER BY embedding <=> %s, id''').format(sql.Identifier(PG_TABLE)),
+            ORDER BY embedding <=> %s, id''').format(sql.Identifier(*active_vector_table().split('.'))),
             (vector, ids, vector)).fetchall()
     if {r[0] for r in rows} != set(ids):
         raise ValueError('회수 후보의 기존 임베딩 누락. 후보를 임의로 추가/제거하지 않음')

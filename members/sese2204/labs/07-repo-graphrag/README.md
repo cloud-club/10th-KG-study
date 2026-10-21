@@ -26,7 +26,8 @@ status: done
 - LLM·임베딩: OpenAI 호환 게이트웨이 하나로 모두 부른다. 루트 `.env`에 `LLM_BASE_URL`·`LLM_API_KEY`를 둔다.
   - **추출 `gpt-5.6-terra`**(추론 모델, effort 기본값 medium). `gpt-5.4-mini`와의 비교는 아래 [추출 모델 비교](#추출-모델-비교--mini-vs-terra)
   - 생성·요약 `gpt-5.4-mini`, 임베딩 `gemini-embedding-2`(3072차원), 채점 `claude-sonnet-5-5`(생성과 다른 계열)
-  - 모델 바꾸기: `GRAPHRAG_EXTRACT_MODEL` · `GRAPHRAG_EXTRACT_EFFORT` · `GRAPHRAG_CHAT_MODEL` · `GRAPHRAG_EMBED_MODEL`
+  - 모델 바꾸기: `GRAPHRAG_EXTRACT_MODEL` · `GRAPHRAG_EXTRACT_EFFORT` · `GRAPHRAG_CHAT_MODEL` · `GRAPHRAG_EMBED_MODEL` · `GRAPHRAG_JUDGE_MODEL`
+  - 모델 이름은 이 게이트웨이 기준이다. 다른 엔드포인트(예: OpenAI 직접)로 돌리면 모델을 바꿔야 하고, 그러면 캐시를 못 써서 답도 우리 결과와 달라진다
 
 ## 실행 방법
 
@@ -50,18 +51,30 @@ python judge_extract.py --n 60 ../outputs/extract.json   # 추출 정확도를 �
 
 ### 다른 곳에서 보기 — `snapshot/`
 
-**LLM 키 없이 그래프만 보기**: Neo4j만 있으면 된다.
+스냅샷에는 그래프, 임베딩(2,669개, float32로 줄여도 값이 같다), 코퍼스·위키 청크, LLM 캐시, 채점 원본(1~6회차)이 들어 있다.
+
+> **`snapshot.py load`는 Neo4j의 기존 데이터를 전부 지운다.** 같은 `docker-compose.yml`의 Neo4j에 자기 실습 그래프를 넣어 두었다면 먼저 백업한다. 데이터가 있으면 멈추고, `--force`를 붙여야 지운다.
+
+**키 없이 그래프 보기**: Neo4j만 있으면 된다.
 
 ```bash
 docker compose up -d neo4j                      # 저장소 루트에서
 cd members/sese2204/labs/07-repo-graphrag
 uv venv -p 3.12 .venv && VIRTUAL_ENV=.venv uv pip install -r requirements.txt
-cd src && python snapshot.py load               # 기존 Neo4j 데이터는 지운다. 노드 3,017 · 관계 12,701 (terra 그래프)
+cd src && python snapshot.py load               # 노드 3,017 · 관계 12,551. 임베딩·입력·캐시는 outputs/ 로 되돌린다
 ```
 
-그다음 Neo4j Browser(http://localhost:7474)에서 `demo.cypher`의 쿼리를 하나씩 실행한다. 스냅샷에는 임베딩이 없어서(약 200MB, GitHub 파일 한도 초과) 벡터 인덱스는 비어 있다. `demo.cypher`는 임베딩을 쓰지 않는다.
+그다음 Neo4j Browser(http://localhost:7474)에서 `demo.cypher`의 쿼리를 하나씩 실행한다.
 
-**키가 있으면 같은 결과로 재빌드**: `cp ../snapshot/cache/*.jsonl ../outputs/` 뒤에 위 실행 순서대로 돌린다. 추출(terra·mini 둘 다)·커뮤니티 요약·Dataset 매핑·답변·채점은 캐시에서 나오고, 임베딩만 새로 부른다(청크 2,048 + 위키 409 + 질문). 채점 원본 1~5회차와 추출 정확도 기록은 `snapshot/results/`에 있다.
+**키 없이 질문 12개 재현**: Elasticsearch도 띄운다(`docker compose up -d elasticsearch`).
+
+```bash
+python embed_index.py --snapshot   # ES(nori BM25 + 벡터) · Neo4j 벡터 인덱스 · 위키 인덱스. 임베딩은 캐시에서 나온다
+python eval.py                     # 질문 12개 × 3방식. 답변·채점 모두 캐시 → snapshot/results/eval_run6.json 과 같다
+python ask.py "질문 12개 중 하나" --show   # 근거까지 보기
+```
+
+`--snapshot`은 스냅샷 당시의 위키 청크를 쓴다. 지금 `wiki/`를 다시 읽으면 위키가 그새 고쳐져 임베딩이 맞지 않는다. 죽은 키(`LLM_API_KEY=invalid`)로 새 clone을 흉내 내 위 순서를 돌려, 답변 36개가 6회차와 글자까지 같은 것을 확인했다. **새 질문**을 던지면 질문 임베딩과 답변 생성을 불러야 해서 키가 필요하다.
 
 스냅샷을 갱신하려면 파이프라인을 돌린 뒤 `python snapshot.py export`.
 
@@ -89,7 +102,8 @@ src/
 ├── eval.py            채점
 ├── qa_report.py       QA.md 생성
 └── snapshot.py        스냅샷 내보내기·불러오기
-snapshot/              graph.json.gz(임베딩 제외 그래프) · cache/(LLM 캐시) · results/(채점·추출 정확도 원본)
+snapshot/              graph.json.gz(그래프) · embeddings.npz(임베딩) · inputs/(코퍼스·위키 청크) · cache/(LLM 캐시) · results/(채점·추출 정확도 원본)
+figures/               qualitative.html(정성평가·그래프 슬라이드 27장) · png/(슬라이드·Neo4j Browser 캡처) · shoot.sh(슬라이드 → PNG)
 QA.md                  질의–답변 원문 (자동 생성)
 demo.cypher            Neo4j Browser 시연용 쿼리
 ```
@@ -102,11 +116,11 @@ demo.cypher            Neo4j Browser 시연용 쿼리
 |---|---|---|
 | 구조 | `(Member)-[:WROTE]->(Document)-[:HAS_CHUNK]->(Chunk)`, `TAGGED→Tag`, `IN_WEEK→Week` (Member 14 · Document 187 · Chunk 2,048 · Tag 156) | 파서 (결정적) |
 | 사전 | `Technique` 46 · `Tool` 18, `PART_OF` 17, `(Chunk)-[:MENTIONS]->` 5,562 | 사람이 정한 사전 + 별칭 매칭 (결정적) |
-| 의미 | `Finding` 225 (`kind`: measured 197 / cited 28), `Pitfall` 223, `Dataset` 9 · `ABOUT` 426 · `COMPARED_WITH {outcome}` 100 · `ON_DATA` 86 · `OCCURS_IN` 413 · `MITIGATED_BY` 83 · `EVIDENCED_BY→Chunk` 448 | LLM 추출(terra) + 검증 |
+| 의미 | `Finding` 225 (`kind`: measured 197 / cited 28), `Pitfall` 223, `Dataset` 9 · `ABOUT` 356 · `COMPARED_WITH {outcome}` 86 · `ON_DATA` 86 · `OCCURS_IN` 355 · `MITIGATED_BY` 75 · `EVIDENCED_BY→Chunk` 448 | LLM 추출(terra) + 검증 |
 | 커뮤니티 | `Community` 12 (요약 대상), `IN_COMMUNITY` 493 | Leiden + LLM 요약 |
 | 위키 (v3 전용) | `WikiPage` 53 · `LINKS_TO` 585 · `CITES→Document` 582 · `Contradiction` 20 | 파서 |
 
-전체 노드 3,017개, 관계 1만 2,701개 (`main` `162b822` 기준).
+전체 노드 3,017개, 관계 1만 2,551개 (`main` `162b822` 기준, 6회차).
 
 - **누가 확인했는지는 LLM에 묻지 않는다.** `Finding`→`Chunk`→`Document`→`Member` 경로로 정해진다. `(Member)-[:REPORTED]->(Finding)`은 그 경로를 접어 둔 파생 관계다.
 - **"측정했다"와 "정리했다"를 구분한다.** 위키 규칙(CLAUDE.md)을 그대로 스키마에 옮겨 `Finding.kind`(measured·cited)로 둔다.
@@ -152,7 +166,7 @@ demo.cypher            Neo4j Browser 시연용 쿼리
 
 ## 결과
 
-질문 12개(6주차 분류: 단일 사실 · 교차 멤버 · 멀티홉 · 집계 · 글로벌 · 모순 · 근거 없음). gold는 원문과 대조해 사람이 확정했다(`questions.yaml`의 `gold_source`). **답변 원문은 [`QA.md`](QA.md)(5회차)에 있다.**
+질문 12개(6주차 분류: 단일 사실 · 교차 멤버 · 멀티홉 · 집계 · 글로벌 · 모순 · 근거 없음). gold는 원문과 대조해 사람이 확정했다(`questions.yaml`의 `gold_source`). **답변 원문은 [`QA.md`](QA.md)(6회차)에 있다.**
 
 ### 점수 — 참고만 한다
 
@@ -163,14 +177,17 @@ demo.cypher            Neo4j Browser 시연용 쿼리
 | 3 | + terra 추출 | 6.5 | 8.0 | 6.5 |
 | 4 | + v3 이웃 동점 순서 고정 | 6.5 | 8.0 | 6.5 |
 | 5 | + PR #45 머지(문서 177 → 187, 자기 문서 제외), Q07 gold 갱신 | 5.0 | 7.0 | 6.0 |
+| 6 | + 적재 버그 수정(관계 150개 제거), 행 순서 고정 | 5.0 | 7.0 | 6.0 |
 
 correct 1 · partial 0.5. 판정은 각 회차 1회.
 
 **점수 차이는 노이즈와 구별되지 않는다.** 3회차에 v3는 코드도 데이터도 그대로인데 7.5에서 6.5로 떨어졌다. v1 답은 12개가 모두 2회차와 같았는데, v3 답은 12개가 모두 달랐다. v3가 쓰는 위키링크 이웃 쿼리에 동점 순서가 정해져 있지 않아서, DB를 스냅샷에서 다시 불러오며 컨텍스트가 바뀐 것으로 보인다. 4회차에 이름순으로 고정한 뒤에는 두 번 돌려 같은 점수가 나왔다. 아무것도 바꾸지 않아도 1점이 흔들리는 셈이니, 질문 12개로 0.5~1점 차이를 말할 수 없다.
 
+6회차는 적재 버그(아래 함정)를 고친 뒤 다시 채점했다. 판정 36개가 5회차와 모두 같고, 답 문장은 v2의 Q06·Q11·Q12 세 개만 바뀌었다.
+
 5회차에 세 방식이 함께 내려간 것은 노이즈가 아니라 **데이터가 늘어서 생긴 실제 퇴행**이다(아래 Q01). 1~4회차의 Q07 gold(dldusgh318 10)는 새 코퍼스에서 17로 바뀌어 갱신했다. 그래서 아래 정성 관찰과 추출 정확도 지표를 본다.
 
-### 정성 관찰 (5회차 답변 기준, [`QA.md`](QA.md))
+### 정성 관찰 (5·6회차 답변 기준, [`QA.md`](QA.md))
 
 | 질문 유형 | 관찰 |
 |---|---|
@@ -202,6 +219,8 @@ correct 1 · partial 0.5. 판정은 각 회차 1회.
 - **v3는 공정한 경쟁자가 아니다.** 위키는 같은 노트를 읽고 LLM이 합성한 결과이고, 일부 gold의 출처(Q03·Q04·Q11)가 위키 자체다. v3가 잘했다는 결과는 "미리 합성해 둔 질문에는 답이 있다"는 뜻이지 검색 성능이 아니다.
 - **gold도 판단이다.** Q03의 do-dop처럼 gold가 경계를 좁게 잡은 곳이 있고, Q04처럼 결과가 섞인 멤버를 한쪽으로 분류한 곳이 있다. 심판은 그 gold로만 채점한다.
 - **Dataset 정규화가 처음에 틀렸다.** "lab 노트"·"개인 노트"처럼 데이터 종류를 특정할 수 없는 표현 42개가 전부 `옵시디언 노트`로 묶였다. 정규화 프롬프트에 "출처가 명시된 경우만" 규칙을 넣어 null로 돌렸다. LLM 정규화는 `outputs/datasets.json`을 사람이 한 번 봐야 한다.
+- **라벨 없이 이름으로 MERGE하면 같은 이름의 다른 층 노드에 붙는다.** `MERGE (t {name: e})`가 기법 `GraphRAG`뿐 아니라 위키 페이지 `GraphRAG`, 태그 `grep` 같은 노드 11개에도 관계를 걸어 관계 150개가 더 생겼다. v3 전용이어야 할 위키 층에 v2 관계가 닿은 셈이다. 검색 쿼리는 라벨로 걸러서 답은 같았지만, `db.schema.visualization()`에 Finding→WikiPage 선이 보여 알았다. 6회차에 라벨로 MATCH하도록 고쳤다.
+- **Neo4j 행 순서는 저장 순서다.** `ORDER BY` 없는 쿼리와 `collect()` 목록은 DB를 스냅샷에서 다시 불러오면 순서가 바뀐다. 순서가 바뀌면 프롬프트가 바뀌고, 답도 캐시도 달라진다(Q06·Q11·Q12 v2). 로컬 서치 쿼리에 `ORDER BY`를 넣고, Text2Cypher 결과는 문자열 목록을 정렬해서 넘긴다.
 - **evidence 검증은 문자열 일치만 본다.** 근거 문구가 원문에 있어도 승패 방향이나 단위(문항 하나 vs 평균)까지 맞는다는 보장은 없다. 그래서 원문 대조 채점(`judge_extract.py`)을 따로 둔다.
 - **민감 정보:** 노트에는 개인 문서 제목 같은 것이 섞여 있다. 추출 프롬프트가 데이터를 유형으로만 적게 하지만, Finding의 `evidence`·`value`에는 원문이 그대로 들어간다. 원문은 이미 공개 저장소에 있는 멤버 노트이고, 이 README에는 옮기지 않았다.
 

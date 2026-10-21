@@ -3,7 +3,7 @@
 질문 12개는 정답률을 비교하기엔 적다. 그래서 세 방식의 답변 원문을 질문별로 나란히 놓고 사람이 읽는다.
 심판 판정은 참고로만 접어 둔다.
 
-실행: python qa_report.py [eval 파일 이름]   (기본 eval_run5.json — outputs/ 에 없으면 snapshot/results/ 에서 찾는다)
+실행: python qa_report.py [eval 파일 이름]   (기본 eval_run6.json — outputs/ 에 없으면 snapshot/results/ 에서 찾는다)
 """
 import json
 import sys
@@ -84,5 +84,5 @@ def main(path):
 
 
 if __name__ == "__main__":
-    name = sys.argv[1] if len(sys.argv) > 1 else "eval_run5.json"
+    name = sys.argv[1] if len(sys.argv) > 1 else "eval_run6.json"
     main(next(p for p in (OUT / name, LAB / "snapshot/results" / name) if p.exists()))

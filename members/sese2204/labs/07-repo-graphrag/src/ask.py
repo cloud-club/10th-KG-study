@@ -142,6 +142,16 @@ def run_read(cypher, params=None):
         return s.run(cypher, params or {}, timeout=15).data()
 
 
+def stable_rows(cy, rows):
+    """행 순서·collect() 목록 순서는 저장 순서를 따라서, DB 를 스냅샷에서 다시 불러오면 바뀐다.
+    프롬프트가 바뀌면 답이 달라지므로 문자열 목록은 정렬하고, ORDER BY 가 없으면 행도 정렬한다."""
+    rows = [{k: sorted(v) if isinstance(v, list) and all(isinstance(x, str) for x in v) else v for k, v in r.items()}
+            for r in rows]
+    if not re.search(r"\bORDER\s+BY\b", cy, re.I):
+        rows.sort(key=lambda r: json.dumps(r, ensure_ascii=False, sort_keys=True))
+    return rows
+
+
 def text2cypher(q):
     msgs = [{"role": "system", "content": T2C_SYS}, {"role": "user", "content": q}]
     trace = []
@@ -179,6 +189,7 @@ RETURN DISTINCT labels(x)[0] AS type, x.id AS id, m.id AS member, d.path AS path
        coalesce(x.claim, x.name + ': ' + x.description) AS fact, x.kind AS kind, x.metric AS metric, x.value AS value,
        x.condition AS condition, x.mitigation AS mitigation, ds.name AS dataset,
        collect(DISTINCT o.name + '(' + cw.outcome + ')') AS vs, collect(DISTINCT e.name) AS via
+ORDER BY id
 """
 
 
@@ -192,6 +203,8 @@ def v2_local(q, show=False):
     # 질문에 나온 엔티티 우선, 없으면 진입 청크에서 자주 나온 비허브 엔티티 3개
     ents = q_ents or [e for e, _ in sorted(chunk_ents.items(), key=lambda x: -x[1]) if e not in HUBS][:3]
     facts = run_read(LOCAL_Q, {"ents": ents}) if ents else []
+    for f in facts:  # collect() 순서도 저장 순서를 따른다
+        f["vs"], f["via"] = sorted(f["vs"]), sorted(f["via"])
     # 질문 이름에 멤버 id 가 있으면 그 멤버의 사실로 좁힌다
     member_ids = {r["member"] for r in facts}
     named = [m for m in member_ids if re.search(rf"\b{re.escape(m)}\b", q, re.I)]
@@ -223,6 +236,7 @@ def v2_aggregate(q, show=False):
         # 0행은 '없음'이 아니다(6주차 sunghyun) — 같은 질문을 로컬 서치로 다시 찾는다
         res = v2_local(q, show)
         return dict(res, mode="v2/aggregate→local", cypher=cy, rows=0, trace=trace)
+    rows = stable_rows(cy, rows)
     blocks = [f"[G1] Cypher: {cy}\n가정: {assumption}\n결과 {len(rows)}행:\n" + json.dumps(rows[:50], ensure_ascii=False)]
     return {"mode": "v2/aggregate", "cypher": cy, "rows": len(rows), "answer": answer(q, blocks),
             "context": blocks if show else f"{len(rows)} rows", "trace": trace}

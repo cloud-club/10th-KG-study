@@ -8,3 +8,6 @@ streamlit>=1.40,<2
 rdflib>=7.1,<8
 Unidecode>=1.3,<2
 neo4j>=6,<7
+
+# 개인 지식그래프 MCP 서버 (로컬 stdio)
+mcp>=1.10,<2

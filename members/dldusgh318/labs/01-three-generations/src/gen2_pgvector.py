@@ -19,7 +19,7 @@ import sys
 import psycopg
 from pgvector.psycopg import register_vector
 
-from common import CHUNKS, EMBED_DIM, EMBED_MODEL, PG_DSN, PG_TABLE
+from common import CHUNKS, EMBED_DIM, EMBED_MODEL, PG_DSN, PG_TABLE, active_vector_table, canonical_search_result
 
 DDL = f"""
 DROP TABLE IF EXISTS {PG_TABLE};
@@ -127,16 +127,16 @@ def search_vector(query: str, limit: int = 50) -> list[dict]:
         cur.execute(f"SET hnsw.ef_search = {EF_SEARCH}")
         cur.execute(
             f"SELECT id, source, title, heading, text,"
-            f" 1 - (embedding <=> %s) AS score FROM {PG_TABLE}"
+            f" 1 - (embedding <=> %s) AS score FROM {active_vector_table()}"
             " ORDER BY embedding <=> %s LIMIT %s",
             (vec, vec, limit),
         )
         return [
-            {
+            canonical_search_result({
                 "id": row[0], "rank": rank, "source": row[1],
                 "title": row[2], "heading": row[3] or "", "text": row[4],
                 "score": float(row[5]),
-            }
+            })
             for rank, row in enumerate(cur.fetchall(), start=1)
         ]
 

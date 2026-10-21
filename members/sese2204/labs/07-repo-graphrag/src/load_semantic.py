@@ -83,6 +83,12 @@ def main():
         findings.append(f)
     pitfalls = [dict(p, id=fid("P", p)) for p in ext["pitfalls"]]
 
+    # 엔티티는 라벨로 MATCH 한다. 라벨 없이 이름으로 MERGE 하면 같은 이름의 Tag·WikiPage 에도 관계가 붙는다
+    known = {n for d in ENTS.values() for n in d}
+    used = [e for f in findings for e in f["about"] + [cw["entity"] for cw in f["compared_with"]]]
+    used += [e for p in pitfalls for e in p["occurs_in"] + (p.get("mitigated_by") or [])]
+    leaked = len({e for e in used if e not in known})
+
     with neo4j_driver() as drv, drv.session() as s:
         s.run("MATCH (n) WHERE n:Technique OR n:Tool OR n:Finding OR n:Pitfall OR n:Dataset DETACH DELETE n")
         for label in ("Technique", "Tool", "Finding", "Pitfall", "Dataset"):
@@ -112,8 +118,12 @@ def main():
                                claim: f.claim, evidence: f.evidence, dataset_raw: f.dataset})
             CREATE (x)-[:EVIDENCED_BY]->(c)
             CREATE (m)-[:REPORTED]->(x)
-            FOREACH (e IN f.about | MERGE (t {name: e}) MERGE (x)-[:ABOUT]->(t))
-            FOREACH (cw IN f.compared_with | MERGE (t {name: cw.entity}) MERGE (x)-[:COMPARED_WITH {outcome: cw.outcome}]->(t))
+            WITH x, f
+            CALL (x, f) { UNWIND f.about AS e
+                   MATCH (t {name: e}) WHERE t:Technique OR t:Tool MERGE (x)-[:ABOUT]->(t) }
+            CALL (x, f) { UNWIND f.compared_with AS cw
+                   MATCH (t {name: cw.entity}) WHERE t:Technique OR t:Tool
+                   MERGE (x)-[:COMPARED_WITH {outcome: cw.outcome}]->(t) }
             FOREACH (_ IN CASE WHEN f.dataset_type IS NULL THEN [] ELSE [1] END |
                 MERGE (ds:Dataset {name: f.dataset_type}) MERGE (x)-[:ON_DATA]->(ds))
             """,
@@ -127,13 +137,14 @@ def main():
                                evidence: p.evidence})
             CREATE (x)-[:EVIDENCED_BY]->(c)
             CREATE (m)-[:HIT]->(x)
-            FOREACH (e IN p.occurs_in | MERGE (t {name: e}) MERGE (x)-[:OCCURS_IN]->(t))
-            FOREACH (e IN coalesce(p.mitigated_by, []) | MERGE (t {name: e}) MERGE (x)-[:MITIGATED_BY]->(t))
+            WITH x, p
+            CALL (x, p) { UNWIND p.occurs_in AS e
+                   MATCH (t {name: e}) WHERE t:Technique OR t:Tool MERGE (x)-[:OCCURS_IN]->(t) }
+            CALL (x, p) { UNWIND coalesce(p.mitigated_by, []) AS e
+                   MATCH (t {name: e}) WHERE t:Technique OR t:Tool MERGE (x)-[:MITIGATED_BY]->(t) }
             """,
             rows=pitfalls,
         )
-        # MERGE (t {name: e}) 가 라벨 없는 노드를 만들었다면 사전 밖 이름이 새어 들어온 것 — 0 이어야 한다
-        leaked = s.run("MATCH (n) WHERE size(labels(n)) = 0 RETURN count(n) AS n").single()["n"]
         counts = s.run(
             "MATCH (n) WHERE n:Technique OR n:Tool OR n:Finding OR n:Pitfall OR n:Dataset "
             "RETURN labels(n)[0] AS k, count(*) AS c ORDER BY k"
@@ -144,7 +155,7 @@ def main():
         ).data()
     for row in counts + rels:
         print(f"{row['k']:>14} {row['c']}")
-    print("unlabeled (사전 밖 누수):", leaked)
+    print("사전 밖 이름 (적재 안 됨):", leaked)
 
 
 if __name__ == "__main__":

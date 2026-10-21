@@ -7,6 +7,7 @@
 """
 import argparse
 import json
+import os
 import time
 
 import yaml
@@ -14,7 +15,7 @@ import yaml
 from ask import chat, loads_json, v1, v2, v3
 from common import LAB, OUT
 
-JUDGE_MODEL = "claude-sonnet-5-5"
+JUDGE_MODEL = os.getenv("GRAPHRAG_JUDGE_MODEL", "claude-sonnet-5-5")
 JUDGE_SYS = """너는 채점자다. 질문, 정답(gold), 시스템 답을 보고 판정한다. JSON 으로만:
 {"verdict": "correct|partial|wrong", "unsupported": true|false, "reason": "<한두 문장>"}
 - correct: gold 의 핵심(사람·수치·결론)을 빠짐없이 맞혔다. 목록형은 gold 항목을 모두(또는 gold 가 허용한 기준 이상) 맞혔다.

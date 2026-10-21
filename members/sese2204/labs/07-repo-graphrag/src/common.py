@@ -68,7 +68,6 @@ class JsonCache:
 def embed(texts, cache=None, batch=32):
     """gemini-embedding-2 로 임베딩. 캐시에 있으면 호출하지 않는다."""
     cache = cache or JsonCache("embeddings")
-    client = llm()
     out = [None] * len(texts)
     todo = []
     for i, t in enumerate(texts):
@@ -77,6 +76,7 @@ def embed(texts, cache=None, batch=32):
             todo.append(i)
         else:
             out[i] = hit
+    client = llm() if todo else None  # 캐시만으로 끝나면 키가 없어도 돈다 (스냅샷 임베딩)
     for s in range(0, len(todo), batch):
         idx = todo[s : s + batch]
         resp = client.embeddings.create(model=EMBED_MODEL, input=[texts[i] for i in idx])

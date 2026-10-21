@@ -83,18 +83,27 @@ def main():
         print("neo4j chunks with embedding", s.run("MATCH (c:Chunk) WHERE c.embedding IS NOT NULL RETURN count(c) AS n").single()["n"])
 
 
-def index_wiki():
-    """v3 용 — 위키 페이지를 같은 방식으로 청킹해 별도 인덱스(wiki_chunks)에. v1·v2 는 이 인덱스를 읽지 않는다."""
+def wiki_rows(from_snapshot=False):
+    """위키 페이지를 코퍼스와 같은 방식으로 청킹한다. 스냅샷에서 불러왔으면 그때의 청크를 그대로 쓴다
+    (위키는 계속 고쳐지므로, 지금 wiki/ 를 다시 읽으면 스냅샷 임베딩과 맞지 않는다)."""
     from corpus import chunk, parse_frontmatter
     from common import REPO
 
-    pages = json.loads((OUT / "wiki.json").read_text())
+    if from_snapshot:
+        return json.loads((OUT / "wiki_chunks.json").read_text())
     rows = []
-    for p in pages:
+    for p in json.loads((OUT / "wiki.json").read_text()):
         fm, body = parse_frontmatter((REPO / p["path"]).read_text())
         body = body.split("\n## 출처")[0]  # 출처 목록은 검색 대상에서 뺀다
         for i, (h, t) in enumerate(chunk(body)):
             rows.append({"id": f"{p['name']}#{i}", "page": p["name"], "title": p["title"], "heading": h, "text": t})
+    (OUT / "wiki_chunks.json").write_text(json.dumps(rows, ensure_ascii=False))
+    return rows
+
+
+def index_wiki(from_snapshot=False):
+    """v3 용 — 위키 청크를 별도 인덱스(wiki_chunks)에. v1·v2 는 이 인덱스를 읽지 않는다."""
+    rows = wiki_rows(from_snapshot)
     vecs = embed([f"{r['title']} / {r['heading']}\n{r['text']}" for r in rows])
     client = es()
     client.indices.delete(index=WIKI_INDEX, ignore_unavailable=True)
@@ -108,6 +117,7 @@ def index_wiki():
 if __name__ == "__main__":
     import sys
 
+    # --snapshot: snapshot.py load 로 되돌린 위키 청크를 쓴다 (키 없이 스냅샷 임베딩으로 인덱스를 만들 때)
     if "--wiki" not in sys.argv:
         main()
-    index_wiki()
+    index_wiki(from_snapshot="--snapshot" in sys.argv)

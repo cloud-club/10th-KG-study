@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "my-kg": {
+      "type": "stdio",
+      "command": ".venv/bin/python",
+      "args": ["src/mcp_server.py"],
+      "env": {}
+    }
+  }
+}

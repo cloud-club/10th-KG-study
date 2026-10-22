@@ -1,0 +1,260 @@
+node.Concept {
+  color: #bbbf54;
+  size: 25px;
+}
+
+node.Evidence {
+  color: #f2a866;
+  size: 25px;
+}
+
+node.Assertion {
+  color: #98bdff;
+  size: 25px;
+}
+
+node.InterestArea {
+  color: #8DCC93;
+  size: 66px;
+  caption: "{display_name}";
+}
+
+node.Profile {
+  color: #FFC454;
+  size: 60px;
+  caption: "{display_name}";
+}
+
+node.ReferencePost {
+  color: #bf98a7;
+  size: 25px;
+}
+
+node.OwnPost {
+  color: #4C8EDA;
+  size: 54px;
+  caption: "{post_number}";
+}
+
+node.Feature {
+  color: #fcc0df;
+  size: 25px;
+}
+
+node.Project {
+  color: #40e3f1;
+  size: 25px;
+}
+
+node.Topic {
+  color: #ffd3d7;
+  size: 25px;
+}
+
+node.Post {
+  color: #4C8EDA;
+  size: 54px;
+  caption: "{display_name}";
+}
+
+node.W5InterestArea {
+  color: #c2c8ff;
+  size: 25px;
+}
+
+node.W5Profile {
+  color: #ebc0a8;
+  size: 25px;
+}
+
+node.W5Evidence {
+  color: #ff9a6c;
+  size: 25px;
+}
+
+node.W5Assertion {
+  color: #ffc2f5;
+  size: 25px;
+}
+
+node.W5Entity {
+  color: #a2eb91;
+  size: 25px;
+}
+
+node.W5Topic {
+  color: #8fdca4;
+  size: 25px;
+  caption: "{name}";
+}
+
+node.W5Post {
+  color: #f2a26a;
+  size: 25px;
+}
+
+node.W5Project {
+  color: #e6bcb2;
+  size: 25px;
+}
+
+node.W5Feature {
+  color: #c4a984;
+  size: 25px;
+}
+
+node.W5OwnPost {
+  color: #a4b330;
+  size: 25px;
+}
+
+node.W5ReferencePost {
+  color: #eebd3a;
+  size: 25px;
+}
+
+relationship.SUBJECT {
+  width: 1px;
+}
+
+relationship.W5_FACT {
+  width: 1px;
+}
+
+relationship.OBJECT {
+  width: 1px;
+}
+
+relationship.SUPPORTS {
+  width: 1px;
+}
+
+relationship.SOURCE_POST {
+  width: 1px;
+}
+
+relationship.COVERS_TOPIC {
+  width: 1px;
+}
+
+relationship.DESCRIBES_PROJECT {
+  width: 1px;
+}
+
+relationship.DESCRIBES_FEATURE {
+  width: 1px;
+}
+
+relationship.HAS_FEATURE {
+  width: 1px;
+}
+
+relationship.INTERESTED_IN {
+  width: 1px;
+}
+
+relationship.IN_AREA {
+  width: 1px;
+}
+
+relationship.PUBLISHED {
+  width: 1px;
+}
+
+node.AnalyticsDesign {
+  color: #7AB8CC;
+  diameter: 70px;
+  caption: "{display_name}";
+}
+
+node.AnalystAgent {
+  color: #8A67D6;
+  diameter: 100px;
+  caption: "{display_name}";
+}
+
+node.DataTool {
+  color: #64B5F6;
+  diameter: 80px;
+  caption: "{display_name}";
+}
+
+node.MetricDefinition {
+  color: #F5C76C;
+  diameter: 65px;
+  caption: "{display_name}";
+}
+
+node.AnalysisRule {
+  color: #E998B2;
+  diameter: 75px;
+  caption: "{display_name}";
+}
+
+node.Workflow {
+  color: #7BCBA5;
+  diameter: 80px;
+  caption: "{display_name}";
+}
+
+node.ReportDesign {
+  color: #BCA7DF;
+  diameter: 80px;
+  caption: "{display_name}";
+}
+
+node.DataRequirement {
+  color: #EDAA75;
+  diameter: 80px;
+  caption: "{display_name}";
+}
+
+relationship.PLANS_ANALYTICS_ASSISTANT {
+  caption: "분석 설계";
+}
+
+relationship.PLANS_TO_QUERY {
+  caption: "조회 계획";
+}
+
+relationship.PLANS_TO_TRACK {
+  caption: "지표 정의";
+}
+
+relationship.PLANS_TO_RUN {
+  caption: "실행 계획";
+}
+
+relationship.PLANS_TO_PRODUCE {
+  caption: "보고서 계획";
+}
+
+relationship.PLANS_TO_USE {
+  caption: "사용 계획";
+}
+
+relationship.PLANS_TO_READ_FROM {
+  caption: "출처 후보";
+}
+
+relationship.REQUIRES_SOURCE {
+  caption: "출처 확인 필요";
+}
+
+relationship.PLANS_TO_ENFORCE {
+  caption: "분석 규칙";
+}
+
+node.Workspace {
+  color: #476B91;
+  diameter: 110px;
+  caption: "{display_name}";
+}
+
+relationship.HAS_ACCOUNT {
+  caption: "계정";
+}
+
+relationship.HAS_PROJECT {
+  caption: "프로젝트";
+}

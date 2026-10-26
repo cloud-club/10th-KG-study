@@ -17,7 +17,7 @@ import sys
 
 from elasticsearch import Elasticsearch, helpers
 
-from common import CHUNKS, ES_INDEX, ES_URL
+from common import CHUNKS, ES_INDEX, ES_URL, canonical_search_result
 
 SETTINGS = {
     "settings": {
@@ -161,7 +161,7 @@ def search_bm25(query: str, limit: int = 50) -> list[dict]:
     """Nori 기반 BM25 결과를 W3 공통 형식으로 반환한다."""
     hits, _total, _took = search(query, limit=limit, field="text")
     return [
-        {
+        canonical_search_result({
             "id": hit["_id"],
             "rank": rank,
             "score": float(hit["_score"]),
@@ -169,7 +169,7 @@ def search_bm25(query: str, limit: int = 50) -> list[dict]:
             "source": hit["_source"].get("source", ""),
             "heading": hit["_source"].get("heading", ""),
             "text": hit["_source"].get("text", ""),
-        }
+        })
         for rank, hit in enumerate(hits, start=1)
     ]
 

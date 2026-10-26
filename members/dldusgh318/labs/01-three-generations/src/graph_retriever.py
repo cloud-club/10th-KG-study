@@ -2,22 +2,26 @@
 import hashlib
 import json
 import os
+import re
 
 import psycopg
 from psycopg.rows import dict_row
 
 import agent
-from common import PG_DSN, load_chunks_by_id
+from common import PG_DSN, load_chunks_by_id, active_runtime
 
 RELATIONS = {'partOf', 'usesTechnology', 'replaces'}
 STATUS = {'implemented': '구현됨', 'proposed': '제안만', 'not_implemented': '미구현'}
 
 
 def load_graph():
+    schema = active_runtime().get('graph_schema', 'public')
+    if not re.fullmatch(r'[a-z_][a-z0-9_]*', schema):
+        raise ValueError('잘못된 그래프 스키마 이름')
     with psycopg.connect(os.getenv('POSTGRES_DSN', PG_DSN), row_factory=dict_row) as conn:
         conn.execute('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY')
-        entities = conn.execute('SELECT entity_id,type,label,props FROM entities ORDER BY entity_id').fetchall()
-        edges = conn.execute('SELECT id,subject,predicate,object,chunk_id,evidence FROM edges ORDER BY id').fetchall()
+        entities = conn.execute(f'SELECT entity_id,type,label,props FROM {schema}.entities ORDER BY entity_id').fetchall()
+        edges = conn.execute(f'SELECT id,subject,predicate,object,chunk_id,evidence FROM {schema}.edges ORDER BY id').fetchall()
     return {'entities': entities, 'edges': edges}
 
 
@@ -62,8 +66,8 @@ def expand(graph, seed_chunk_ids):
             'uses': sorted(uses)}
 
 
-def assemble_v2(retrieved, graph, corpus, *, recovery_order=None):
-    trace = expand(graph, {r['id'] for r in retrieved})
+def assemble_v2(retrieved, graph, corpus, *, recovery_order=None, expansion=None):
+    trace = expansion if expansion is not None else expand(graph, {r['id'] for r in retrieved})
     if not trace['seed_nodes']:
         context, mapping, assembly = agent.assemble_context(retrieved)
         return context, mapping, {**trace, 'fallback_v1': True, 'recovered_chunks': [],

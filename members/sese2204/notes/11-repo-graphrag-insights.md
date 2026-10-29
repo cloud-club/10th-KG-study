@@ -64,11 +64,11 @@ flowchart LR
 |---|---|---|---|
 | ① 구조 | Member 14 · Document 187 · Chunk 2,048 · Tag 156 · Week 6 | WROTE · HAS_CHUNK · TAGGED · IN_WEEK | 파서 (결정적) |
 | ② 사전 | Technique 46 · Tool 18 | PART_OF 17 · MENTIONS 5,562 | 사람이 큐레이션한 사전 + 별칭 정규식 (결정적) |
-| ③ 의미 | Finding 225 · Pitfall 223 · Dataset 9 | ABOUT 426 · COMPARED_WITH 100 · ON_DATA 86 · OCCURS_IN 413 · MITIGATED_BY 83 · EVIDENCED_BY 448 | LLM 추출(gpt-5.6-terra) + 검증 |
+| ③ 의미 | Finding 225 · Pitfall 223 · Dataset 9 | ABOUT 356 · COMPARED_WITH 86 · ON_DATA 86 · OCCURS_IN 355 · MITIGATED_BY 75 · EVIDENCED_BY 448 | LLM 추출(gpt-5.6-terra) + 검증 |
 | ④ 커뮤니티 | Community 12 | IN_COMMUNITY 493 | Leiden + LLM 요약 |
 | ⑤ 위키 (v3 전용) | WikiPage 53 · Contradiction 20 | LINKS_TO 585 · CITES 582 · CREDITS · INVOLVES | 파서 |
 
-전체 규모는 노드 3,017개(임베딩 제외), 관계 1만 2,701개다.
+전체 규모는 노드 3,017개(임베딩 제외), 관계 1만 2,551개다(6회차, 적재 버그 수정 후).
 
 #### ① 구조 층 — LLM 없이
 
@@ -235,6 +235,7 @@ flowchart TD
 | 3 | + terra 추출 | 6.5 | 8.0 | 6.5 |
 | 4 | + v3 이웃 동점 순서 고정 | 6.5 | 8.0 | 6.5 |
 | 5 | + PR #45 머지(문서 177 → 187, 자기 문서 제외), Q07 gold 갱신 | 5.0 | 7.0 | 6.0 |
+| 6 | + 적재 버그 수정(관계 150개 제거), 행 순서 고정 | 5.0 | 7.0 | 6.0 |
 
 **3회차에 v3는 아무것도 바꾸지 않았는데 1점이 떨어졌다.** v1 답은 12개가 모두 이전 회차와 같았는데, v3 답은 12개가 모두 달랐다. 위키 이웃 쿼리의 동점 순서가 정해져 있지 않아서, DB를 다시 불러오며 컨텍스트가 바뀐 것으로 보인다. 그러니 0.5~1점 차이로는 아무것도 말할 수 없다. 반대로 **5회차에 세 방식이 함께 내려간 것은 노이즈가 아니라 데이터가 늘어서 생긴 실제 퇴행**이었다(Q01). 그래서 [`QA.md`](../labs/07-repo-graphrag/QA.md)(5회차)의 답변 원문을 질문별로 읽었다.
 
@@ -279,8 +280,9 @@ flowchart TD
 ```bash
 # 키 없이 그래프만 보기 (저장소 루트에서 docker compose up -d neo4j 후)
 cd members/sese2204/labs/07-repo-graphrag/src
-python snapshot.py load          # 노드 3,017 · 관계 12,701 (terra 그래프)
+python snapshot.py load          # 노드 3,017 · 관계 12,551. 기존 Neo4j 데이터가 있으면 멈춘다(--force 로 지운다)
 # → http://localhost:7474 에서 ../demo.cypher 실행
+python embed_index.py --snapshot && python eval.py   # ES 도 띄우면 질문 12개를 키 없이 재현 (임베딩·답변·채점 캐시)
 
 # 키가 있으면 같은 질문을 세 방식에
 python ask.py "RRF가 BM25나 벡터 단독보다 못했다고 직접 측정한 멤버는?"
